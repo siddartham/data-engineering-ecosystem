@@ -1,8 +1,9 @@
 ## Data Engineering Ecosystem
 
+### Data Engineering Foundational Libraries
 The idea is to have a data engineering ecosystem that is easy to use and maintain. 
 
-An ideal DE ecosystem should enable you to do the following:
+An ideal DE ecosystem should enable y the following:
 1. Develop platform agnostic data pipelines 
    * To avoid Vendor Lock-in and high cost of migration across platforms.
 2. Automated Schema Management across data stores, environments to avoid schema drift
@@ -41,16 +42,43 @@ Thus, we need to have the following packages:
 4. `data-quality-framework` - provides a common framework for data quality checks.
 
 
+Above 4 foundational libraries - that can used by any company, any team to build their own data engineering ecosystem.
 
-Using the above foundational packages, we can build a data engineering ecosystem for a team, to develop ETLs, maintain
-schemas and perform data quality checks:
 
-1. `my-datastore-orm` - This provides an example of how one can use the orm-framework to define the schema of the data across different data stores and environments.
-2. `my-etl-wrapper` - a wrapper over `etl-framework` to provide a common interface for all ETLs over your data stores and file systems.
-3. `sample-etl` - A sample ETL provides an example of how to use the `my-etl-wrapper` to process data
-4. `my-data-quality` - This package provides an example of how to use the data-quality-framework to perform data quality checks
+### Data Store Wide Libraries(i.e org specific libraries)
+Using foundational libraries, we can build team/org specific data engineering ecosystem, for etl configuration and interface management, host schema for the org, data quality management for the org etc.
 
+Above 3 functionalities can be achieved by 3 packages.
+
+1. `my-datastore-orm` - Hosting schema of your data store(using orm-framework base class), across different environments, different data stores(Hive, Delta Lake, Snowflake etc).
+2. `my-datastore-etl-wrapper` - a wrapper over `etl-framework` to provide a common interface for all ETLs over your data stores and file systems.
+3. `my-datastore-data-quality` - This package provides an example of how to use the data-quality-framework to perform data quality checks
+
+
+
+### Example ETL to load objects to Data Store
+1. `sample-etl` - A sample ETL provides an example of how to use the `my-etl-wrapper` to process data
 
 ### Attribute Naming Standards
 `attribute-name-validator` - This package provides a tool for attribute name validation against the naming standards.
 
+
+
+## Current Status
+
+#### Foundational Libraries
+- [x] `file-system-client`
+- [x] `orm-framework`
+- [ ] `etl-framework`
+- [ ] `data-quality-framework`
+
+#### Data Store Wide Libraries
+- [ ] `my-datastore-orm`
+- [ ] `my-datastore-etl-wrapper`
+- [ ] `my-datastore-data-quality`
+
+#### Example ETL to load objects to Data Store
+- [ ] `sample-etl`
+
+#### Attribute Naming Standards
+- [x] `attribute-name-validator`
