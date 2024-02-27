@@ -1,0 +1,56 @@
+## Data Engineering Ecosystem
+
+The idea is to have a data engineering ecosystem that is easy to use and maintain. 
+
+An ideal DE ecosystem should enable you to do the following:
+1. Develop platform agnostic data pipelines 
+   * To avoid Vendor Lock-in and high cost of migration across platforms.
+2. Automated Schema Management across data stores, environments to avoid schema drift
+   * To avoid schema drift across different environments and data stores. 
+3. Automated Data Quality Checks to ensure data quality and integrity.
+
+
+As a part of the efforts to avoid **vendor lock-in** & **schema drift** and maintain **data quality**, we need the following abilities:
+
+1. Ability to interact with different file systems using an uniform interface. 
+   * When the file system changes, the code that interacts with file systems should not change beyond parameters.
+2. Ability to maintain schema across different environments(dev, qa, prod) and data stores(hive, snowflake, databricks) with a same code. 
+   * When the data store software changes, the code that maintains schema should not change.
+   * There should not be schema drift across different environments.
+3. Using Above two abilities, develop an Ability to perform ETL across different processing paradigms(multi-threaded vs spark) and different file systems and data stores with a uniform interface.
+   * A uniform interface to perform ETL across different processing paradigms, file systems and data stores.
+4. Ability to perform data quality checks across different data stores with a uniform interface.
+
+
+Thus, we need to have the following packages:
+
+1. `file-system-client` - provides an uniform interface to access files from different file systems, dbfs, s3, local file system
+   * This is wrapper over `boto3`(for S3) and `localstack-client`(for local testing)
+2. `orm-framework` - provides a declarative way to define the schema of the databases across different data stores and environments.
+   * This is a wrapper over sqlalchemy, to build a declarative base class for ORM classes.
+   * Provides wrappers to connectors to different data stores & computes
+     * `psycopg2` for postgres
+     * `pyhive[hive,presto,sqlalchemy]` for Hive, Presto
+     * `snowflake-sqlalchemy` for Snowflake
+     * `databricks-sql-connector` for Databricks
+     * `pyspark` for Spark
+     * `pyarrow`, `pandas` for multi-threaded processing, API extraction
+     * `cerberus-python-client` for pulling secrets from cerberus, for testing connections with data stores.
+3. `etl-framework` - package provides a common framework for "Extract, Transform and Load" (ETL) jobs - using multi processing and pyspark patterns to process data
+   * This depends on `file-system-client[s3]` and `orm-framework[pyarrow]`
+4. `data-quality-framework` - provides a common framework for data quality checks.
+
+
+
+Using the above foundational packages, we can build a data engineering ecosystem for a team, to develop ETLs, maintain
+schemas and perform data quality checks:
+
+1. `my-datastore-orm` - This provides an example of how one can use the orm-framework to define the schema of the data across different data stores and environments.
+2. `my-etl-wrapper` - a wrapper over `etl-framework` to provide a common interface for all ETLs over your data stores and file systems.
+3. `sample-etl` - A sample ETL provides an example of how to use the `my-etl-wrapper` to process data
+4. `my-data-quality` - This package provides an example of how to use the data-quality-framework to perform data quality checks
+
+
+### Attribute Naming Standards
+`attribute-name-validator` - This package provides a tool for attribute name validation against the naming standards.
+
