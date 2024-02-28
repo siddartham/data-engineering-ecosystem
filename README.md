@@ -69,16 +69,16 @@ Above 3 functionalities can be achieved by 3 packages.
 #### Foundational Libraries
 - [x] `file-system-client`
 - [x] `orm-framework`
-- [ ] `etl-framework`
-- [ ] `data-quality-framework`
+- [x] `etl-framework`
+- [x] `data-quality-framework`
 
 #### Data Store Wide Libraries
-- [ ] `my-datastore-orm`
-- [ ] `my-datastore-etl-wrapper`
-- [ ] `my-datastore-data-quality`
+- [x] `my-datastore-orm`
+- [x] `my-datastore-etl-wrapper`
+- [x] `my-datastore-data-quality`
 
 #### Example ETL to load objects to Data Store
-- [ ] `sample-etl`
+- [x] `sample-etl`
 
 #### Attribute Naming Standards
 - [x] `attribute-name-validator`
