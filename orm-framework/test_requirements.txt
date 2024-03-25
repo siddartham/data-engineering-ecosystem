@@ -1,0 +1,10 @@
+alembic
+black
+databricks-sdk
+delta-spark
+flake8
+isort
+mypy
+pytest
+tox
+

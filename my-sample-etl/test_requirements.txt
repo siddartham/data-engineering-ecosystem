@@ -1,0 +1,8 @@
+black
+flake8
+isort
+localstack-s3-pyspark
+mypy
+pytest
+tox
+types-protobuf!=4.24.0.20240106

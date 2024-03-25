@@ -1,0 +1,24 @@
+manifest: "1.0"
+title: file-system-client
+description: A common framework for interfacing with cloud and local file systems.
+type: documentation
+tags:
+  - S3
+  - MultiCloud
+  - ScalableEngineering
+urls:
+  repository: https://github.com/siddartham/file-system-client
+maintainerEmail: reddy.siddartha53@gmail.com
+documents: &documents
+  documents:
+    - title: README
+      type: markdown
+      url: https://raw.githubusercontent.com/siddartham/file-system-client/main/README.md
+    - title: CONTRIBUTING
+      type: markdown
+      url: https://raw.githubusercontent.com/siddartham/file-system-client/main/CONTRIBUTING.md
+defaultVersion: "latest"
+versions:
+  "latest":
+    status: release
+    <<: *documents

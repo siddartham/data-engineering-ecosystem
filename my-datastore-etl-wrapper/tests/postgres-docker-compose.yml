@@ -1,0 +1,13 @@
+version: "3.1"
+services:
+    postgres:
+        network_mode: bridge
+        container_name: postgres
+        restart: always
+        image: postgres
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: postgres,sustainability_dev
+            POSTGRES_USER: ci
+            POSTGRES_PASSWORD: test

@@ -1,0 +1,65 @@
+name: deploy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - master
+    paths:
+    - pyproject.toml
+    - setup.py
+    - setup.cfg
+jobs:
+  deploy:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.8'
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    - run: make ci-install
+    - name: Deploy to DEV
+      run: |
+        venv/bin/alembic -n snowflake-dev upgrade head
+        venv/bin/my-datastore-orm snowflake create dev -vo -cf
+        venv/bin/my-datastore-orm snowflake drop dev -udo
+        venv/bin/my-datastore-orm snowflake validate dev -ifk '*'
+    - name: Deploy to QA
+      run: |
+        venv/bin/alembic -n snowflake-qa upgrade head
+        venv/bin/my-datastore-orm snowflake create qa -vo -cf
+        venv/bin/my-datastore-orm snowflake drop qa -udo
+        venv/bin/my-datastore-orm snowflake validate qa -ifk '*'
+    - name: Deploy to PROD
+      run: |
+        venv/bin/alembic -n snowflake-prod upgrade head
+        venv/bin/my-datastore-orm snowflake create prod -vo -cf
+        venv/bin/my-datastore-orm snowflake drop prod -udo
+        venv/bin/my-datastore-orm snowflake validate prod -ifk '*'
+    - name: configure git
+      run: |
+        git config --global user.email "$(git --no-pager show -s --format=%ae)" && \
+        git config --global user.name "$(git --no-pager show -s --format=%an)"
+    - name: tag version
+      run: venv/bin/daves-dev-tools git tag-version
+    - name: push tags
+      run: git push --tags || echo "Tag already exists"
+    - name: install gh
+      run: |
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+        && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+        && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+        && sudo apt update \
+        && sudo apt install gh -y
+    - name: create release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: gh release create "$(venv/bin/python setup.py --version)" || echo "Release already exists"
+#    - name: Distribute to PyPI
+#      env:
+#        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+#        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+#      run: make distribute

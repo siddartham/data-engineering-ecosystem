@@ -1,0 +1,14 @@
+black
+daves-dev-tools
+flake8
+isort
+mypy
+file-system-client
+my-datastore-etl-wrapper
+my-datastore-etl-wrapper[all]
+my-datastore-etl-wrapper[postgresql]
+my-datastore-etl-wrapper[snowflake,spark]
+my-datastore-etl-wrapper[spark]
+pyspark
+pytest
+tox

@@ -1,0 +1,36 @@
+name: test
+on:
+  workflow_call:
+  workflow_dispatch:
+  pull_request:
+    branches:
+    - '*'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+        - 3.8
+        - 3.9
+        - '3.10'
+        - 3.11
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    - uses: actions/setup-java@v4
+      with:
+        distribution: zulu
+        java-version: 8
+    - run: |
+        sudo apt-get update
+        sudo apt-get install libpq-dev libsasl2-dev postgresql-client -y
+    - name: install
+      run: make ci-install
+    - name: test
+      run: make test

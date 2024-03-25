@@ -1,0 +1,19 @@
+manifest: "1.0"
+title: etl-framework
+description:
+type: documentation
+tags:
+  - Cerberus
+urls:
+  repository: https://github.com/siddartham/etl-framework
+maintainerEmail: reddy.siddartha53@gmail.com
+documents: &documents
+  documents:
+    - title: README
+      type: markdown
+      url: https://raw.githubusercontent.com/siddartham/etl-framework/main/README.md
+defaultVersion: "latest"
+versions:
+  "latest":
+    status: release
+    <<: *documents
