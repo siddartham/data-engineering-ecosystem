@@ -88,7 +88,7 @@ def camel(string: str, capitalize: bool = False) -> str:
 
     >>> print(camel('in-you-go'))
     inYouGo
-
+`
     >>> print(camel('False'))
     false
 
@@ -153,7 +153,7 @@ def camel(string: str, capitalize: bool = False) -> str:
     return character_string
 
 
-class _CharacterType(enum.Enum):
+class _CharacterType(Enum):
     DIGIT = enum.auto()
     LOWERCASE = enum.auto()
     UPPERCASE = enum.auto()

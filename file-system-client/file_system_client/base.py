@@ -40,6 +40,11 @@ class FileSystem(ABC):
     def root(self) -> str:
         return self._root
 
+    """
+    The two fields(root, _root) are used for quality control,
+    so that you can't set the root to a non-string value and
+    root is always stripped of leading and trailing whitespace.
+    """
     @root.setter
     def root(self, root: str) -> None:
         assert isinstance(root, str)
