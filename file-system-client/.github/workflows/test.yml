@@ -12,7 +12,7 @@ on:
     - tox.ini
     - .github/**
     branches:
-    - '*'
+    - 'fsc**'
 jobs:
   test:
     runs-on: ${{ matrix.os }}

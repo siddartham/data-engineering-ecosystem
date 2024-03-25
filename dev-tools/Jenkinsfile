@@ -1,0 +1,98 @@
+pipeline {
+    agent {
+        docker {
+            image 'artifactory.company.com:9001/company-myteam/test-corretto8-python36-spark24'
+            args '-ti -u ci'
+        }
+    }
+    stages {
+        stage('install'){
+            steps {
+                sh "sudo pip3 uninstall -y company-myteam-dev-tools"
+                sh "sudo pip3 install --upgrade pip"
+                sh "sudo pip3 install --no-deps -r requirements.txt -e '.[test]'"
+            }
+        }
+        stage('test-py36') {
+            // Run tox if package files have changed, tests have changed,
+            // requirements have changed, this is our first build, or
+            // the previous build failed
+            when {
+                anyOf {
+                    changeset "company/**"
+                    changeset "setup.py"
+                    changeset "tests/**"
+                    buildingTag()
+                    expression {
+                        return currentBuild.number == 1
+                    }
+                    expression {
+                        !("SUCCESS".equals(currentBuild.previousBuild.result))
+                    }
+                }
+            }
+            steps {
+                sh 'tox -e py36'
+            }
+        }
+        stage('distribute') {
+            // Run tox if package files have changed, tests have changed,
+            // requirements have changed, this is our first build, or
+            // the previous build failed
+            when {
+                branch "master"
+                anyOf {
+                    changeset "company/**"
+                    changeset "setup.py"
+                    changeset "tests/**"
+                    buildingTag()
+                    expression {
+                        return currentBuild.number == 1
+                    }
+                    expression {
+                        !("SUCCESS".equals(currentBuild.previousBuild.result))
+                    }
+                }
+            }
+            steps {
+                sh 'company-myteam-dev-tools pypi distribute'
+            }
+        }
+    }
+    post {
+        // Email Build Results to the Author of the Commit
+        success {
+            mail (
+                to: sh(
+                    script: "git --no-pager show -s --format=%ae ${env.GIT_COMMIT}",
+                    returnStdout: true
+                ).trim(),
+                from: "a.bmx.myteam@company.com",
+                subject: "Success - ${env.JOB_NAME}",
+                body: "${env.BUILD_URL}"
+            )
+        }
+        failure {
+            mail (
+                to: sh(
+                    script: "git --no-pager show -s --format=%ae ${env.GIT_COMMIT}",
+                    returnStdout: true
+                ).trim(),
+                from: "a.bmx.myteam@company.com",
+                subject: "Failed - ${env.JOB_NAME}",
+                body: "${env.BUILD_URL}"
+            )
+        }
+        aborted {
+            mail (
+                to: sh(
+                    script: "git --no-pager show -s --format=%ae ${env.GIT_COMMIT}",
+                    returnStdout: true
+                ).trim(),
+                from: "a.bmx.myteam@company.com",
+                subject: "Aborted - ${env.JOB_NAME}",
+                body: "${env.BUILD_URL}"
+            )
+        }
+    }
+}
