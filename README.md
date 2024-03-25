@@ -1,9 +1,22 @@
 ## Data Engineering Ecosystem
 
+
+### Fundamental Questions in building a Data Engineering environment?
+* Why and How to build a common file-system interface to interact with databricks file system, local file system, s3 etc. ? 
+* Why and How to build an ORM framework - internal mechanics of ORM ? 
+* Why and How to build an ORM model for your database, to set urls, permissions? 
+* Why and How to build an ETL framework? 
+* Why and How to build an ETL wrapper for your team, to set permissions? 
+* How to build an ETL based on framework? 
+* Why and How to write a Client SDK, what is the need for oapi, instead of openapi-codegen? 
+* How to use metaprogramming, abstract base classes, decorators, hooks to build tools and packages ?
+
+
 ### Data Engineering Foundational Libraries
 The idea is to have a data engineering ecosystem that is easy to use and maintain. 
 
-An ideal DE ecosystem should enable y the following:
+
+An ideal Data Engineering ecosystem should enable the following:
 1. Develop platform agnostic data pipelines 
    * To avoid Vendor Lock-in and high cost of migration across platforms.
 2. Automated Schema Management across data stores, environments to avoid schema drift
@@ -64,10 +77,12 @@ Above 3 functionalities can be achieved by 3 packages.
 
 
 
-## Current Status
+### Current Status
 
-#### Dev Tools
+#### Development Setup & Tools
 - [x] `dev-tools`  - common CLI to interact with airflow, managed spark, docker, pypi
+- [x] `dev-env-setup` - set up development environment
+- [x] `python-package-template` - template for python packages
 
 #### Foundational Libraries
 - [x] `file-system-client`
@@ -78,10 +93,10 @@ Above 3 functionalities can be achieved by 3 packages.
 #### Data Store Wide Libraries
 - [x] `my-datastore-orm`
 - [x] `my-datastore-etl-wrapper`
-- [x] `my-datastore-data-quality`
+- [ ] `my-datastore-data-quality`
 
 #### Example ETL to load objects to Data Store
-- [x] `sample-etl`
+- [x] `my-sample-etl`
 
 #### Attribute Naming Standards
 - [x] `attribute-name-validator`
