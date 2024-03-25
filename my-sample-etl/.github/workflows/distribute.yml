@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - main
+    - mse
     paths:
     - pyproject.toml
     - setup.py

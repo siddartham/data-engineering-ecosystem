@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - master
+    - mdo
     paths:
     - pyproject.toml
     - setup.py

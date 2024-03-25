@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - main
+    - mdew
     paths:
     - pyproject.toml
     - setup.py
