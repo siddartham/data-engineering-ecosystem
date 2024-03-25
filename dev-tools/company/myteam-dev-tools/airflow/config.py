@@ -1,0 +1,2 @@
+DEFAULT_DAG_DIRECTORY: str = "airflow/dags"
+STATUS_CHECK_INTERVAL: int = 60

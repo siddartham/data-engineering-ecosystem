@@ -66,6 +66,9 @@ Above 3 functionalities can be achieved by 3 packages.
 
 ## Current Status
 
+#### Dev Tools
+- [x] `dev-tools`  - common CLI to interact with airflow, managed spark, docker, pypi
+
 #### Foundational Libraries
 - [x] `file-system-client`
 - [x] `orm-framework`
