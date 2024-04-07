@@ -138,7 +138,7 @@ def main() -> None:
     `my-datastore-orm snowflake` command.
     """
     arguments: Namespace = parse_arguments(
-        "data-quality-framework snowflake",
+        "my-datastore-validation snowflake",
         environments=ENVIRONMENTS,
         roles=ROLES,
         commands=(),

@@ -49,12 +49,12 @@ def validate(
 def main() -> None:
     """
     This function is the entry point for the
-    `data-quality-framework sqlite` command.
+    `my-datastore-validation sqlite` command.
     Execute `my-datastore-orm sqlite -h` for information
     about his command.
     """
     arguments: Namespace = parse_arguments(
-        "data-quality-framework sqlite",
+        "my-datastore-validation sqlite",
         commands=(),
         include=(
             "echo",
