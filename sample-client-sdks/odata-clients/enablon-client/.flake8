@@ -1,0 +1,6 @@
+[flake8]
+exclude =
+    .git,
+    venv,
+    .tox
+ignore = F842, W503

@@ -1,0 +1,21 @@
+name: distribute
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - setup.py
+    - setup.cfg
+    - pyproject.toml
+jobs:
+  distribute:
+    runs-on: [self-hosted, bmx-runner, bmx-sustainability-runner]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    - run: make ci-install
+    - run: make distribute

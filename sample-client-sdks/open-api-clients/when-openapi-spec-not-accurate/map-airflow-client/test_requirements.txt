@@ -1,0 +1,9 @@
+black
+daves-dev-tools
+flake8
+isort
+mypy
+pendulum
+pip
+pytest
+tox

@@ -1,0 +1,2 @@
+nike-sustainability-dev-tools~=2.21
+--extra-index-url https://artifactory.nike.com/artifactory/api/pypi/python-local/simple

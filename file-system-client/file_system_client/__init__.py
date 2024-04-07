@@ -48,7 +48,7 @@ def from_url(
         if s3 is None:
             raise ValueError(
                 "Use of the S3 file system requires installing "
-                'nike-file-system-client with the "s3" extra: '
+                'file-system-client with the "s3" extra: '
                 "`pip install file-system-client[s3]`"
             )
         return s3.from_url(url)

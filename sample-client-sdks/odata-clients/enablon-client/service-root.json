@@ -1,0 +1,1910 @@
+{
+    "@odata.context": "https://nike-ehs.uat.eu.enablon.io/Nike.uat/odata/v4/$metadata",
+    "value": [
+        {
+            "name": "CSR_ImpactTypes",
+            "kind": "EntitySet",
+            "url": "CSR_ImpactTypes"
+        },
+        {
+            "name": "CSR_ObjectivesTargetTypes",
+            "kind": "EntitySet",
+            "url": "CSR_ObjectivesTargetTypes"
+        },
+        {
+            "name": "CSR_StrategyHierarchyLevels",
+            "kind": "EntitySet",
+            "url": "CSR_StrategyHierarchyLevels"
+        },
+        {
+            "name": "CSR_ObjectivesSources",
+            "kind": "EntitySet",
+            "url": "CSR_ObjectivesSources"
+        },
+        {
+            "name": "CSR_ObjectivesAchievementStatus",
+            "kind": "EntitySet",
+            "url": "CSR_ObjectivesAchievementStatus"
+        },
+        {
+            "name": "CSR_ObjectivesPriority",
+            "kind": "EntitySet",
+            "url": "CSR_ObjectivesPriority"
+        },
+        {
+            "name": "CSR_ObjectivesAuditTrail",
+            "kind": "EntitySet",
+            "url": "CSR_ObjectivesAuditTrail"
+        },
+        {
+            "name": "CSR_StrategyHierarchyAuditTrail",
+            "kind": "EntitySet",
+            "url": "CSR_StrategyHierarchyAuditTrail"
+        },
+        {
+            "name": "CSR_Objectives",
+            "kind": "EntitySet",
+            "url": "CSR_Objectives"
+        },
+        {
+            "name": "CSR_StrategyHierarchy",
+            "kind": "EntitySet",
+            "url": "CSR_StrategyHierarchy"
+        },
+        {
+            "name": "TCK_HelpdeskFieldMappings",
+            "kind": "EntitySet",
+            "url": "TCK_HelpdeskFieldMappings"
+        },
+        {
+            "name": "TCK_Visibility",
+            "kind": "EntitySet",
+            "url": "TCK_Visibility"
+        },
+        {
+            "name": "TCK_ActionItemsAuditTrail",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItemsAuditTrail"
+        },
+        {
+            "name": "TCK_ActionItemResolution",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItemResolution"
+        },
+        {
+            "name": "TCK_ActionItemPriority",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItemPriority"
+        },
+        {
+            "name": "TCK_ActionItemStatus",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItemStatus"
+        },
+        {
+            "name": "TCK_ActionItemImpactedLayers",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItemImpactedLayers"
+        },
+        {
+            "name": "TCK_ActionItemType",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItemType"
+        },
+        {
+            "name": "TCK_CS_StatusForNikeTeam",
+            "kind": "EntitySet",
+            "url": "TCK_CS_StatusForNikeTeam"
+        },
+        {
+            "name": "TCK_CS_TypeOfChange",
+            "kind": "EntitySet",
+            "url": "TCK_CS_TypeOfChange"
+        },
+        {
+            "name": "TCK_CS_ActionItemProject",
+            "kind": "EntitySet",
+            "url": "TCK_CS_ActionItemProject"
+        },
+        {
+            "name": "TCK_CS_TeamsResponsible",
+            "kind": "EntitySet",
+            "url": "TCK_CS_TeamsResponsible"
+        },
+        {
+            "name": "TCK_ModulesPages",
+            "kind": "EntitySet",
+            "url": "TCK_ModulesPages"
+        },
+        {
+            "name": "TCK_ScreenCaptures",
+            "kind": "EntitySet",
+            "url": "TCK_ScreenCaptures"
+        },
+        {
+            "name": "TCK_ActionItem",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItem"
+        },
+        {
+            "name": "TCK_Resources",
+            "kind": "EntitySet",
+            "url": "TCK_Resources"
+        },
+        {
+            "name": "ho_ImportFilesDPC",
+            "kind": "EntitySet",
+            "url": "ho_ImportFilesDPC"
+        },
+        {
+            "name": "ho_ScenarioOLD",
+            "kind": "EntitySet",
+            "url": "ho_ScenarioOLD"
+        },
+        {
+            "name": "ho_RecordGender",
+            "kind": "EntitySet",
+            "url": "ho_RecordGender"
+        },
+        {
+            "name": "ho_SubApplications",
+            "kind": "EntitySet",
+            "url": "ho_SubApplications"
+        },
+        {
+            "name": "ho_Applications",
+            "kind": "EntitySet",
+            "url": "ho_Applications"
+        },
+        {
+            "name": "ho_DeletionsTable",
+            "kind": "EntitySet",
+            "url": "ho_DeletionsTable"
+        },
+        {
+            "name": "ho_UsualWeekDay",
+            "kind": "EntitySet",
+            "url": "ho_UsualWeekDay"
+        },
+        {
+            "name": "ho_OrphanActions",
+            "kind": "EntitySet",
+            "url": "ho_OrphanActions"
+        },
+        {
+            "name": "ho_UnitLevels",
+            "kind": "EntitySet",
+            "url": "ho_UnitLevels"
+        },
+        {
+            "name": "ho_EntityUnitManagement",
+            "kind": "EntitySet",
+            "url": "ho_EntityUnitManagement"
+        },
+        {
+            "name": "ho_UnitConversions",
+            "kind": "EntitySet",
+            "url": "ho_UnitConversions"
+        },
+        {
+            "name": "ho_Units",
+            "kind": "EntitySet",
+            "url": "ho_Units"
+        },
+        {
+            "name": "ho_AddressNormsEntitiesSubform",
+            "kind": "EntitySet",
+            "url": "ho_AddressNormsEntitiesSubform"
+        },
+        {
+            "name": "ho_Norms",
+            "kind": "EntitySet",
+            "url": "ho_Norms"
+        },
+        {
+            "name": "ho_AddressLine",
+            "kind": "EntitySet",
+            "url": "ho_AddressLine"
+        },
+        {
+            "name": "ho_CalendarConfiguration",
+            "kind": "EntitySet",
+            "url": "ho_CalendarConfiguration"
+        },
+        {
+            "name": "ho_NewsLanguages",
+            "kind": "EntitySet",
+            "url": "ho_NewsLanguages"
+        },
+        {
+            "name": "ho_AuditTrailUser",
+            "kind": "EntitySet",
+            "url": "ho_AuditTrailUser"
+        },
+        {
+            "name": "ho_LanguageLevel",
+            "kind": "EntitySet",
+            "url": "ho_LanguageLevel"
+        },
+        {
+            "name": "ho_BusinessTypes",
+            "kind": "EntitySet",
+            "url": "ho_BusinessTypes"
+        },
+        {
+            "name": "ho_BusinessDirectoryAT",
+            "kind": "EntitySet",
+            "url": "ho_BusinessDirectoryAT"
+        },
+        {
+            "name": "ho_DirectoryAuditTrail",
+            "kind": "EntitySet",
+            "url": "ho_DirectoryAuditTrail"
+        },
+        {
+            "name": "ho_BusinessDirectory",
+            "kind": "EntitySet",
+            "url": "ho_BusinessDirectory"
+        },
+        {
+            "name": "ho_Directory",
+            "kind": "EntitySet",
+            "url": "ho_Directory"
+        },
+        {
+            "name": "ho_Domains",
+            "kind": "EntitySet",
+            "url": "ho_Domains"
+        },
+        {
+            "name": "ho_GeographyLevels",
+            "kind": "EntitySet",
+            "url": "ho_GeographyLevels"
+        },
+        {
+            "name": "ho_ThirdAxisLevels",
+            "kind": "EntitySet",
+            "url": "ho_ThirdAxisLevels"
+        },
+        {
+            "name": "ho_SecondAxisLevels",
+            "kind": "EntitySet",
+            "url": "ho_SecondAxisLevels"
+        },
+        {
+            "name": "ho_FirstAxisLevels",
+            "kind": "EntitySet",
+            "url": "ho_FirstAxisLevels"
+        },
+        {
+            "name": "ho_KeyWordsEntities",
+            "kind": "EntitySet",
+            "url": "ho_KeyWordsEntities"
+        },
+        {
+            "name": "ho_Business",
+            "kind": "EntitySet",
+            "url": "ho_Business"
+        },
+        {
+            "name": "ho_ThirdAxisAuditTrail",
+            "kind": "EntitySet",
+            "url": "ho_ThirdAxisAuditTrail"
+        },
+        {
+            "name": "ho_SecondAxisAuditTrail",
+            "kind": "EntitySet",
+            "url": "ho_SecondAxisAuditTrail"
+        },
+        {
+            "name": "ho_EntitiesAuditTrail",
+            "kind": "EntitySet",
+            "url": "ho_EntitiesAuditTrail"
+        },
+        {
+            "name": "ho_HThirdAxis",
+            "kind": "EntitySet",
+            "url": "ho_HThirdAxis"
+        },
+        {
+            "name": "ho_HSecondAxis",
+            "kind": "EntitySet",
+            "url": "ho_HSecondAxis"
+        },
+        {
+            "name": "ho_HFirstAxis",
+            "kind": "EntitySet",
+            "url": "ho_HFirstAxis"
+        },
+        {
+            "name": "ho_SnapshotsAxis",
+            "kind": "EntitySet",
+            "url": "ho_SnapshotsAxis"
+        },
+        {
+            "name": "ho_Geography",
+            "kind": "EntitySet",
+            "url": "ho_Geography"
+        },
+        {
+            "name": "ho_ThirdAxis",
+            "kind": "EntitySet",
+            "url": "ho_ThirdAxis"
+        },
+        {
+            "name": "ho_SecondAxis",
+            "kind": "EntitySet",
+            "url": "ho_SecondAxis"
+        },
+        {
+            "name": "ho_Entities",
+            "kind": "EntitySet",
+            "url": "ho_Entities"
+        },
+        {
+            "name": "ho_NewGlossary",
+            "kind": "EntitySet",
+            "url": "ho_NewGlossary"
+        },
+        {
+            "name": "ho_Documents",
+            "kind": "EntitySet",
+            "url": "ho_Documents"
+        },
+        {
+            "name": "ho_NewsArticles",
+            "kind": "EntitySet",
+            "url": "ho_NewsArticles"
+        },
+        {
+            "name": "SD_ConsistencyCheckTypes",
+            "kind": "EntitySet",
+            "url": "SD_ConsistencyCheckTypes"
+        },
+        {
+            "name": "SD_ConsistencyCheckJustificationTypes",
+            "kind": "EntitySet",
+            "url": "SD_ConsistencyCheckJustificationTypes"
+        },
+        {
+            "name": "SD_UpdaterType",
+            "kind": "EntitySet",
+            "url": "SD_UpdaterType"
+        },
+        {
+            "name": "SD_ConsolidationType",
+            "kind": "EntitySet",
+            "url": "SD_ConsolidationType"
+        },
+        {
+            "name": "SD_QuestionnaireType",
+            "kind": "EntitySet",
+            "url": "SD_QuestionnaireType"
+        },
+        {
+            "name": "SD_InputSubtypes",
+            "kind": "EntitySet",
+            "url": "SD_InputSubtypes"
+        },
+        {
+            "name": "SD_InputTypes",
+            "kind": "EntitySet",
+            "url": "SD_InputTypes"
+        },
+        {
+            "name": "SD_EmissionFactorSource",
+            "kind": "EntitySet",
+            "url": "SD_EmissionFactorSource"
+        },
+        {
+            "name": "SD_FuelTypeLevels",
+            "kind": "EntitySet",
+            "url": "SD_FuelTypeLevels"
+        },
+        {
+            "name": "SD_SourceTypeLevels",
+            "kind": "EntitySet",
+            "url": "SD_SourceTypeLevels"
+        },
+        {
+            "name": "SD_EFDistributionLevels",
+            "kind": "EntitySet",
+            "url": "SD_EFDistributionLevels"
+        },
+        {
+            "name": "SD_MaterialTypes",
+            "kind": "EntitySet",
+            "url": "SD_MaterialTypes"
+        },
+        {
+            "name": "SD_ConversionTypes",
+            "kind": "EntitySet",
+            "url": "SD_ConversionTypes"
+        },
+        {
+            "name": "SD_FuelType",
+            "kind": "EntitySet",
+            "url": "SD_FuelType"
+        },
+        {
+            "name": "SD_SourceType",
+            "kind": "EntitySet",
+            "url": "SD_SourceType"
+        },
+        {
+            "name": "SD_SourceScope",
+            "kind": "EntitySet",
+            "url": "SD_SourceScope"
+        },
+        {
+            "name": "SD_GreenHouseGas",
+            "kind": "EntitySet",
+            "url": "SD_GreenHouseGas"
+        },
+        {
+            "name": "SD_SupplierEnergyCoverageAT",
+            "kind": "EntitySet",
+            "url": "SD_SupplierEnergyCoverageAT"
+        },
+        {
+            "name": "SD_EnergySupplierAT",
+            "kind": "EntitySet",
+            "url": "SD_EnergySupplierAT"
+        },
+        {
+            "name": "SD_EACEnergyAllocationAT",
+            "kind": "EntitySet",
+            "url": "SD_EACEnergyAllocationAT"
+        },
+        {
+            "name": "SD_EnergyAttributesCertificateAT",
+            "kind": "EntitySet",
+            "url": "SD_EnergyAttributesCertificateAT"
+        },
+        {
+            "name": "SD_MaterialTypesAT",
+            "kind": "EntitySet",
+            "url": "SD_MaterialTypesAT"
+        },
+        {
+            "name": "SD_ConversionTypesAT",
+            "kind": "EntitySet",
+            "url": "SD_ConversionTypesAT"
+        },
+        {
+            "name": "SD_LocalCrossUnitsConversionsAT",
+            "kind": "EntitySet",
+            "url": "SD_LocalCrossUnitsConversionsAT"
+        },
+        {
+            "name": "SD_CrossUnitsConversionsAT",
+            "kind": "EntitySet",
+            "url": "SD_CrossUnitsConversionsAT"
+        },
+        {
+            "name": "SD_EmissionFactorAuditTrail",
+            "kind": "EntitySet",
+            "url": "SD_EmissionFactorAuditTrail"
+        },
+        {
+            "name": "SD_EmissionFactorsAuditTrail",
+            "kind": "EntitySet",
+            "url": "SD_EmissionFactorsAuditTrail"
+        },
+        {
+            "name": "SD_GHGProtocolsAuditTrail",
+            "kind": "EntitySet",
+            "url": "SD_GHGProtocolsAuditTrail"
+        },
+        {
+            "name": "SD_LocalCrossUnitsConversions",
+            "kind": "EntitySet",
+            "url": "SD_LocalCrossUnitsConversions"
+        },
+        {
+            "name": "SD_CrossUnitsConversions",
+            "kind": "EntitySet",
+            "url": "SD_CrossUnitsConversions"
+        },
+        {
+            "name": "SD_RelatedGeography",
+            "kind": "EntitySet",
+            "url": "SD_RelatedGeography"
+        },
+        {
+            "name": "SD_EnergyFuelMix",
+            "kind": "EntitySet",
+            "url": "SD_EnergyFuelMix"
+        },
+        {
+            "name": "SD_EmissionFactor",
+            "kind": "EntitySet",
+            "url": "SD_EmissionFactor"
+        },
+        {
+            "name": "SD_SupplierEnergyUsage",
+            "kind": "EntitySet",
+            "url": "SD_SupplierEnergyUsage"
+        },
+        {
+            "name": "SD_SupplierEnergyCoverage",
+            "kind": "EntitySet",
+            "url": "SD_SupplierEnergyCoverage"
+        },
+        {
+            "name": "SD_EnergySupplier",
+            "kind": "EntitySet",
+            "url": "SD_EnergySupplier"
+        },
+        {
+            "name": "SD_EACEnergyUsage",
+            "kind": "EntitySet",
+            "url": "SD_EACEnergyUsage"
+        },
+        {
+            "name": "SD_EACEnergyAllocation",
+            "kind": "EntitySet",
+            "url": "SD_EACEnergyAllocation"
+        },
+        {
+            "name": "SD_EnergyAttributesCertificate",
+            "kind": "EntitySet",
+            "url": "SD_EnergyAttributesCertificate"
+        },
+        {
+            "name": "SD_EmissionFactors",
+            "kind": "EntitySet",
+            "url": "SD_EmissionFactors"
+        },
+        {
+            "name": "SD_CS_TComponent",
+            "kind": "EntitySet",
+            "url": "SD_CS_TComponent"
+        },
+        {
+            "name": "SD_CS_ProdGender",
+            "kind": "EntitySet",
+            "url": "SD_CS_ProdGender"
+        },
+        {
+            "name": "SD_CS_ProdSizeGroup",
+            "kind": "EntitySet",
+            "url": "SD_CS_ProdSizeGroup"
+        },
+        {
+            "name": "SD_CS_MoldCountry",
+            "kind": "EntitySet",
+            "url": "SD_CS_MoldCountry"
+        },
+        {
+            "name": "SD_CS_MoldManuf",
+            "kind": "EntitySet",
+            "url": "SD_CS_MoldManuf"
+        },
+        {
+            "name": "SD_CS_MoldStatus",
+            "kind": "EntitySet",
+            "url": "SD_CS_MoldStatus"
+        },
+        {
+            "name": "SD_CS_MoldType",
+            "kind": "EntitySet",
+            "url": "SD_CS_MoldType"
+        },
+        {
+            "name": "SD_CS_MCSCode",
+            "kind": "EntitySet",
+            "url": "SD_CS_MCSCode"
+        },
+        {
+            "name": "SD_CS_ToolingAuditTrail",
+            "kind": "EntitySet",
+            "url": "SD_CS_ToolingAuditTrail"
+        },
+        {
+            "name": "SD_CS_Tooling",
+            "kind": "EntitySet",
+            "url": "SD_CS_Tooling"
+        },
+        {
+            "name": "SD_CS_CrossbrandRollupFrequency",
+            "kind": "EntitySet",
+            "url": "SD_CS_CrossbrandRollupFrequency"
+        },
+        {
+            "name": "SD_CS_RolledUpData",
+            "kind": "EntitySet",
+            "url": "SD_CS_RolledUpData"
+        },
+        {
+            "name": "SD_CS_CrossbrandIndicatorMapping",
+            "kind": "EntitySet",
+            "url": "SD_CS_CrossbrandIndicatorMapping"
+        },
+        {
+            "name": "SD_CS_DataRollupConfigurationTable",
+            "kind": "EntitySet",
+            "url": "SD_CS_DataRollupConfigurationTable"
+        },
+        {
+            "name": "SD_CS_ReportingAxisMappingTable",
+            "kind": "EntitySet",
+            "url": "SD_CS_ReportingAxisMappingTable"
+        },
+        {
+            "name": "SD_TableColumnsLevels",
+            "kind": "EntitySet",
+            "url": "SD_TableColumnsLevels"
+        },
+        {
+            "name": "SD_TableLinesLevels",
+            "kind": "EntitySet",
+            "url": "SD_TableLinesLevels"
+        },
+        {
+            "name": "SD_IndicatorLevels",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorLevels"
+        },
+        {
+            "name": "SD_ObtentionMethod",
+            "kind": "EntitySet",
+            "url": "SD_ObtentionMethod"
+        },
+        {
+            "name": "SD_CustomLists",
+            "kind": "EntitySet",
+            "url": "SD_CustomLists"
+        },
+        {
+            "name": "SD_CustomListTypes",
+            "kind": "EntitySet",
+            "url": "SD_CustomListTypes"
+        },
+        {
+            "name": "SD_IndicatorsAuditTrail",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorsAuditTrail"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks"
+        },
+        {
+            "name": "SD_HistorizedIndicators",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators"
+        },
+        {
+            "name": "SD_Snapshots",
+            "kind": "EntitySet",
+            "url": "SD_Snapshots"
+        },
+        {
+            "name": "SD_Referentials",
+            "kind": "EntitySet",
+            "url": "SD_Referentials"
+        },
+        {
+            "name": "SD_TableColumn",
+            "kind": "EntitySet",
+            "url": "SD_TableColumn"
+        },
+        {
+            "name": "SD_TableLine",
+            "kind": "EntitySet",
+            "url": "SD_TableLine"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks"
+        },
+        {
+            "name": "SD_Indicators",
+            "kind": "EntitySet",
+            "url": "SD_Indicators"
+        },
+        {
+            "name": "SD_Frequency",
+            "kind": "EntitySet",
+            "url": "SD_Frequency"
+        },
+        {
+            "name": "SD_CS_NikeDataFoundationImport",
+            "kind": "EntitySet",
+            "url": "SD_CS_NikeDataFoundationImport"
+        },
+        {
+            "name": "SD_CS_DefectImport",
+            "kind": "EntitySet",
+            "url": "SD_CS_DefectImport"
+        },
+        {
+            "name": "SD_CS_ChemistryUpload",
+            "kind": "EntitySet",
+            "url": "SD_CS_ChemistryUpload"
+        },
+        {
+            "name": "SD_CS_ImportWasteEntries",
+            "kind": "EntitySet",
+            "url": "SD_CS_ImportWasteEntries"
+        },
+        {
+            "name": "SD_CS_UnitTypes",
+            "kind": "EntitySet",
+            "url": "SD_CS_UnitTypes"
+        },
+        {
+            "name": "SD_CS_DefectBottom",
+            "kind": "EntitySet",
+            "url": "SD_CS_DefectBottom"
+        },
+        {
+            "name": "SD_CS_DefectSettings",
+            "kind": "EntitySet",
+            "url": "SD_CS_DefectSettings"
+        },
+        {
+            "name": "SD_CS_ComponentColor",
+            "kind": "EntitySet",
+            "url": "SD_CS_ComponentColor"
+        },
+        {
+            "name": "SD_CS_DefectProcess",
+            "kind": "EntitySet",
+            "url": "SD_CS_DefectProcess"
+        },
+        {
+            "name": "SD_CS_ComponentSize",
+            "kind": "EntitySet",
+            "url": "SD_CS_ComponentSize"
+        },
+        {
+            "name": "SD_CS_material",
+            "kind": "EntitySet",
+            "url": "SD_CS_material"
+        },
+        {
+            "name": "SD_CS_Shift",
+            "kind": "EntitySet",
+            "url": "SD_CS_Shift"
+        },
+        {
+            "name": "SD_CS_ActualExtrapolated",
+            "kind": "EntitySet",
+            "url": "SD_CS_ActualExtrapolated"
+        },
+        {
+            "name": "SD_CS_Function",
+            "kind": "EntitySet",
+            "url": "SD_CS_Function"
+        },
+        {
+            "name": "SD_CS_EmissionsSource",
+            "kind": "EntitySet",
+            "url": "SD_CS_EmissionsSource"
+        },
+        {
+            "name": "SD_CS_EnergyEmissions",
+            "kind": "EntitySet",
+            "url": "SD_CS_EnergyEmissions"
+        },
+        {
+            "name": "SD_CS_GHG",
+            "kind": "EntitySet",
+            "url": "SD_CS_GHG"
+        },
+        {
+            "name": "SD_CS_Scope",
+            "kind": "EntitySet",
+            "url": "SD_CS_Scope"
+        },
+        {
+            "name": "SD_CS_ProductCAS",
+            "kind": "EntitySet",
+            "url": "SD_CS_ProductCAS"
+        },
+        {
+            "name": "SD_CS_CASNumbers",
+            "kind": "EntitySet",
+            "url": "SD_CS_CASNumbers"
+        },
+        {
+            "name": "SD_CS_ProductGroup",
+            "kind": "EntitySet",
+            "url": "SD_CS_ProductGroup"
+        },
+        {
+            "name": "SD_CS_Product",
+            "kind": "EntitySet",
+            "url": "SD_CS_Product"
+        },
+        {
+            "name": "SD_CS_Vendor",
+            "kind": "EntitySet",
+            "url": "SD_CS_Vendor"
+        },
+        {
+            "name": "SD_CS_Source",
+            "kind": "EntitySet",
+            "url": "SD_CS_Source"
+        },
+        {
+            "name": "SD_CS_WasteVendor",
+            "kind": "EntitySet",
+            "url": "SD_CS_WasteVendor"
+        },
+        {
+            "name": "SD_CS_ManagementMethod",
+            "kind": "EntitySet",
+            "url": "SD_CS_ManagementMethod"
+        },
+        {
+            "name": "SD_CS_Component",
+            "kind": "EntitySet",
+            "url": "SD_CS_Component"
+        },
+        {
+            "name": "SD_CS_WasteItem",
+            "kind": "EntitySet",
+            "url": "SD_CS_WasteItem"
+        },
+        {
+            "name": "SD_CS_MaterialGroup",
+            "kind": "EntitySet",
+            "url": "SD_CS_MaterialGroup"
+        },
+        {
+            "name": "SD_CS_WasteType",
+            "kind": "EntitySet",
+            "url": "SD_CS_WasteType"
+        },
+        {
+            "name": "SD_CS_ProductType",
+            "kind": "EntitySet",
+            "url": "SD_CS_ProductType"
+        },
+        {
+            "name": "SD_CS_InputWFLevels",
+            "kind": "EntitySet",
+            "url": "SD_CS_InputWFLevels"
+        },
+        {
+            "name": "SD_StandardAlerts",
+            "kind": "EntitySet",
+            "url": "SD_StandardAlerts"
+        },
+        {
+            "name": "SD_AlertsTemplates",
+            "kind": "EntitySet",
+            "url": "SD_AlertsTemplates"
+        },
+        {
+            "name": "SD_Recalculations",
+            "kind": "EntitySet",
+            "url": "SD_Recalculations"
+        },
+        {
+            "name": "SD_RecalculationsAuditTrail",
+            "kind": "EntitySet",
+            "url": "SD_RecalculationsAuditTrail"
+        },
+        {
+            "name": "SD_CampaignsAuditTrail",
+            "kind": "EntitySet",
+            "url": "SD_CampaignsAuditTrail"
+        },
+        {
+            "name": "SD_TrackingAlerts",
+            "kind": "EntitySet",
+            "url": "SD_TrackingAlerts"
+        },
+        {
+            "name": "SD_Alerts",
+            "kind": "EntitySet",
+            "url": "SD_Alerts"
+        },
+        {
+            "name": "SD_Updater",
+            "kind": "EntitySet",
+            "url": "SD_Updater"
+        },
+        {
+            "name": "SD_Campaigns",
+            "kind": "EntitySet",
+            "url": "SD_Campaigns"
+        },
+        {
+            "name": "SD_Entities",
+            "kind": "EntitySet",
+            "url": "SD_Entities"
+        },
+        {
+            "name": "SD_Entities_CS_DefectEntries",
+            "kind": "EntitySet",
+            "url": "SD_Entities_CS_DefectEntries"
+        },
+        {
+            "name": "SD_Entities_CS_Chemistry",
+            "kind": "EntitySet",
+            "url": "SD_Entities_CS_Chemistry"
+        },
+        {
+            "name": "SD_Entities_CS_WasteEntries",
+            "kind": "EntitySet",
+            "url": "SD_Entities_CS_WasteEntries"
+        },
+        {
+            "name": "SD_Entities_ConsistencyChecks",
+            "kind": "EntitySet",
+            "url": "SD_Entities_ConsistencyChecks"
+        },
+        {
+            "name": "SD_Entities_InputAT",
+            "kind": "EntitySet",
+            "url": "SD_Entities_InputAT"
+        },
+        {
+            "name": "SD_Entities_Tracking",
+            "kind": "EntitySet",
+            "url": "SD_Entities_Tracking"
+        },
+        {
+            "name": "SD_Entities_DataConsistencyChecks",
+            "kind": "EntitySet",
+            "url": "SD_Entities_DataConsistencyChecks"
+        },
+        {
+            "name": "SD_Entities_Data",
+            "kind": "EntitySet",
+            "url": "SD_Entities_Data"
+        },
+        {
+            "name": "SD_Entities_Input",
+            "kind": "EntitySet",
+            "url": "SD_Entities_Input"
+        },
+        {
+            "name": "SysMultiLinks_CSR_Objectives_FirstAxis",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_CSR_Objectives_FirstAxis"
+        },
+        {
+            "name": "SysMultiLinks_CSR_Objectives_TeamMembers",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_CSR_Objectives_TeamMembers"
+        },
+        {
+            "name": "SysMultiLinks_CSR_Objectives_LinkToObjectives",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_CSR_Objectives_LinkToObjectives"
+        },
+        {
+            "name": "SysMultiLinks_TCK_ActionItem_Captures",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_TCK_ActionItem_Captures"
+        },
+        {
+            "name": "SysMultiLinks_TCK_ActionItem_Followers",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_TCK_ActionItem_Followers"
+        },
+        {
+            "name": "SysMultiLinks_TCK_ActionItem_LinkedItems",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_TCK_ActionItem_LinkedItems"
+        },
+        {
+            "name": "SysMultiLinks_ho_EntityUnitManagement_DisabledUnits",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_EntityUnitManagement_DisabledUnits"
+        },
+        {
+            "name": "SysMultiLinks_ho_Units_FirstPartFilter",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Units_FirstPartFilter"
+        },
+        {
+            "name": "SysMultiLinks_ho_Units_SecondPartFilter",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Units_SecondPartFilter"
+        },
+        {
+            "name": "SysMultiLinks_ho_BusinessTypes_SubApplications",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_BusinessTypes_SubApplications"
+        },
+        {
+            "name": "SysMultiLinks_ho_BusinessDirectory_Type",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_BusinessDirectory_Type"
+        },
+        {
+            "name": "SysMultiLinks_ho_BusinessDirectory_Entities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_BusinessDirectory_Entities"
+        },
+        {
+            "name": "SysMultiLinks_ho_Directory_WorkingPerimeter",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Directory_WorkingPerimeter"
+        },
+        {
+            "name": "SysMultiLinks_ho_Directory_Entities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Directory_Entities"
+        },
+        {
+            "name": "SysMultiLinks_ho_Directory_APFirstAxis",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Directory_APFirstAxis"
+        },
+        {
+            "name": "SysMultiLinks_ho_HFirstAxis_SecondAxes",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_HFirstAxis_SecondAxes"
+        },
+        {
+            "name": "SysMultiLinks_ho_HFirstAxis_ThirdAxes",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_HFirstAxis_ThirdAxes"
+        },
+        {
+            "name": "SysMultiLinks_ho_HFirstAxis_Keywords",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_HFirstAxis_Keywords"
+        },
+        {
+            "name": "SysMultiLinks_ho_Entities_Keywords",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Entities_Keywords"
+        },
+        {
+            "name": "SysMultiLinks_ho_Entities_SecondAxes",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Entities_SecondAxes"
+        },
+        {
+            "name": "SysMultiLinks_ho_Entities_ThirdAxes",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_Entities_ThirdAxes"
+        },
+        {
+            "name": "SysMultiLinks_ho_NewsArticles_Entities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_NewsArticles_Entities"
+        },
+        {
+            "name": "SysMultiLinks_ho_NewsArticles_SecondAxis",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_NewsArticles_SecondAxis"
+        },
+        {
+            "name": "SysMultiLinks_ho_NewsArticles_ThirdAxis",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_NewsArticles_ThirdAxis"
+        },
+        {
+            "name": "SysMultiLinks_ho_NewsArticles_Applications",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_ho_NewsArticles_Applications"
+        },
+        {
+            "name": "SysMultiLinks_SD_EnergySupplier_Entities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_EnergySupplier_Entities"
+        },
+        {
+            "name": "SysMultiLinks_SD_EnergyAttributesCertificate_Entities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_EnergyAttributesCertificate_Entities"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_DataRollupConfigurationTable_CS_SourceEntities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_DataRollupConfigurationTable_CS_SourceEntities"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_DataRollupConfigurationTable_SourceIndicators",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_DataRollupConfigurationTable_SourceIndicators"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_DataRollupConfigurationTable_Frequencies",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_DataRollupConfigurationTable_Frequencies"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_ReportingAxisMappingTable_CS_SourceEntities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_ReportingAxisMappingTable_CS_SourceEntities"
+        },
+        {
+            "name": "SysMultiLinks_SD_VersionedConsistencyChecks_ExpectedValueList",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_VersionedConsistencyChecks_ExpectedValueList"
+        },
+        {
+            "name": "SysMultiLinks_SD_VersionedConsistencyChecks_JustificationType",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_VersionedConsistencyChecks_JustificationType"
+        },
+        {
+            "name": "SysMultiLinks_SD_HistorizedIndicators_DependencyAnswers",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_HistorizedIndicators_DependencyAnswers"
+        },
+        {
+            "name": "SysMultiLinks_SD_HistorizedIndicators_LineComposition",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_HistorizedIndicators_LineComposition"
+        },
+        {
+            "name": "SysMultiLinks_SD_HistorizedIndicators_ColumnComposition",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_HistorizedIndicators_ColumnComposition"
+        },
+        {
+            "name": "SysMultiLinks_SD_HistorizedIndicators_DefaultMultipleListAnswer",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_HistorizedIndicators_DefaultMultipleListAnswer"
+        },
+        {
+            "name": "SysMultiLinks_SD_HistorizedIndicators_Referentials",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_HistorizedIndicators_Referentials"
+        },
+        {
+            "name": "SysMultiLinks_SD_Snapshots_IndicatorPerimeter",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Snapshots_IndicatorPerimeter"
+        },
+        {
+            "name": "SysMultiLinks_SD_TableLine_DependencyAnswerList",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_TableLine_DependencyAnswerList"
+        },
+        {
+            "name": "SysMultiLinks_SD_IndicatorConsistencyChecks_ExpectedValueList",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_IndicatorConsistencyChecks_ExpectedValueList"
+        },
+        {
+            "name": "SysMultiLinks_SD_IndicatorConsistencyChecks_JustificationType",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_IndicatorConsistencyChecks_JustificationType"
+        },
+        {
+            "name": "SysMultiLinks_SD_Indicators_DependencyAnswers",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Indicators_DependencyAnswers"
+        },
+        {
+            "name": "SysMultiLinks_SD_Indicators_TableLines",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Indicators_TableLines"
+        },
+        {
+            "name": "SysMultiLinks_SD_Indicators_AllLineComposition",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Indicators_AllLineComposition"
+        },
+        {
+            "name": "SysMultiLinks_SD_Indicators_TableColumns",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Indicators_TableColumns"
+        },
+        {
+            "name": "SysMultiLinks_SD_Indicators_AllColumnComposition",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Indicators_AllColumnComposition"
+        },
+        {
+            "name": "SysMultiLinks_SD_Indicators_DefaultMultipleListAnswer",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Indicators_DefaultMultipleListAnswer"
+        },
+        {
+            "name": "SysMultiLinks_SD_Indicators_Referentials",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Indicators_Referentials"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_Product_CS_Brand",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_Product_CS_Brand"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_WasteVendor_CS_ProductType",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_WasteVendor_CS_ProductType"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_ManagementMethod_CS_ProductType",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_ManagementMethod_CS_ProductType"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_Component_CS_WasteTypes",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_Component_CS_WasteTypes"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_WasteItem_CS_WasteTypes",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_WasteItem_CS_WasteTypes"
+        },
+        {
+            "name": "SysMultiLinks_SD_CS_WasteType_CS_ProductType",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_CS_WasteType_CS_ProductType"
+        },
+        {
+            "name": "SysMultiLinks_SD_Recalculations_Campaigns",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Recalculations_Campaigns"
+        },
+        {
+            "name": "SysMultiLinks_SD_Recalculations_FirstAxis",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Recalculations_FirstAxis"
+        },
+        {
+            "name": "SysMultiLinks_SD_Recalculations_Questionnaires",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Recalculations_Questionnaires"
+        },
+        {
+            "name": "SysMultiLinks_SD_Updater_Campaigns",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Updater_Campaigns"
+        },
+        {
+            "name": "SysMultiLinks_SD_Updater_HistorizedIndicators",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Updater_HistorizedIndicators"
+        },
+        {
+            "name": "SysMultiLinks_SD_Updater_Indicators",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Updater_Indicators"
+        },
+        {
+            "name": "SysMultiLinks_SD_Updater_TableLines",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Updater_TableLines"
+        },
+        {
+            "name": "SysMultiLinks_SD_Updater_TableColumns",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Updater_TableColumns"
+        },
+        {
+            "name": "SysMultiLinks_SD_Updater_Entities",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Updater_Entities"
+        },
+        {
+            "name": "SysMultiLinks_SD_Campaigns_ArchiveIndicatorPerimeter",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Campaigns_ArchiveIndicatorPerimeter"
+        },
+        {
+            "name": "SysMultiLinks_SD_Campaigns_IndicatorPerimeter",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Campaigns_IndicatorPerimeter"
+        },
+        {
+            "name": "SysMultiLinks_SD_Campaigns_ReportingPerimeter",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Campaigns_ReportingPerimeter"
+        },
+        {
+            "name": "SysMultiLinks_SD_Entities_Data_ValueListMultiple",
+            "kind": "EntitySet",
+            "url": "SysMultiLinks_SD_Entities_Data_ValueListMultiple"
+        },
+        {
+            "name": "Shared_No_Yes",
+            "kind": "EntitySet",
+            "url": "Shared_No_Yes"
+        },
+        {
+            "name": "Shared_Timezones",
+            "kind": "EntitySet",
+            "url": "Shared_Timezones"
+        },
+        {
+            "name": "CSR_ObjectivesAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "CSR_ObjectivesAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "CSR_StrategyHierarchyAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "CSR_StrategyHierarchyAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "CSR_Objectives_CustomChoice_Type",
+            "kind": "EntitySet",
+            "url": "CSR_Objectives_CustomChoice_Type"
+        },
+        {
+            "name": "CSR_Objectives_CustomChoice_ThresholdSymbol",
+            "kind": "EntitySet",
+            "url": "CSR_Objectives_CustomChoice_ThresholdSymbol"
+        },
+        {
+            "name": "CSR_Objectives_CustomChoice_SDSpatialConso",
+            "kind": "EntitySet",
+            "url": "CSR_Objectives_CustomChoice_SDSpatialConso"
+        },
+        {
+            "name": "CSR_Objectives_CustomChoice_SDTimeConso",
+            "kind": "EntitySet",
+            "url": "CSR_Objectives_CustomChoice_SDTimeConso"
+        },
+        {
+            "name": "TCK_ActionItemsAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItemsAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "TCK_ActionItem_CustomChoice_Severity",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItem_CustomChoice_Severity"
+        },
+        {
+            "name": "TCK_ActionItem_CustomChoice_CS_QualityCheckComplete",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItem_CustomChoice_CS_QualityCheckComplete"
+        },
+        {
+            "name": "TCK_ActionItem_CustomChoice_SWTicketStatus",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItem_CustomChoice_SWTicketStatus"
+        },
+        {
+            "name": "TCK_ActionItem_CustomChoice_SWTicketBuildStatus",
+            "kind": "EntitySet",
+            "url": "TCK_ActionItem_CustomChoice_SWTicketBuildStatus"
+        },
+        {
+            "name": "TCK_Resources_CustomChoice_Company",
+            "kind": "EntitySet",
+            "url": "TCK_Resources_CustomChoice_Company"
+        },
+        {
+            "name": "ho_ImportFilesDPC_CustomChoice_ImportType",
+            "kind": "EntitySet",
+            "url": "ho_ImportFilesDPC_CustomChoice_ImportType"
+        },
+        {
+            "name": "ho_Applications_CustomChoice_Status",
+            "kind": "EntitySet",
+            "url": "ho_Applications_CustomChoice_Status"
+        },
+        {
+            "name": "ho_Units_CustomChoice_Type",
+            "kind": "EntitySet",
+            "url": "ho_Units_CustomChoice_Type"
+        },
+        {
+            "name": "ho_Units_CustomChoice_Relation",
+            "kind": "EntitySet",
+            "url": "ho_Units_CustomChoice_Relation"
+        },
+        {
+            "name": "ho_CalendarConfiguration_CustomChoice_Display",
+            "kind": "EntitySet",
+            "url": "ho_CalendarConfiguration_CustomChoice_Display"
+        },
+        {
+            "name": "ho_CalendarConfiguration_CustomChoice_EndDateBasedOn",
+            "kind": "EntitySet",
+            "url": "ho_CalendarConfiguration_CustomChoice_EndDateBasedOn"
+        },
+        {
+            "name": "ho_AuditTrailUser_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "ho_AuditTrailUser_CustomChoice_Mode"
+        },
+        {
+            "name": "ho_BusinessDirectoryAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "ho_BusinessDirectoryAT_CustomChoice_Mode"
+        },
+        {
+            "name": "ho_DirectoryAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "ho_DirectoryAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "ho_Directory_CustomChoice_AccountStatus",
+            "kind": "EntitySet",
+            "url": "ho_Directory_CustomChoice_AccountStatus"
+        },
+        {
+            "name": "ho_GeographyLevels_CustomChoice_SystemLevel",
+            "kind": "EntitySet",
+            "url": "ho_GeographyLevels_CustomChoice_SystemLevel"
+        },
+        {
+            "name": "ho_ThirdAxisAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "ho_ThirdAxisAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "ho_SecondAxisAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "ho_SecondAxisAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "ho_EntitiesAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "ho_EntitiesAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "ho_HThirdAxis_CustomChoice_EntityStatus",
+            "kind": "EntitySet",
+            "url": "ho_HThirdAxis_CustomChoice_EntityStatus"
+        },
+        {
+            "name": "ho_HSecondAxis_CustomChoice_EntityStatus",
+            "kind": "EntitySet",
+            "url": "ho_HSecondAxis_CustomChoice_EntityStatus"
+        },
+        {
+            "name": "ho_HFirstAxis_CustomChoice_EntityStatus",
+            "kind": "EntitySet",
+            "url": "ho_HFirstAxis_CustomChoice_EntityStatus"
+        },
+        {
+            "name": "ho_SnapshotsAxis_CustomChoice_Status",
+            "kind": "EntitySet",
+            "url": "ho_SnapshotsAxis_CustomChoice_Status"
+        },
+        {
+            "name": "ho_ThirdAxis_CustomChoice_EntityStatus",
+            "kind": "EntitySet",
+            "url": "ho_ThirdAxis_CustomChoice_EntityStatus"
+        },
+        {
+            "name": "ho_SecondAxis_CustomChoice_EntityStatus",
+            "kind": "EntitySet",
+            "url": "ho_SecondAxis_CustomChoice_EntityStatus"
+        },
+        {
+            "name": "ho_Entities_CustomChoice_EntityStatus",
+            "kind": "EntitySet",
+            "url": "ho_Entities_CustomChoice_EntityStatus"
+        },
+        {
+            "name": "ho_NewGlossary_CustomChoice_TypeOfConstant",
+            "kind": "EntitySet",
+            "url": "ho_NewGlossary_CustomChoice_TypeOfConstant"
+        },
+        {
+            "name": "ho_NewsArticles_CustomChoice_Priority",
+            "kind": "EntitySet",
+            "url": "ho_NewsArticles_CustomChoice_Priority"
+        },
+        {
+            "name": "ho_NewsArticles_CustomChoice_LinksNumber",
+            "kind": "EntitySet",
+            "url": "ho_NewsArticles_CustomChoice_LinksNumber"
+        },
+        {
+            "name": "ho_NewsArticles_CustomChoice_FilesNumber",
+            "kind": "EntitySet",
+            "url": "ho_NewsArticles_CustomChoice_FilesNumber"
+        },
+        {
+            "name": "ho_NewsArticles_CustomChoice_Axe",
+            "kind": "EntitySet",
+            "url": "ho_NewsArticles_CustomChoice_Axe"
+        },
+        {
+            "name": "ho_NewsArticles_CustomChoice_Visibility",
+            "kind": "EntitySet",
+            "url": "ho_NewsArticles_CustomChoice_Visibility"
+        },
+        {
+            "name": "SD_SupplierEnergyCoverageAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_SupplierEnergyCoverageAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_EnergySupplierAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_EnergySupplierAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_EACEnergyAllocationAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_EACEnergyAllocationAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_EnergyAttributesCertificateAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_EnergyAttributesCertificateAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_MaterialTypesAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_MaterialTypesAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_ConversionTypesAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_ConversionTypesAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_LocalCrossUnitsConversionsAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_LocalCrossUnitsConversionsAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_CrossUnitsConversionsAT_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_CrossUnitsConversionsAT_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_EmissionFactorAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_EmissionFactorAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_EmissionFactorsAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_EmissionFactorsAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_GHGProtocolsAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_GHGProtocolsAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_CS_ToolingAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_CS_ToolingAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_IndicatorsAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorsAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_TrendMethod",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_TrendMethod"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_TrendOperator",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_TrendOperator"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_TrendInclusion",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_TrendInclusion"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_TrendMinInclusion",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_TrendMinInclusion"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_TrendMaxInclusion",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_TrendMaxInclusion"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueListComparisonType",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueListComparisonType"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueComparisonType",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueComparisonType"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueMinInclusion",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueMinInclusion"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueMaxInclusion",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_ExpectedValueMaxInclusion"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_FailureType",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_FailureType"
+        },
+        {
+            "name": "SD_VersionedConsistencyChecks_CustomChoice_JustificationMode",
+            "kind": "EntitySet",
+            "url": "SD_VersionedConsistencyChecks_CustomChoice_JustificationMode"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_PreviousValueBasedOn",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_PreviousValueBasedOn"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_Type",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_Type"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_LineType",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_LineType"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_ColumnType",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_ColumnType"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_ConsolidationType",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_ConsolidationType"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_ConsoOrder",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_ConsoOrder"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_WishedTrend",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_WishedTrend"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_CcCommentsActive",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_CcCommentsActive"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_CcRangeActive",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_CcRangeActive"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_MinValueBehavior",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_MinValueBehavior"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_MaxValueBehavior",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_MaxValueBehavior"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_CcPreviousPeriodActive",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_CcPreviousPeriodActive"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_CcPreviousPeriodAppreciation",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_CcPreviousPeriodAppreciation"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_CcRuleActive",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_CcRuleActive"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_CcFilledActive",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_CcFilledActive"
+        },
+        {
+            "name": "SD_HistorizedIndicators_CustomChoice_CS_QuestionnaireForm",
+            "kind": "EntitySet",
+            "url": "SD_HistorizedIndicators_CustomChoice_CS_QuestionnaireForm"
+        },
+        {
+            "name": "SD_TableColumn_CustomChoice_Type",
+            "kind": "EntitySet",
+            "url": "SD_TableColumn_CustomChoice_Type"
+        },
+        {
+            "name": "SD_TableColumn_CustomChoice_ConsoOrder",
+            "kind": "EntitySet",
+            "url": "SD_TableColumn_CustomChoice_ConsoOrder"
+        },
+        {
+            "name": "SD_TableLine_CustomChoice_Type",
+            "kind": "EntitySet",
+            "url": "SD_TableLine_CustomChoice_Type"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_TrendMethod",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_TrendMethod"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_TrendOperator",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_TrendOperator"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_TrendInclusion",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_TrendInclusion"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_TrendMinInclusion",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_TrendMinInclusion"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_TrendMaxInclusion",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_TrendMaxInclusion"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueListComparisonType",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueListComparisonType"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueComparisonType",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueComparisonType"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueMinInclusion",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueMinInclusion"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueMaxInclusion",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_ExpectedValueMaxInclusion"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_FailureType",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_FailureType"
+        },
+        {
+            "name": "SD_IndicatorConsistencyChecks_CustomChoice_JustificationMode",
+            "kind": "EntitySet",
+            "url": "SD_IndicatorConsistencyChecks_CustomChoice_JustificationMode"
+        },
+        {
+            "name": "SD_Indicators_CustomChoice_PreviousValueBasedOn",
+            "kind": "EntitySet",
+            "url": "SD_Indicators_CustomChoice_PreviousValueBasedOn"
+        },
+        {
+            "name": "SD_Indicators_CustomChoice_CS_QuestionnaireForm",
+            "kind": "EntitySet",
+            "url": "SD_Indicators_CustomChoice_CS_QuestionnaireForm"
+        },
+        {
+            "name": "SD_Indicators_CustomChoice_Type",
+            "kind": "EntitySet",
+            "url": "SD_Indicators_CustomChoice_Type"
+        },
+        {
+            "name": "SD_Indicators_CustomChoice_LineType",
+            "kind": "EntitySet",
+            "url": "SD_Indicators_CustomChoice_LineType"
+        },
+        {
+            "name": "SD_Indicators_CustomChoice_ColumnType",
+            "kind": "EntitySet",
+            "url": "SD_Indicators_CustomChoice_ColumnType"
+        },
+        {
+            "name": "SD_Indicators_CustomChoice_ConsoOrder",
+            "kind": "EntitySet",
+            "url": "SD_Indicators_CustomChoice_ConsoOrder"
+        },
+        {
+            "name": "SD_Indicators_CustomChoice_WishedTrend",
+            "kind": "EntitySet",
+            "url": "SD_Indicators_CustomChoice_WishedTrend"
+        },
+        {
+            "name": "SD_CS_NikeDataFoundationImport_CustomChoice_CS_UploadStatus",
+            "kind": "EntitySet",
+            "url": "SD_CS_NikeDataFoundationImport_CustomChoice_CS_UploadStatus"
+        },
+        {
+            "name": "SD_CS_DefectImport_CustomChoice_CS_UploadStatus",
+            "kind": "EntitySet",
+            "url": "SD_CS_DefectImport_CustomChoice_CS_UploadStatus"
+        },
+        {
+            "name": "SD_CS_ChemistryUpload_CustomChoice_CS_UploadStatus",
+            "kind": "EntitySet",
+            "url": "SD_CS_ChemistryUpload_CustomChoice_CS_UploadStatus"
+        },
+        {
+            "name": "SD_CS_ImportWasteEntries_CustomChoice_CS_UploadStatus",
+            "kind": "EntitySet",
+            "url": "SD_CS_ImportWasteEntries_CustomChoice_CS_UploadStatus"
+        },
+        {
+            "name": "SD_StandardAlerts_CustomChoice_TgXmlStartDate",
+            "kind": "EntitySet",
+            "url": "SD_StandardAlerts_CustomChoice_TgXmlStartDate"
+        },
+        {
+            "name": "SD_StandardAlerts_CustomChoice_Delay",
+            "kind": "EntitySet",
+            "url": "SD_StandardAlerts_CustomChoice_Delay"
+        },
+        {
+            "name": "SD_StandardAlerts_CustomChoice_Periodicity",
+            "kind": "EntitySet",
+            "url": "SD_StandardAlerts_CustomChoice_Periodicity"
+        },
+        {
+            "name": "SD_StandardAlerts_CustomChoice_TgXmlEndDate",
+            "kind": "EntitySet",
+            "url": "SD_StandardAlerts_CustomChoice_TgXmlEndDate"
+        },
+        {
+            "name": "SD_Recalculations_CustomChoice_DefinitionLevel",
+            "kind": "EntitySet",
+            "url": "SD_Recalculations_CustomChoice_DefinitionLevel"
+        },
+        {
+            "name": "SD_Recalculations_CustomChoice_Recurrence",
+            "kind": "EntitySet",
+            "url": "SD_Recalculations_CustomChoice_Recurrence"
+        },
+        {
+            "name": "SD_RecalculationsAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_RecalculationsAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_CampaignsAuditTrail_CustomChoice_Mode",
+            "kind": "EntitySet",
+            "url": "SD_CampaignsAuditTrail_CustomChoice_Mode"
+        },
+        {
+            "name": "SD_Alerts_CustomChoice_Periodicity",
+            "kind": "EntitySet",
+            "url": "SD_Alerts_CustomChoice_Periodicity"
+        },
+        {
+            "name": "SD_Updater_CustomChoice_FractalScope",
+            "kind": "EntitySet",
+            "url": "SD_Updater_CustomChoice_FractalScope"
+        },
+        {
+            "name": "SD_Campaigns_CustomChoice_LevelNo",
+            "kind": "EntitySet",
+            "url": "SD_Campaigns_CustomChoice_LevelNo"
+        },
+        {
+            "name": "SD_Entities_CustomChoice_EntityStatus",
+            "kind": "EntitySet",
+            "url": "SD_Entities_CustomChoice_EntityStatus"
+        },
+        {
+            "name": "SD_Entities_ConsistencyChecks_CustomChoice_CcType",
+            "kind": "EntitySet",
+            "url": "SD_Entities_ConsistencyChecks_CustomChoice_CcType"
+        },
+        {
+            "name": "SD_Entities_DataConsistencyChecks_CustomChoice_Status",
+            "kind": "EntitySet",
+            "url": "SD_Entities_DataConsistencyChecks_CustomChoice_Status"
+        }
+    ]
+}

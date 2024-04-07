@@ -1,0 +1,6 @@
+--extra-index-url https://artifactory.nike.com/artifactory/api/pypi/python-local/simple
+black
+flake8
+mypy
+pytest
+tox

@@ -8,8 +8,6 @@
 
 ## Install
 
-You can install this package from Nike's Artifactory PYPI:
-
 ```shell script
 pip3 install {{cookiecutter.name}}
 ```

@@ -1,0 +1,36 @@
+name: test
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches:
+    - '*'
+    paths:
+    - nike/**
+    - setup.py
+    - setup.cfg
+    - tests/**
+    - requirements.txt
+    - tox.ini
+    - .github/**
+    - service-root.json
+    - metadata.xml
+jobs:
+  test:
+    runs-on: [self-hosted, bmx-runner, bmx-sustainability-runner]
+    strategy:
+      matrix:
+        python:
+        - 3.8
+        - 3.9
+        - '3.10'
+        - 3.11
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    - run: make ci-install
+    - run: make test

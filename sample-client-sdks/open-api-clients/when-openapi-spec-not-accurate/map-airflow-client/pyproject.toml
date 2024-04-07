@@ -1,0 +1,32 @@
+[build-system]
+requires = [
+    "setuptools",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+extend-exclude = ".*/model.py|.*v1/client.py"
+line-length = 79
+target-version = [
+    "py38",
+    "py39",
+    "py310",
+    "py311",
+]
+
+[tool.isort]
+profile = "black"
+src_paths = [
+    "map_airflow_client",
+    "tests",
+    "scripts",
+    "setup.py",
+]
+line_length = 79
+wrap_length = 79
+multi_line_output = 3
+extend_skip_glob = [
+    "**/model.py",
+    "**/v1/client.py",
+]
