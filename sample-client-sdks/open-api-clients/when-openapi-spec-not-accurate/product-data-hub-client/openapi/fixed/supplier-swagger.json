@@ -1,0 +1,2203 @@
+{
+    "info": {
+        "title": "Material Vendor Management Service",
+        "description": "This is the API for the Material Vendor Management entity and should be the way to get or search Supplier data.",
+        "version": "1.3.0"
+    },
+    "host": "vendormanagement.api-product.pes-prod.nike.com",
+    "basePath": "/v1/materialVendorManagement",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/data/materialSuppliers/{objectId}": {
+            "get": {
+                "tags": [
+                    "Material Vendor Management Supplier"
+                ],
+                "summary": "Material Vendor Management Supplier Data",
+                "description": "How you get a single supplier.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "A single Id of the object (in this case Material Vendor Management Supplier)",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "supCore",
+                            "supLegacy",
+                            "supState",
+                            "supStatus",
+                            "supAgent",
+                            "supAgentLegacy",
+                            "supAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains supplier core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/supplierResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/materialSuppliers": {
+            "get": {
+                "tags": [
+                    "Material Vendor Management Supplier"
+                ],
+                "summary": "Material Vendor Management Supplier Data (Bulk)",
+                "description": "How you get Material Vendor Management Supplier in a Bulk fashion.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "query",
+                        "description": "A comma separated list of Ids of the object (in this case Supplier)",
+                        "required": true,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "supCore",
+                            "supLegacy",
+                            "supState",
+                            "supStatus",
+                            "supAgent",
+                            "supAgentLegacy",
+                            "supAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Number of entries the API should attempt to fetch, default is 10",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the entries the API should attempt to fetch, default is 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains supplier core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/supplierBulkResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/search/materialSuppliers": {
+            "get": {
+                "tags": [
+                    "Material Vendor Management Supplier",
+                    "Search"
+                ],
+                "summary": "Material Supplier Search",
+                "description": "How you search against all fields contained within the Material Supplier entity",
+                "parameters": [
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Number of entries the API should attempt to fetch, default is 10",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the entries the API should attempt to fetch, default is 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "This parameter is how you pass free text search, if any string is passed here it will be searched as free text includes (supplierName, parentCompanyName, legacySupplierName, agentFullName, agentParentCompanyName)",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "divisionCode",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "vendorOwnershipType",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "hasAgentIndicator",
+                        "in": "query",
+                        "description": "The the boolean associated with this item",
+                        "required": false,
+                        "type": "boolean",
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "legacySupplierCode",
+                        "in": "query",
+                        "description": "The balue associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierStateIdentifier",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "string",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "supplierStateIdentifierReference",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "supplierStatusIndicator",
+                        "in": "query",
+                        "description": "The boolean value associated with this item",
+                        "required": false,
+                        "type": "boolean",
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "agentIdentifier",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "legacyAgentCode",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains links to the material suppliers endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/searchResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "A field that has been queried does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/materialSupplierLocations/{objectId}": {
+            "get": {
+                "tags": [
+                    "Material Vendor Management Supplier Location"
+                ],
+                "summary": "Material Vendor Management Supplier Location Data",
+                "description": "How you get a single Material Vendor Management Supplier location.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "A single Id of the object (in this case Material Vendor Management Supplier Location)",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "suplocCore",
+                            "suplocLegacy",
+                            "suplocGeneral",
+                            "suplocState",
+                            "suplocStatus",
+                            "suplocAddress",
+                            "suplocContact",
+                            "suplocGeography",
+                            "suplocAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains supplier location core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/supplierLocationResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/materialSupplierLocations": {
+            "get": {
+                "tags": [
+                    "Material Vendor Management Supplier Location"
+                ],
+                "summary": "Material Vendor Management Supplier Location Data (Bulk)",
+                "description": "How you get supplier location in a Bulk fashion.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "query",
+                        "description": "A comma separated list of Ids of the object (in this case Supplier Location)",
+                        "required": true,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "suplocCore",
+                            "suplocLegacy",
+                            "suplocGeneral",
+                            "suplocState",
+                            "suplocStatus",
+                            "suplocAddress",
+                            "suplocContact",
+                            "suplocGeography",
+                            "suplocAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Number of entries the API should attempt to fetch, default is 10",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the entries the API should attempt to fetch, default is 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains supplier location core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/supplierLocationBulkResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/search/materialSupplierLocations": {
+            "get": {
+                "tags": [
+                    "Material Vendor Management Supplier Location",
+                    "Search"
+                ],
+                "summary": "Material Supplier Location Search",
+                "description": "How you search against all fields contained within the Material Supplier Location entity",
+                "parameters": [
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "Number of entries the API should attempt to fetch, default is 10",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Offset of the entries the API should attempt to fetch, default is 0",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "This parameter is how you pass free text search, if any string is passed here it will be searched as free text includes (supplierLocationName, cityName)",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "supplierIdentifier",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "legacySupplierLocationCode",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "responsibleNikeLiaisonOfficeIdentifier",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "supplierReasonRetiredIdentifier",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "string",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierLocationFoundedYearNumber",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "accreditedTestFacility",
+                        "in": "query",
+                        "description": "The boolean value associated with this item",
+                        "required": false,
+                        "type": "boolean",
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "securityVendorAccessGroup",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "globalDevelopmentCenter",
+                        "in": "query",
+                        "description": "The boolean value associated with this item",
+                        "required": false,
+                        "type": "boolean",
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "responsibleNikeLiaisonOfficeIdentifierReference",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierLocationStateIdentifier",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierLocationStateIdentifierReference",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierLocationStatusIndicator",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierLocationStatusIndicatorBoolean",
+                        "in": "query",
+                        "description": "The boolean value associated with this item",
+                        "required": false,
+                        "type": "boolean",
+                        "collectionFormat": "csv"
+                    },
+                    {
+                        "name": "supplierLocationAddressType",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "stateProvince",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "geographicArea",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierLocationContactRole",
+                        "in": "query",
+                        "description": "The value associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "supplierLocationCountry",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "portOfOriginCountry",
+                        "in": "query",
+                        "description": "The reference key associated with this item",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains links to the material supplier location endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/searchResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "A field that has been queried does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/materialPerformanceTestLabs/{objectId}": {
+            "get": {
+                "tags": [
+                    "Material Performance Test Labs"
+                ],
+                "summary": "Material Performance Test Labs Data",
+                "description": "How you get a single record of Material Performance Test Lab.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "A single Id of the object (in this case Testing Lab Identifier)",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "perfTestLabCore",
+                            "perfTestLabGeneral",
+                            "perfTestLabState",
+                            "perfTestLabStatus",
+                            "perfTestLabAddress",
+                            "perfTestLabContact",
+                            "perfTestLabAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains supplier location core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/materialPerformanceTestLabResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "swagger": "2.0",
+    "definitions": {
+        "supplierResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/supplier_dataunits"
+                        },
+                        "relationships": {
+                            "$ref": "#/definitions/_links",
+                            "description": "Link to the relationships endpoint to get any relationships for this entity"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                },
+                "objectId": {
+                    "description": "The business key related to items requested.",
+                    "type": "string"
+                },
+                "objectType": {
+                    "description": "The type of key that has been requested.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supplierBulkResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "objectId": {
+                                "description": "The business key related to items requested.",
+                                "type": "string"
+                            },
+                            "objectType": {
+                                "description": "The type of key that has been requested.",
+                                "type": "string"
+                            },
+                            "data": {
+                                "$ref": "#/definitions/supplier_dataunits"
+                            },
+                            "relationships": {
+                                "$ref": "#/definitions/_links",
+                                "description": "Link to the relationships endpoint to get any relationships for this entity"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "count": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "offset": {
+                    "description": "The number of entries offset (can be used to derive the \"Page Number\" by using count)",
+                    "type": "integer"
+                },
+                "next": {
+                    "$ref": "#/definitions/_links"
+                },
+                "prev": {
+                    "$ref": "#/definitions/_links"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supplierLocationResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/supplierLocation_dataunits"
+                        },
+                        "relationships": {
+                            "$ref": "#/definitions/_links",
+                            "description": "Link to the relationships endpoint to get any relationships for this entity"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                },
+                "objectId": {
+                    "description": "The business key related to items requested.",
+                    "type": "string"
+                },
+                "objectType": {
+                    "description": "The type of key that has been requested.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supplierLocationBulkResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "objectId": {
+                                "description": "The business key related to items requested.",
+                                "type": "string"
+                            },
+                            "objectType": {
+                                "description": "The type of key that has been requested.",
+                                "type": "string"
+                            },
+                            "data": {
+                                "$ref": "#/definitions/supplierLocation_dataunits"
+                            },
+                            "relationships": {
+                                "$ref": "#/definitions/_links",
+                                "description": "Link to the relationships endpoint to get any relationships for this entity"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "count": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "offset": {
+                    "description": "The number of entries offset (can be used to derive the \"Page Number\" by using count)",
+                    "type": "integer"
+                },
+                "next": {
+                    "$ref": "#/definitions/_links"
+                },
+                "prev": {
+                    "$ref": "#/definitions/_links"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "materialPerformanceTestLabResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/testLab_dataunits"
+                        },
+                        "relationships": {
+                            "$ref": "#/definitions/_links",
+                            "description": "Link to the relationships endpoint to get any relationships for this entity"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                },
+                "objectId": {
+                    "description": "The business key related to items requested.",
+                    "type": "string"
+                },
+                "objectType": {
+                    "description": "The type of key that has been requested.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "relationshipResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "relationships": {
+                                "$ref": "#/definitions/_reference"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "count": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "searchResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "relationships": {
+                                "$ref": "#/definitions/_reference"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "count": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "offset": {
+                    "description": "The number of entries offset (can be used to derive the \"Page Number\" by using count)",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "The total number of records in this search",
+                    "type": "integer"
+                },
+                "next": {
+                    "$ref": "#/definitions/_links"
+                },
+                "prev": {
+                    "$ref": "#/definitions/_links"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supplier_dataunits": {
+            "properties": {
+                "supCore": {
+                    "$ref": "#/definitions/supCore"
+                },
+                "supLegacy": {
+                    "$ref": "#/definitions/supLegacy"
+                },
+                "supState": {
+                    "$ref": "#/definitions/supState"
+                },
+                "supStatus": {
+                    "$ref": "#/definitions/supStatus"
+                },
+                "supAgent": {
+                    "$ref": "#/definitions/supAgent"
+                },
+                "supAgentLegacy": {
+                    "$ref": "#/definitions/supAgentLegacy"
+                },
+                "supAudit": {
+                    "$ref": "#/definitions/supAudit"
+                },
+                "supEntitlement": {
+                    "$ref": "#/definitions/Entitlements"
+                }
+            },
+            "type": "object",
+            "required": [
+                "supCore"
+            ]
+        },
+        "supCore": {
+            "properties": {
+                "supplierIdentifier": {
+                    "description": "No Definition Available",
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "integer"
+                        }
+                    ]
+                },
+                "supplierName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "divisionCode": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to LM Division"
+                },
+                "parentCompanyName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "vendorOwnershipType": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "webSiteAddress": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "hasAgentIndicator": {
+                    "description": "No Definition Available",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "supLegacy": {
+            "properties": {
+                "legacySupplierCode": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "legacySupplierName": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supState": {
+            "properties": {
+                "supplierStateIdentifier": {
+                    "type": "string"
+                },
+                "supplierStateIdentifierReference": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to Supplier State"
+                }
+            },
+            "type": "object"
+        },
+        "supStatus": {
+            "properties": {
+                "supplierStatusIndicator": {
+                    "description": "No Definition Available",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "supAgent": {
+            "properties": {
+                "agentIdentifier": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to Supplier End Point"
+                },
+                "agentFullName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "agentParentCompanyName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supAgentLegacy": {
+            "properties": {
+                "legacyAgentCode": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supAudit": {
+            "properties": {
+                "createTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "changeTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "createdBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "modifiedBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supplierLocation_dataunits": {
+            "properties": {
+                "suplocCore": {
+                    "$ref": "#/definitions/suplocCore"
+                },
+                "suplocLegacy": {
+                    "$ref": "#/definitions/suplocLegacy"
+                },
+                "suplocGeneral": {
+                    "$ref": "#/definitions/suplocGeneral"
+                },
+                "suplocState": {
+                    "$ref": "#/definitions/suplocState"
+                },
+                "suplocStatus": {
+                    "$ref": "#/definitions/suplocStatus"
+                },
+                "suplocAddress": {
+                    "$ref": "#/definitions/suplocAddress"
+                },
+                "suplocContact": {
+                    "$ref": "#/definitions/suplocContact"
+                },
+                "suplocGeography": {
+                    "$ref": "#/definitions/suplocGeography"
+                },
+                "suplocAudit": {
+                    "$ref": "#/definitions/suplocAudit"
+                },
+                "suplocEntitlement": {
+                    "$ref": "#/definitions/Entitlements"
+                }
+            },
+            "type": "object",
+            "required": [
+                "suplocCore"
+            ]
+        },
+        "suplocCore": {
+            "properties": {
+                "supplierLocationIdentifier": {
+                    "description": "supplier Location Identifier",
+                    "type": "integer"
+                },
+                "supplierLocationName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "supplier": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to Supplier End Point"
+                }
+            },
+            "type": "object"
+        },
+        "suplocLegacy": {
+            "properties": {
+                "legacySupplierLocationCode": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "suplocGeneral": {
+            "properties": {
+                "responsibleNikeLiaisonOfficeIdentifier": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "supplierReasonRetiredIdentifier": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "supplierLocationFoundedYearNumber": {
+                    "description": "No Definition Available",
+                    "type": "integer"
+                },
+                "accreditedTestFacility": {
+                    "type": "boolean"
+                },
+                "securityVendorAccessGroup": {
+                    "type": "string"
+                },
+                "globalDevelopmentCenter": {
+                    "type": "boolean"
+                },
+                "responsibleNikeLiaisonOfficeIdentifierReference": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to Responsible NLO Liaison Office"
+                },
+                "confidentialityAgreementIndicator": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "suplocState": {
+            "properties": {
+                "supplierLocationStateIdentifier": {
+                    "type": "string"
+                },
+                "supplierLocationStateIdentifierReference": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to Supplier Location State"
+                }
+            },
+            "type": "object"
+        },
+        "suplocStatus": {
+            "properties": {
+                "supplierLocationStatusIndicator": {
+                    "type": "string"
+                },
+                "supplierLocationStatusIndicatorBoolean": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "suplocAddress": {
+            "items": {
+                "properties": {
+                    "supplierLocationAddressType": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "streetAddress1": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "streetAddress2": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "cityName": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "stateProvince": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "postalCode": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "geographicArea": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "supplierLocationLatestRecordIndicator": {
+                        "description": "No Definition Available",
+                        "type": "boolean"
+                    },
+                    "phoneNumber": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "faxNumber": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "supplierLocationChangeTimeStamp": {
+                        "description": "No Definition Available",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "country": {
+                        "$ref": "#/definitions/_reference",
+                        "description": "Reference Link to LM ISO Country"
+                    }
+                },
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "suplocContact": {
+            "items": {
+                "properties": {
+                    "supplierLocationContactRole": {
+                        "type": "string"
+                    },
+                    "supplierLocationContactPriorityIdentifier": {
+                        "type": "string"
+                    },
+                    "fullName": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "emailAddress": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "primaryPhoneNumber": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "suplocGeography": {
+            "properties": {
+                "supplierLocationCountry": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to LM ISO Country"
+                },
+                "portOfOriginCountry": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to LM ISO Country"
+                }
+            },
+            "type": "object"
+        },
+        "suplocAudit": {
+            "properties": {
+                "createTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "changeTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "createdBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "modifiedBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "testLab_dataunits": {
+            "properties": {
+                "perfTestLabCore": {
+                    "$ref": "#/definitions/perfTestLabCore"
+                },
+                "perfTestLabGeneral": {
+                    "$ref": "#/definitions/perfTestLabGeneral"
+                },
+                "perfTestLabState": {
+                    "$ref": "#/definitions/perfTestLabState"
+                },
+                "perfTestLabStatus": {
+                    "$ref": "#/definitions/perfTestLabStatus"
+                },
+                "perfTestLabAddress": {
+                    "$ref": "#/definitions/perfTestLabAddress"
+                },
+                "perfTestLabContact": {
+                    "$ref": "#/definitions/perfTestLabContact"
+                },
+                "perfTestLabAudit": {
+                    "$ref": "#/definitions/perfTestLabAudit"
+                },
+                "perfTestLabEntitlement": {
+                    "$ref": "#/definitions/Entitlements"
+                }
+            },
+            "type": "object",
+            "required": [
+                "perfTestLabCore"
+            ]
+        },
+        "perfTestLabCore": {
+            "properties": {
+                "testLabIdentifier": {
+                    "description": "supplierIdentifier",
+                    "type": "integer"
+                },
+                "testLabCode": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "testLabName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "division": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to LM Division Reference"
+                },
+                "parentCompanyName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "perfTestLabGeneral": {
+            "properties": {
+                "responsibleNikeLiaisonOffice": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to Test Lab Liaison Office"
+                },
+                "accreditedTestFacility": {
+                    "type": "boolean"
+                },
+                "securityVendorAccessGroup": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "perfTestLabState": {
+            "properties": {
+                "testLabState": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to Test Lab State Reference"
+                }
+            },
+            "type": "object"
+        },
+        "perfTestLabStatus": {
+            "properties": {
+                "testLabStatusIndicator": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "perfTestLabAddress": {
+            "properties": {
+                "streetAddress1": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "streetAddress2": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "cityName": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "stateProvince": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "postalCode": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "country": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to LM ISO Country Reference"
+                },
+                "phoneNumber": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "faxNumber": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "perfTestLabContact": {
+            "items": {
+                "properties": {
+                    "testLabContactRole": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "testLabPrimaryContactIndicator": {
+                        "type": "boolean"
+                    },
+                    "fullName": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "emailAddress": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    },
+                    "primaryPhoneNumber": {
+                        "description": "No Definition Available",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "perfTestLabAudit": {
+            "properties": {
+                "createTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "changeTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "createdBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "modifiedBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "_links": {
+            "properties": {
+                "rel": {
+                    "description": "The type of relationship",
+                    "type": "string"
+                },
+                "href": {
+                    "description": "The reference link",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "_reference": {
+            "properties": {
+                "referenceKey": {
+                    "description": "The key for the described field",
+                    "type": "string"
+                },
+                "link": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The url link to the reference service to get descriptions and other data related to the reference key"
+                }
+            },
+            "type": "object"
+        },
+        "_error": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "detailType": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Entitlements": {
+            "properties": {
+                "entitlements": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "securityDefinitions": {
+        "nike_auth": {
+            "type": "oauth2",
+            "description": "Method Nike we will leverage centralized authentication to get the JWT token to uniquely identify users",
+            "flow": "application",
+            "tokenUrl": "https://nike.okta.com/oauth2/aus27z7p76as9Dz0H1t7/v1/token",
+            "scopes": {
+                "read": "permission to read data from this service"
+            }
+        }
+    },
+    "produces": [
+        "application/json"
+    ],
+    "parameters": {
+        "traceParam": {
+            "name": "X-B3-TraceId",
+            "in": "header",
+            "description": "A UUID that will uniquely identify a reqest for tracking purposes, if not passed one will be assigned",
+            "required": false,
+            "type": "string"
+        },
+        "apiKeyParam": {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "The api key that will identify an application with the AWS API Gateway and is used for tracking and throttling",
+            "required": true,
+            "type": "string"
+        }
+    }
+}

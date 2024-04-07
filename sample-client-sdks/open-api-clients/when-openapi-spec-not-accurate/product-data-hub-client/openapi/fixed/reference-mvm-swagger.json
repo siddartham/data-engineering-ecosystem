@@ -1,0 +1,1304 @@
+{
+    "info": {
+        "title": "Material Vendor Management Reference Data Service",
+        "description": "This is the API for the Material Vendor Management Reference Data",
+        "version": "1.1.0"
+    },
+    "host": "vendormanagement.api-product.pes-prod.nike.com",
+    "basePath": "/v1/materialVendorManagement",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/data/testLabLiaisonOffices/{objectId}": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get specific reference data for a specific Test Lab Liaison Office key",
+                "description": "How you get a single reference data resource",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "The code associated with of the Test Lab Liaison Office object",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with the number of records asked for",
+                        "schema": {
+                            "$ref": "#/definitions/testLabLiaisonOfficeResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for an id that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/testLabLiaisonOffices": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get all reference data for Test Lab Liaison Office",
+                "description": "How you get all the reference data associated with a specific type of reference information",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with all available records",
+                        "schema": {
+                            "$ref": "#/definitions/testLabLiaisonOfficeBulkResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/testLabStates/{objectId}": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get specific reference data for a specific Test Lab State key",
+                "description": "How you get a single reference data resource",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "The code associated with of the Test Lab State object",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with the number of records asked for",
+                        "schema": {
+                            "$ref": "#/definitions/testLabStateResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for an id that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/testLabStates": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get all reference data for Test Lab State",
+                "description": "How you get all the reference data associated with a specific type of reference information",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with all available records",
+                        "schema": {
+                            "$ref": "#/definitions/testLabStateBulkResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/responsibleNikeLiaisonOffices/{objectId}": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get specific reference data for a specific responsibleNikeLiaisonOffice key",
+                "description": "How you get a single reference data resource",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "The code associated with of the responsibleNikeLiaisonOffice object",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with the number of records asked for",
+                        "schema": {
+                            "$ref": "#/definitions/responsibleNikeLiaisonOfficeResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for an id that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/responsibleNikeLiaisonOffices": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get all reference data for age",
+                "description": "How you get all the reference data associated with a specific type of reference information",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with all",
+                        "schema": {
+                            "$ref": "#/definitions/responsibleNikeLiaisonOfficeBulkResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/supplierStates/{objectId}": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get specific reference data for a specific supplierState key",
+                "description": "How you get a single reference data resource",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "The code associated with of the supplierState object",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with the number of records asked for",
+                        "schema": {
+                            "$ref": "#/definitions/supplierStateResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for an id that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/data/supplierStates": {
+            "get": {
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "Get all reference data for age",
+                "description": "How you get all the reference data associated with a specific type of reference information",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object with all",
+                        "schema": {
+                            "$ref": "#/definitions/supplierStateBulkResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "swagger": "2.0",
+    "definitions": {
+        "testLabLiaisonOfficeResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/testLabLiaisonOffice"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "testLabLiaisonOfficeBulkResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "objectId": {
+                                "description": "The business key related to items requested.",
+                                "type": "string"
+                            },
+                            "objectType": {
+                                "description": "The type of key that has been requested.",
+                                "type": "string"
+                            },
+                            "data": {
+                                "$ref": "#/definitions/testLabLiaisonOffice"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "totalCount": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "testLabLiaisonOffice": {
+            "properties": {
+                "testLabLiaisonOfficeIdentifier": {
+                    "type": "integer"
+                },
+                "testLabLiaisonOfficeName": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "createTimestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "modifiedBy": {
+                    "type": "string"
+                },
+                "changeTimestamp": {
+                    "description": "<a target=\"_blank\" href =\"http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp\">Definition</a>",
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "type": "object"
+        },
+        "testLabStateResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/testLabState"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "testLabStateBulkResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "objectId": {
+                                "description": "The business key related to items requested.",
+                                "type": "string"
+                            },
+                            "objectType": {
+                                "description": "The type of key that has been requested.",
+                                "type": "string"
+                            },
+                            "data": {
+                                "$ref": "#/definitions/testLabState"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "totalCount": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "testLabState": {
+            "properties": {
+                "testLabStateIdentifier": {
+                    "type": "integer"
+                },
+                "testLabStateName": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "createTimestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "modifiedBy": {
+                    "type": "string"
+                },
+                "changeTimestamp": {
+                    "description": "<a target=\"_blank\" href =\"http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp\">Definition</a>",
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "type": "object"
+        },
+        "responsibleNikeLiaisonOfficeResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/responsibleNikeLiaisonOffice"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "responsibleNikeLiaisonOfficeBulkResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "objectId": {
+                                "description": "The business key related to items requested.",
+                                "type": "string"
+                            },
+                            "objectType": {
+                                "description": "The type of key that has been requested.",
+                                "type": "string"
+                            },
+                            "data": {
+                                "$ref": "#/definitions/responsibleNikeLiaisonOffice"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "totalCount": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "responsibleNikeLiaisonOffice": {
+            "properties": {
+                "responsibleNikeLiaisonOfficeIdentifier": {
+                    "type": "integer"
+                },
+                "responsibleNikeLiaisonOfficeName": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "createTimestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "modifiedBy": {
+                    "type": "string"
+                },
+                "changeTimestamp": {
+                    "description": "<a target=\"_blank\" href =\"http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp\">Definition</a>",
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "type": "object"
+        },
+        "supplierStateResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/supplierState"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supplierStateBulkResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "objectId": {
+                                "description": "The business key related to items requested.",
+                                "type": "string"
+                            },
+                            "objectType": {
+                                "description": "The type of key that has been requested.",
+                                "type": "string"
+                            },
+                            "data": {
+                                "$ref": "#/definitions/supplierState"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "totalCount": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "supplierState": {
+            "properties": {
+                "supplierStateIdentifier": {
+                    "type": "integer"
+                },
+                "supplierStateName": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "createTimestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "modifiedBy": {
+                    "type": "string"
+                },
+                "changeTimestamp": {
+                    "description": "<a target=\"_blank\" href =\"http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp\">Definition</a>",
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "type": "object"
+        },
+        "_links": {
+            "properties": {
+                "rel": {
+                    "description": "The type of relationship",
+                    "type": "string"
+                },
+                "href": {
+                    "description": "The reference link",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "_reference": {
+            "properties": {
+                "referenceKey": {
+                    "description": "The key for the described field",
+                    "type": "string"
+                },
+                "link": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The url link to the reference service to get descriptions and other data related to the reference key"
+                }
+            },
+            "type": "object"
+        },
+        "_error": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "detailType": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "securityDefinitions": {
+        "nike_auth": {
+            "type": "oauth2",
+            "description": "Method Nike we will leverage centralized authentication to get the JWT token to uniquely identify users",
+            "flow": "application",
+            "tokenUrl": "https://nike.okta.com/oauth2/aus27z7p76as9Dz0H1t7/v1/token",
+            "scopes": {
+                "read": "permission to read data from this service"
+            }
+        }
+    },
+    "produces": [
+        "application/json"
+    ],
+    "parameters": {
+        "traceParam": {
+            "name": "X-B3-TraceId",
+            "in": "header",
+            "description": "A UUID that will uniquely identify a reqest for tracking purposes, if not passed one will be assigned",
+            "required": false,
+            "type": "string"
+        },
+        "apiKeyParam": {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "The api key that will identify an application with the AWS API Gateway and is used for tracking and throttling",
+            "required": true,
+            "type": "string"
+        }
+    }
+}

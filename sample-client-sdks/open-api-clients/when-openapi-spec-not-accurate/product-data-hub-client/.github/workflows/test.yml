@@ -1,0 +1,31 @@
+name: test
+on:
+  pull_request:
+    paths:
+    - Makefile
+    - nike/**
+    - setup.py
+    - setup.cfg
+    - tests/**
+    - requirements.txt
+    - tox.ini
+    - .github/**
+jobs:
+  test:
+    strategy:
+      matrix:
+        python:
+        - 3.8
+        - 3.9
+        - '3.10'
+        - '3.11'
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    - run: make ci-install
+    - run: make test

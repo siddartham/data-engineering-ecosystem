@@ -1,0 +1,898 @@
+swagger: '2.0'
+info:
+  title: Material Vendor Management Reference Data Service
+  description: This is the API for the Material Vendor Management Reference Data
+  version: 1.1.0
+host: vendormanagement.api-product.pes-prod.nike.com
+schemes:
+  - https
+basePath: /v1/materialVendorManagement
+produces:
+  - application/json
+
+paths:
+
+  /data/testLabLiaisonOffices/{objectId}:
+    get:
+      summary: Get specific reference data for a specific Test Lab Liaison Office key
+      description: How you get a single reference data resource
+      parameters:
+        - name: objectId
+          in: path
+          description: The code associated with of the Test Lab Liaison Office object
+          required: true
+          type: string # varchar2
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with the number of records asked for
+          schema:
+            $ref: '#/definitions/testLabLiaisonOfficeResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for an id that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/testLabLiaisonOffices:
+    get:
+      summary: Get all reference data for Test Lab Liaison Office
+      description: How you get all the reference data associated with a specific type of reference information
+      parameters:
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with all available records
+          schema:
+            $ref: '#/definitions/testLabLiaisonOfficeBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/testLabStates/{objectId}:
+    get:
+      summary: Get specific reference data for a specific Test Lab State key
+      description: How you get a single reference data resource
+      parameters:
+        - name: objectId
+          in: path
+          description: The code associated with of the Test Lab State object
+          required: true
+          type: string # varchar2
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with the number of records asked for
+          schema:
+            $ref: '#/definitions/testLabStateResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for an id that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/testLabStates:
+    get:
+      summary: Get all reference data for Test Lab State
+      description: How you get all the reference data associated with a specific type of reference information
+      parameters:
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with all available records
+          schema:
+            $ref: '#/definitions/testLabStateBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/responsibleNikeLiaisonOffices/{objectId}:
+    get:
+      summary: Get specific reference data for a specific responsibleNikeLiaisonOffice key
+      description: How you get a single reference data resource
+      parameters:
+        - name: objectId
+          in: path
+          description: The code associated with of the responsibleNikeLiaisonOffice object
+          required: true
+          type: string # varchar2
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with the number of records asked for
+          schema:
+            $ref: '#/definitions/responsibleNikeLiaisonOfficeResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for an id that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/responsibleNikeLiaisonOffices:
+    get:
+      summary: Get all reference data for age
+      description: How you get all the reference data associated with a specific type of reference information
+      parameters:
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with all
+          schema:
+            $ref: '#/definitions/responsibleNikeLiaisonOfficeBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/supplierStates/{objectId}:
+    get:
+      summary: Get specific reference data for a specific supplierState key
+      description: How you get a single reference data resource
+      parameters:
+        - name: objectId
+          in: path
+          description: The code associated with of the supplierState object
+          required: true
+          type: string # varchar2
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with the number of records asked for
+          schema:
+            $ref: '#/definitions/supplierStateResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for an id that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/supplierStates:
+    get:
+      summary: Get all reference data for age
+      description: How you get all the reference data associated with a specific type of reference information
+      parameters:
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Reference
+      responses:
+        '200':
+          description: Returns response object with all
+          schema:
+            $ref: '#/definitions/supplierStateBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+
+# Shared Parameters
+
+parameters:
+  traceParam:
+    name: X-B3-TraceId
+    in: header
+    type: string
+    required: false
+    description: 'A UUID that will uniquely identify a reqest for tracking purposes, if not passed one will be assigned'
+  apiKeyParam:
+    name: x-api-key
+    in: header
+    type: string
+    required: true
+    description: The api key that will identify an application with the AWS API Gateway and is used for tracking and throttling
+
+definitions:
+
+# Test Lab Liaison Office Data
+
+  testLabLiaisonOfficeResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/testLabLiaisonOffice'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  testLabLiaisonOfficeBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/testLabLiaisonOffice'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      totalCount:
+        type: integer
+        description: The number of entries returned in this responses
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  testLabLiaisonOffice:
+    type: object
+    properties:
+      testLabLiaisonOfficeIdentifier:
+        type: integer
+      testLabLiaisonOfficeName:
+        type: string
+      createdBy:
+        type: string
+      createTimestamp:
+        type: string
+        format: date-time
+      modifiedBy:
+        type: string
+      changeTimestamp:
+        type: string
+        format: date-time
+        description: '<a target="_blank" href ="http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp">Definition</a>'
+
+# Test Lab State Data
+
+  testLabStateResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/testLabState'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  testLabStateBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/testLabState'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      totalCount:
+        type: integer
+        description: The number of entries returned in this responses
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  testLabState:
+    type: object
+    properties:
+      testLabStateIdentifier:
+        type: integer
+      testLabStateName:
+        type: string
+      createdBy:
+        type: string
+      createTimestamp:
+        type: string
+        format: date-time
+      modifiedBy:
+        type: string
+      changeTimestamp:
+        type: string
+        format: date-time
+        description: '<a target="_blank" href ="http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp">Definition</a>'
+
+# responsible NLO reference
+
+  responsibleNikeLiaisonOfficeResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/responsibleNikeLiaisonOffice'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  responsibleNikeLiaisonOfficeBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/responsibleNikeLiaisonOffice'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      totalCount:
+        type: integer
+        description: The number of entries returned in this responses
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  responsibleNikeLiaisonOffice:
+    type: object
+    properties:
+      responsibleNikeLiaisonOfficeIdentifier:
+        type: integer # varchar2
+      responsibleNikeLiaisonOfficeName:
+        type: string # varchar2
+      createdBy:
+        type: string # varchar2
+      createTimestamp:
+        type: string
+        format: date-time # timestamp
+      modifiedBy:
+        type: string # varchar2
+      changeTimestamp:
+        type: string
+        format: date-time # timestamp
+        description: '<a target="_blank" href ="http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp">Definition</a>'
+
+# supplier states
+
+  supplierStateResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/supplierState'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  supplierStateBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/supplierState'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      totalCount:
+        type: integer
+        description: The number of entries returned in this responses
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  supplierState:
+    type: object
+    properties:
+      supplierStateIdentifier:
+        type: integer # varchar2
+      supplierStateName:
+        type: string # varchar2
+      createdBy:
+        type: string # varchar2
+      createTimestamp:
+        type: string
+        format: date-time # timestamp
+      modifiedBy:
+        type: string # varchar2
+      changeTimestamp:
+        type: string
+        format: date-time # timestamp
+        description: '<a target="_blank" href ="http://nke-lnx-int-q013:10250/mm/#browse___glossary___MM%252FNike%2520Approved%2520Terms%252FBusiness%2520Term%252FChange%2520Timestamp">Definition</a>'
+
+
+# Common Structures
+
+  _links:
+    type: object
+    properties:
+      rel:
+        description: The type of relationship
+        type: string
+      href:
+        description: The reference link
+        type: string
+
+  _reference:
+    type: object
+    properties:
+      referenceKey:
+        type: string
+        description: The key for the described field
+      link:
+        $ref: '#/definitions/_links'
+        description: The url link to the reference service to get descriptions and other data related to the reference key
+
+#Error Structure
+  _error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      detailType:
+        type: string
+      message:
+        type: string
+
+#Security
+
+securityDefinitions:
+  nike_auth:
+    type: oauth2
+    tokenUrl: https://nike.okta.com/oauth2/aus27z7p76as9Dz0H1t7/v1/token
+    flow: application
+    description: Method Nike we will leverage centralized authentication to get the JWT token to uniquely identify users
+    scopes:
+     read: permission to read data from this service

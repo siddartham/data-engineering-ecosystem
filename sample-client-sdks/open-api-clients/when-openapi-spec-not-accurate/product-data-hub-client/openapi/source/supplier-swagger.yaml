@@ -1,0 +1,1569 @@
+swagger: '2.0'
+info:
+  title: Material Vendor Management Service
+  description: This is the API for the Material Vendor Management entity and should be the way to get or search Supplier data.
+  version: 1.3.0
+host: vendormanagement.api-product.pes-prod.nike.com
+schemes:
+  - https
+basePath: /v1/materialVendorManagement
+produces:
+  - application/json
+
+paths:
+
+# Entity Methods
+  /data/materialSuppliers/{objectId}:
+    get:
+      summary: Material Vendor Management Supplier Data
+      description: How you get a single supplier.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Material Vendor Management Supplier)
+          required: true
+          type: integer
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - supCore
+            - supLegacy
+            - supState
+            - supStatus
+            - supAgent
+            - supAgentLegacy
+            - supAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Material Vendor Management Supplier
+      responses:
+        '200':
+          description: Returns response object which contains supplier core with requested data units
+          schema:
+            $ref: '#/definitions/supplierResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/materialSuppliers:
+    get:
+      summary: Material Vendor Management Supplier Data (Bulk)
+      description: How you get Material Vendor Management Supplier in a Bulk fashion.
+      parameters:
+        - name: objectId
+          in: query
+          description: A comma separated list of Ids of the object (in this case Supplier)
+          required: true
+          type: array
+          items:
+            type: integer
+            format: int64
+          collectionFormat: csv
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - supCore
+            - supLegacy
+            - supState
+            - supStatus
+            - supAgent
+            - supAgentLegacy
+            - supAudit
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Material Vendor Management Supplier
+      responses:
+        '200':
+          description: Returns response object which contains supplier core with requested data units
+          schema:
+            $ref: '#/definitions/supplierBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /search/materialSuppliers:
+    get:
+      summary: Material Supplier Search
+      description: How you search against all fields contained within the Material Supplier entity
+      parameters:
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+        - name: q
+          in: query
+          description: 'This parameter is how you pass free text search, if any string is passed here it will be searched as free text includes (supplierName, parentCompanyName, legacySupplierName, agentFullName, agentParentCompanyName)'
+          required: false
+          type: string
+        - name: divisionCode
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: vendorOwnershipType
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: hasAgentIndicator
+          in: query
+          required: false
+          type: boolean
+          collectionFormat: csv
+          description: 'The the boolean associated with this item'
+        - name: legacySupplierCode
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The balue associated with this item'
+        - name: supplierStateIdentifier
+          in: query
+          required: false
+          type: string
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: supplierStateIdentifierReference
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: supplierStatusIndicator
+          in: query
+          required: false
+          type: boolean
+          collectionFormat: csv
+          description: 'The boolean value associated with this item'
+        - name: agentIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: legacyAgentCode
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+      tags:
+        - Material Vendor Management Supplier
+        - Search
+  # Enum for search
+      responses:
+        '200':
+          description: Returns response object which contains links to the material suppliers endpoint
+          schema:
+            $ref: '#/definitions/searchResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: A field that has been queried does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+# Relationship Methods
+
+  /data/materialSupplierLocations/{objectId}:
+    get:
+      summary: Material Vendor Management Supplier Location Data
+      description: How you get a single Material Vendor Management Supplier location.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Material Vendor Management Supplier Location)
+          required: true
+          type: integer
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - suplocCore
+            - suplocLegacy
+            - suplocGeneral
+            - suplocState
+            - suplocStatus
+            - suplocAddress
+            - suplocContact
+            - suplocGeography
+            - suplocAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Material Vendor Management Supplier Location
+      responses:
+        '200':
+          description: Returns response object which contains supplier location core with requested data units
+          schema:
+            $ref: '#/definitions/supplierLocationResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/materialSupplierLocations:
+    get:
+      summary: Material Vendor Management Supplier Location Data (Bulk)
+      description: How you get supplier location in a Bulk fashion.
+      parameters:
+        - name: objectId
+          in: query
+          description: A comma separated list of Ids of the object (in this case Supplier Location)
+          required: true
+          type: array
+          items:
+            type: integer
+            format: int64
+          collectionFormat: csv
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - suplocCore
+            - suplocLegacy
+            - suplocGeneral
+            - suplocState
+            - suplocStatus
+            - suplocAddress
+            - suplocContact
+            - suplocGeography
+            - suplocAudit
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Material Vendor Management Supplier Location
+      responses:
+        '200':
+          description: Returns response object which contains supplier location core with requested data units
+          schema:
+            $ref: '#/definitions/supplierLocationBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /search/materialSupplierLocations:
+    get:
+      summary: Material Supplier Location Search
+      description: How you search against all fields contained within the Material Supplier Location entity
+      parameters:
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+        - name: q
+          in: query
+          description: 'This parameter is how you pass free text search, if any string is passed here it will be searched as free text includes (supplierLocationName, cityName)'
+          required: false
+          type: string
+        - name: supplierIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: legacySupplierLocationCode
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: responsibleNikeLiaisonOfficeIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: supplierReasonRetiredIdentifier
+          in: query
+          required: false
+          type: string
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: supplierLocationFoundedYearNumber
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: accreditedTestFacility
+          in: query
+          required: false
+          type: boolean
+          collectionFormat: csv
+          description: 'The boolean value associated with this item'
+        - name: securityVendorAccessGroup
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: globalDevelopmentCenter
+          in: query
+          required: false
+          type: boolean
+          collectionFormat: csv
+          description: 'The boolean value associated with this item'
+        - name: responsibleNikeLiaisonOfficeIdentifierReference
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: supplierLocationStateIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: supplierLocationStateIdentifierReference
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: supplierLocationStatusIndicator
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: supplierLocationStatusIndicatorBoolean
+          in: query
+          required: false
+          type: boolean
+          collectionFormat: csv
+          description: 'The boolean value associated with this item'
+        - name: supplierLocationAddressType
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: stateProvince
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: geographicArea
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: country
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: supplierLocationContactRole
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The value associated with this item'
+        - name: supplierLocationCountry
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: portOfOriginCountry
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+      tags:
+        - Material Vendor Management Supplier Location
+        - Search
+  # Enum for search
+      responses:
+        '200':
+          description: Returns response object which contains links to the material supplier location endpoint
+          schema:
+            $ref: '#/definitions/searchResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: A field that has been queried does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/materialPerformanceTestLabs/{objectId}:
+    get:
+      summary: Material Performance Test Labs Data
+      description: How you get a single record of Material Performance Test Lab.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Testing Lab Identifier)
+          required: true
+          type: integer
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - perfTestLabCore
+            - perfTestLabGeneral
+            - perfTestLabState
+            - perfTestLabStatus
+            - perfTestLabAddress
+            - perfTestLabContact
+            - perfTestLabAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Material Performance Test Labs
+      responses:
+        '200':
+          description: Returns response object which contains supplier location core with requested data units
+          schema:
+            $ref: '#/definitions/materialPerformanceTestLabResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+parameters:
+  traceParam:
+    name: X-B3-TraceId
+    in: header
+    type: string
+    required: false
+    description: 'A UUID that will uniquely identify a reqest for tracking purposes, if not passed one will be assigned'
+  apiKeyParam:
+    name: x-api-key
+    in: header
+    type: string
+    required: true
+    description: The api key that will identify an application with the AWS API Gateway and is used for tracking and throttling
+
+definitions:
+
+# Responses
+
+  supplierResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/supplier_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  supplierBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/supplier_dataunits'
+            relationships:
+              $ref: '#/definitions/_links'
+              description: Link to the relationships endpoint to get any relationships for this entity
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      offset:
+        type: integer
+        description: The number of entries offset (can be used to derive the "Page Number" by using count)
+      next:
+        $ref: '#/definitions/_links'
+      prev:
+        $ref: '#/definitions/_links'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  supplierLocationResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/supplierLocation_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  supplierLocationBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/supplierLocation_dataunits'
+            relationships:
+              $ref: '#/definitions/_links'
+              description: Link to the relationships endpoint to get any relationships for this entity
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      offset:
+        type: integer
+        description: The number of entries offset (can be used to derive the "Page Number" by using count)
+      next:
+        $ref: '#/definitions/_links'
+      prev:
+        $ref: '#/definitions/_links'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+
+  materialPerformanceTestLabResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/testLab_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  relationshipResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            relationships:
+              $ref: '#/definitions/_reference'
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  searchResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            relationships:
+              $ref: '#/definitions/_reference'
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      offset:
+        type: integer
+        description: The number of entries offset (can be used to derive the "Page Number" by using count)
+      totalCount:
+        type: integer
+        description: The total number of records in this search
+      next:
+        $ref: '#/definitions/_links'
+      prev:
+        $ref: '#/definitions/_links'
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Supplier Data
+
+  supplier_dataunits:
+    type: object
+    required:
+      - supCore
+    properties:
+      supCore:
+         $ref: '#/definitions/supCore'
+      supLegacy:
+         $ref: '#/definitions/supLegacy'
+      supState:
+         $ref: '#/definitions/supState'
+      supStatus:
+         $ref: '#/definitions/supStatus'
+      supAgent:
+         $ref: '#/definitions/supAgent'
+      supAgentLegacy:
+         $ref: '#/definitions/supAgentLegacy'
+      supAudit:
+         $ref: '#/definitions/supAudit'
+      supEntitlement:
+         $ref: '#/definitions/Entitlements'
+
+# Supplier Data Units
+
+  supCore:
+    type: object
+    properties:
+      supplierIdentifier:
+        type: string
+        description: 'No Definition Available'
+      supplierName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+      divisionCode:
+        description: 'Reference Link to LM Division'
+        $ref: '#/definitions/_reference'
+      parentCompanyName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+      vendorOwnershipType:
+        type: string # varchar(600)
+        description: 'No Definition Available'
+      webSiteAddress:
+        type: string # varchar(2000)
+        description: 'No Definition Available'
+      hasAgentIndicator:
+        type: boolean # Boolean
+        description: 'No Definition Available'
+
+  supLegacy:
+    type: object
+    properties:
+      legacySupplierCode:
+        type: string # varchar(600)
+        description: 'No Definition Available'
+      legacySupplierName:
+        type: string
+
+  supState:
+    type: object
+    properties:
+      supplierStateIdentifier:
+        type: string
+      supplierStateIdentifierReference:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Supplier State'
+
+  supStatus:
+    type: object
+    properties:
+      supplierStatusIndicator:
+        type: boolean # Boolean
+        description: 'No Definition Available'
+
+  supAgent:
+    type: object
+    properties:
+      agentIdentifier:
+        description: 'Reference Link to Supplier End Point'
+        $ref: '#/definitions/_reference'
+      agentFullName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+      agentParentCompanyName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+
+  supAgentLegacy:
+    type: object
+    properties:
+      legacyAgentCode:
+        type: string # varchar(600)
+        description: 'No Definition Available'
+
+  supAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # Timestamp(6)
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # Timestamp(6)
+        description: 'No Definition Available'
+      createdBy:
+        type: string # varchar(18)
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # varchar(18)
+        description: 'No Definition Available'
+
+# Supplier Location Data
+
+  supplierLocation_dataunits:
+    type: object
+    required:
+      - suplocCore
+    properties:
+      suplocCore:
+         $ref: '#/definitions/suplocCore'
+      suplocLegacy:
+         $ref: '#/definitions/suplocLegacy'
+      suplocGeneral:
+         $ref: '#/definitions/suplocGeneral'
+      suplocState:
+         $ref: '#/definitions/suplocState'
+      suplocStatus:
+         $ref: '#/definitions/suplocStatus'
+      suplocAddress:
+         $ref: '#/definitions/suplocAddress'
+      suplocContact:
+         $ref: '#/definitions/suplocContact'
+      suplocGeography:
+         $ref: '#/definitions/suplocGeography'
+      suplocAudit:
+         $ref: '#/definitions/suplocAudit'
+      suplocEntitlement:
+         $ref: '#/definitions/Entitlements'
+
+# Supplier Location Data Units
+
+  suplocCore:
+    type: object
+    properties:
+      supplierLocationIdentifier:
+        type: string
+        description: 'supplier Location Identifier'
+      supplierLocationName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+      supplier:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Supplier End Point'
+
+  suplocLegacy:
+    type: object
+    properties:
+      legacySupplierLocationCode:
+        type: string # varchar(30)
+        description: 'No Definition Available'
+
+  suplocGeneral:
+    type: object
+    properties:
+      responsibleNikeLiaisonOfficeIdentifier:
+        type: string # varchar(600)
+        description: 'No Definition Available'
+      supplierReasonRetiredIdentifier:
+        type: string # varchar(600)
+        description: 'No Definition Available'
+      supplierLocationFoundedYearNumber:
+        type: integer # Integer
+        description: 'No Definition Available'
+      accreditedTestFacility:
+        type: boolean
+      securityVendorAccessGroup:
+        type: string
+      globalDevelopmentCenter:
+        type: boolean
+      responsibleNikeLiaisonOfficeIdentifierReference:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Responsible NLO Liaison Office'
+
+
+  suplocState:
+    type: object
+    properties:
+      supplierLocationStateIdentifier:
+        type: string
+      supplierLocationStateIdentifierReference:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Supplier Location State'
+
+  suplocStatus:
+    type: object
+    properties:
+      supplierLocationStatusIndicator:
+        type: string
+      supplierLocationStatusIndicatorBoolean:
+        type: boolean
+
+  suplocAddress:
+    type: array
+    items:
+      type: object
+      properties:
+        supplierLocationAddressType:
+          type: string
+          description: 'No Definition Available'
+        streetAddress1:
+          type: string # varchar(765)
+          description: 'No Definition Available'
+        streetAddress2:
+          type: string # varchar(765)
+          description: 'No Definition Available'
+        cityName:
+          type: string # varchar(240)
+          description: 'No Definition Available'
+        stateProvince:
+          type: string # varchar(600)
+          description: 'No Definition Available'
+        postalCode:
+          type: string # varchar(30)
+          description: 'No Definition Available'
+        geographicArea:
+          description: 'No Definition Available'
+          type: string
+        supplierLocationLatestRecordIndicator:
+          type: boolean # Boolean
+          description: 'No Definition Available'
+        phoneNumber:
+          type: string # varchar(4000)
+          description: 'No Definition Available'
+        faxNumber:
+          type: string # varchar(4000)
+          description: 'No Definition Available'
+        supplierLocationChangeTimeStamp:
+          type: string
+          format: date-time # Timestamp(6)
+          description: 'No Definition Available'
+        country:
+          $ref: '#/definitions/_reference' # references to ISO Country
+          description: 'Reference Link to LM ISO Country'
+
+
+  suplocContact:
+    type: array
+    items:
+      type: object
+      properties:
+        supplierLocationContactRole:
+          type: string
+        supplierLocationContactPriorityIdentifier:
+          type: string
+        fullName:
+          type: string # varchar(96)
+          description: 'No Definition Available'
+        emailAddress:
+          type: string # varchar(120)
+          description: 'No Definition Available'
+        primaryPhoneNumber:
+          type: string # varchar(96)
+          description: 'No Definition Available'
+
+  suplocGeography:
+    type: object
+    properties:
+      supplierLocationCountry:
+        $ref: '#/definitions/_reference' # references to ISO Country
+        description: 'Reference Link to LM ISO Country'
+      portOfOriginCountry:
+        $ref: '#/definitions/_reference' # references to ISO Country
+        description: 'Reference Link to LM ISO Country'
+
+  suplocAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # Timestamp(6)
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # Timestamp(6)
+        description: 'No Definition Available'
+      createdBy:
+        type: string # varchar(18)
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # varchar(18)
+        description: 'No Definition Available'
+
+
+# Test Labs Data
+
+  testLab_dataunits:
+    type: object
+    required:
+      - perfTestLabCore
+    properties:
+      perfTestLabCore:
+         $ref: '#/definitions/perfTestLabCore'
+      perfTestLabGeneral:
+         $ref: '#/definitions/perfTestLabGeneral'
+      perfTestLabState:
+         $ref: '#/definitions/perfTestLabState'
+      perfTestLabStatus:
+         $ref: '#/definitions/perfTestLabStatus'
+      perfTestLabAddress:
+         $ref: '#/definitions/perfTestLabAddress'
+      perfTestLabContact:
+         $ref: '#/definitions/perfTestLabContact'
+      perfTestLabAudit:
+         $ref: '#/definitions/perfTestLabAudit'
+      perfTestLabEntitlement:
+         $ref: '#/definitions/Entitlements'
+
+# Test Labs Data Units
+
+  perfTestLabCore:
+    type: object
+    properties:
+      testLabIdentifier:
+        type: integer
+        description: 'supplierIdentifier'
+      testLabCode:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+      testLabName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+      division:
+        description: 'Reference Link to LM Division Reference'
+        $ref: '#/definitions/_reference'
+      parentCompanyName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+
+  perfTestLabGeneral:
+    type: object
+    properties:
+      responsibleNikeLiaisonOffice:
+        description: 'Reference Link to Test Lab Liaison Office'
+        $ref: '#/definitions/_reference'
+      accreditedTestFacility:
+        type: boolean
+      securityVendorAccessGroup:
+        type: string
+
+  perfTestLabState:
+    type: object
+    properties:
+      testLabState:
+        description: 'Reference Link to Test Lab State Reference'
+        $ref: '#/definitions/_reference'
+
+  perfTestLabStatus:
+    type: object
+    properties:
+      testLabStatusIndicator:
+        type: boolean
+
+  perfTestLabAddress:
+    type: object
+    properties:
+      streetAddress1:
+        type: string # varchar(765)
+        description: 'No Definition Available'
+      streetAddress2:
+        type: string # varchar(765)
+        description: 'No Definition Available'
+      cityName:
+        type: string # varchar(240)
+        description: 'No Definition Available'
+      stateProvince:
+        type: string # varchar(600)
+        description: 'No Definition Available'
+      postalCode:
+        type: string # varchar(30)
+        description: 'No Definition Available'
+      country:
+        description: 'Reference Link to LM ISO Country Reference'
+        $ref: '#/definitions/_reference'
+      phoneNumber:
+        type: string # varchar(4000)
+        description: 'No Definition Available'
+      faxNumber:
+        type: string # varchar(4000)
+        description: 'No Definition Available'
+
+  perfTestLabContact:
+    type: array
+    items:
+      type: object
+      properties:
+        testLabContactRole:
+          type: string # varchar(96)
+          description: 'No Definition Available'
+        testLabPrimaryContactIndicator:
+          type: boolean
+        fullName:
+          type: string # varchar(96)
+          description: 'No Definition Available'
+        emailAddress:
+          type: string # varchar(120)
+          description: 'No Definition Available'
+        primaryPhoneNumber:
+          type: string # varchar(96)
+          description: 'No Definition Available'
+
+  perfTestLabAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # Timestamp(6)
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # Timestamp(6)
+        description: 'No Definition Available'
+      createdBy:
+        type: string # varchar(18)
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # varchar(18)
+        description: 'No Definition Available'
+
+
+# Common Structures
+
+  _links:
+    type: object
+    properties:
+      rel:
+        description: The type of relationship
+        type: string
+      href:
+        description: The reference link
+        type: string
+
+  _reference:
+    type: object
+    properties:
+      referenceKey:
+        type: string
+        description: The key for the described field
+      link:
+        $ref: '#/definitions/_links'
+        description: The url link to the reference service to get descriptions and other data related to the reference key
+
+
+#Error Structure
+  _error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      detailType:
+        type: string
+      message:
+        type: string
+
+# Entitlement Structure
+
+  Entitlements:
+    type: object
+    properties:
+      entitlements:
+        type: array
+        items:
+          type: string
+
+#Security
+
+securityDefinitions:
+  nike_auth:
+    type: oauth2
+    tokenUrl: https://nike.okta.com/oauth2/aus27z7p76as9Dz0H1t7/v1/token
+    flow: application
+    description: Method Nike we will leverage centralized authentication to get the JWT token to uniquely identify users
+    scopes:
+     read: permission to read data from this service

@@ -1,0 +1,897 @@
+{
+    "info": {
+        "title": "Sustainability Service",
+        "description": "This is the API for the Sustainability entity and should be the way to get Material Sustainability data.",
+        "version": "1.0.0"
+    },
+    "host": "materialmanagement.api-product.pes-prod.nike.com",
+    "basePath": "/v1",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/sustainability/data/suppliedMaterialIndicies/{objectId}/current": {
+            "get": {
+                "tags": [
+                    "Sustainability"
+                ],
+                "summary": "MSI Score for Most Recent Season",
+                "description": "How you get a single MSI Score for the most recent season.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "A single Id of the object (in this case Supplied Material)",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "sustnbltySuppliedMaterialScoreCore",
+                            "sustnbltySuppliedMaterialScoreComponents",
+                            "sustnbltySupplierLocationScoreComponents",
+                            "sustnbltySuppliedMaterialScoreAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains MSI core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/suppliedMaterialIndexResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/sustainability/data/suppliedMaterialIndicies/current": {
+            "get": {
+                "tags": [
+                    "Sustainability"
+                ],
+                "summary": "MSI Score (Bulk) for Most Recent Season",
+                "description": "How you get MSI Score in a Bulk fashion for the Most Recent Season.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "query",
+                        "description": "A comma separated list of Ids of the object (in this case Supplied Materials)",
+                        "required": true,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "sustnbltySuppliedMaterialScoreCore",
+                            "sustnbltySuppliedMaterialScoreComponents",
+                            "sustnbltySupplierLocationScoreComponents",
+                            "sustnbltySuppliedMaterialScoreAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains {ENTITY-LC} core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/suppliedMaterialIndexBulkResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "You have requested a data unit that does not exist or the number of IDs requested exceeded the maximum number allowed.  Each bulk request should not exceed 25 Object IDs.",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/sustainability/data/seasons/{objectId}": {
+            "get": {
+                "tags": [
+                    "Sustainability",
+                    "Season"
+                ],
+                "summary": "Sustainability Season Data",
+                "description": "How you get a single date for the most recent season.",
+                "parameters": [
+                    {
+                        "name": "objectId",
+                        "in": "path",
+                        "description": "A single Id of the object (in this case Supplied Material)",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "_dataunits",
+                        "in": "query",
+                        "description": "The data units that would be desired, default returns just core data",
+                        "required": false,
+                        "type": "array",
+                        "enum": [
+                            "sustnbltySeasonCore",
+                            "sustnbltySeasonAudit"
+                        ],
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/traceParam"
+                    },
+                    {
+                        "$ref": "#/parameters/apiKeyParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns response object which contains MSI core with requested data units",
+                        "schema": {
+                            "$ref": "#/definitions/sustainabilityDateResponse"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            },
+                            "cache-control": {
+                                "description": "Will indicate rules around caching of the content returned.",
+                                "type": "string"
+                            },
+                            "expires": {
+                                "description": "Will indicate a time when this data should be expired in the cache, though cache-control takes precedence",
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "If you ask for a data unit that is does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "You are not authorized to access this resource",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Access Denied to Object",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        },
+                        "headers": {
+                            "X-B3-TraceId": {
+                                "description": "A UUID that will uniquely identify a reqest for tracking purposes",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The object you have requested is not found",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    },
+                    "500": {
+                        "description": "There has been an internal server error."
+                    },
+                    "503": {
+                        "description": "The service is overloaded, please contact support",
+                        "schema": {
+                            "$ref": "#/definitions/_error"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "nike_auth": [
+                            "read"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/pdhStreamsAdaptor/data": {
+            "put": {
+                "tags": [
+                    "PDHStreamAdaptor"
+                ],
+                "description": "Update a pdhStreamAdaptor resource by objectId",
+                "parameters": [
+                    {
+                        "name": "Events",
+                        "in": "body",
+                        "description": "The request body",
+                        "required": true,
+                        "schema": {
+                            "items": {
+                                "$ref": "#/definitions/PDHStreamAdaptorItems"
+                            },
+                            "type": "array"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "swagger": "2.0",
+    "definitions": {
+        "suppliedMaterialIndexResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/materialSustainabilityIndex_dataunits"
+                        },
+                        "relationships": {
+                            "$ref": "#/definitions/_links",
+                            "description": "Link to the relationships endpoint to get any relationships for this entity"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                },
+                "objectId": {
+                    "type": "string"
+                },
+                "objectType": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "suppliedMaterialIndexBulkResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "properties": {
+                            "objectId": {
+                                "description": "The business key related to items requested.",
+                                "type": "string"
+                            },
+                            "objectType": {
+                                "description": "The type of key that has been requested.",
+                                "type": "string"
+                            },
+                            "data": {
+                                "$ref": "#/definitions/materialSustainabilityIndex_dataunits"
+                            },
+                            "relationships": {
+                                "$ref": "#/definitions/_links",
+                                "description": "Link to the relationships endpoint to get any relationships for this entity"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "count": {
+                    "description": "The number of entries returned in this responses",
+                    "type": "integer"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "sustainabilityDateResponse": {
+            "properties": {
+                "content": {
+                    "properties": {
+                        "objectId": {
+                            "description": "The business key related to items requested.",
+                            "type": "string"
+                        },
+                        "objectType": {
+                            "description": "The type of key that has been requested.",
+                            "type": "string"
+                        },
+                        "data": {
+                            "$ref": "#/definitions/sustainabilityDates_dataunits"
+                        }
+                    },
+                    "type": "object"
+                },
+                "self": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The resource that was called"
+                },
+                "requestTime": {
+                    "description": "A UTC timestamp for when the response was given, also for tracking purposes",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "requestStatus": {
+                    "description": "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "materialSustainabilityIndex_dataunits": {
+            "properties": {
+                "sustnbltySuppliedMaterialScoreCore": {
+                    "$ref": "#/definitions/sustnbltySuppliedMaterialScoreCore"
+                },
+                "sustnbltySuppliedMaterialScoreComponents": {
+                    "$ref": "#/definitions/sustnbltySuppliedMaterialScoreComponents"
+                },
+                "sustnbltySupplierLocationScoreComponents": {
+                    "$ref": "#/definitions/sustnbltySupplierLocationScoreComponents"
+                },
+                "sustnbltySuppliedMaterialScoreAudit": {
+                    "$ref": "#/definitions/sustnbltySuppliedMaterialScoreAudit"
+                }
+            },
+            "type": "object",
+            "required": [
+                "sustnbltySuppliedMaterialScoreCore"
+            ]
+        },
+        "sustnbltySuppliedMaterialScoreCore": {
+            "properties": {
+                "suppliedMaterialIdentifier": {
+                    "type": "integer"
+                },
+                "legacySuppliedMaterialNumber": {
+                    "type": "string"
+                },
+                "supplierLocationIdentifier": {
+                    "type": "integer"
+                },
+                "legacySupplierLocationCode": {
+                    "type": "string"
+                },
+                "suppliedMaterialSustainabilityScore": {
+                    "type": "integer"
+                },
+                "supplierLocationSustainabilityScore": {
+                    "type": "integer"
+                },
+                "sustainabilitySeason": {
+                    "$ref": "#/definitions/_reference"
+                },
+                "sustainabilityBusinessUnit": {
+                    "$ref": "#/definitions/_reference"
+                },
+                "division": {
+                    "$ref": "#/definitions/_reference",
+                    "description": "Reference Link to LM Division"
+                },
+                "nikeSustainabilityRankingDescription": {
+                    "type": "string"
+                },
+                "nikeSustainabilityRanking": {
+                    "type": "string"
+                },
+                "carbonFootprintKgCO2ePerKg": {
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "type": "object"
+        },
+        "sustnbltySuppliedMaterialScoreComponents": {
+            "properties": {
+                "lifecycleAssessmentScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "recycledContentScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "organicContentScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "blendsAndCompositesScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "betterCottonInitiativeProgramScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "waterConservationScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "nikeGreenChemistryProgramScore": {
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "type": "object"
+        },
+        "sustnbltySupplierLocationScoreComponents": {
+            "properties": {
+                "restrictedSubstanceListScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "nikeWaterProgramScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "nikeEnergyAndCarbonProgramScore": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "nikeGreenChemistryTrainingScore": {
+                    "type": "integer"
+                },
+                "nikeGreenChemistryFormScore": {
+                    "type": "integer"
+                },
+                "certificationsAndProgramsScore": {
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "type": "object"
+        },
+        "sustnbltySuppliedMaterialScoreAudit": {
+            "properties": {
+                "createTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "changeTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "createdBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "modifiedBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "sustainabilityDates_dataunits": {
+            "properties": {
+                "sustnbltySeasonCore": {
+                    "$ref": "#/definitions/sustnbltySeasonCore"
+                },
+                "sustnbltySeasonAudit": {
+                    "$ref": "#/definitions/sustnbltySeasonAudit"
+                }
+            },
+            "type": "object",
+            "required": [
+                "sustnbltySeasonCore"
+            ]
+        },
+        "sustnbltySeasonCore": {
+            "properties": {
+                "sustainabilitySeasonIdentifier": {
+                    "type": "integer"
+                },
+                "sustainabilitySeason": {
+                    "$ref": "#/definitions/_reference"
+                },
+                "sustainabilitySeasonStartDate": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "sustainabilitySeasonSecondRunDate": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "sustainabilitySeasonEndDate": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "sustainabilityBusinessUnit": {
+                    "$ref": "#/definitions/_reference"
+                },
+                "sustainabilitySeasonOrderNumber": {
+                    "type": "integer"
+                },
+                "sustainabilityIsMostRecentSeason": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "sustnbltySeasonAudit": {
+            "properties": {
+                "createTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "changeTimestamp": {
+                    "description": "No Definition Available",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "createdBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                },
+                "modifiedBy": {
+                    "description": "No Definition Available",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "_links": {
+            "properties": {
+                "rel": {
+                    "description": "The type of relationship",
+                    "type": "string"
+                },
+                "href": {
+                    "description": "The reference link",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "_reference": {
+            "properties": {
+                "referenceKey": {
+                    "description": "The key for the described field",
+                    "type": "string"
+                },
+                "link": {
+                    "$ref": "#/definitions/_links",
+                    "description": "The url link to the reference service to get descriptions and other data related to the reference key"
+                }
+            },
+            "type": "object"
+        },
+        "_error": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "detailType": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PDHStreamAdaptorItems": {
+            "properties": {
+                "domain": {
+                    "description": "Specifies the domain related to the data",
+                    "type": "string"
+                },
+                "eventType": {
+                    "description": "Type of events responsible for the message e.g. CREATE, UPDATE",
+                    "type": "string"
+                },
+                "sourceSystem": {
+                    "description": "Specifies the system from there the data is sourced from",
+                    "type": "string"
+                },
+                "objectId": {
+                    "description": "Unique identifier for the data",
+                    "type": "string"
+                },
+                "objectType": {
+                    "description": "Type of the data",
+                    "type": "string"
+                },
+                "objectVersion": {
+                    "description": "Version of object data resultant to change. This information will be used to expose the latest data to a consumer. The older versions will be saved in the cold and warm storage areas.",
+                    "type": "integer"
+                },
+                "apiVersion": {
+                    "description": "Version of the splitting required for aligning to the exposed canonical form of data. the expectation if this will help us to version changes to data as defined by the source system / integration services",
+                    "type": "integer"
+                },
+                "correlationId": {
+                    "description": "id for tracking the data produced by source system, logging, monitoring and alerts - UUID is recommended for this field",
+                    "type": "string"
+                },
+                "entitlements": {
+                    "description": "Who can see this data or confidential group information",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "default": []
+                },
+                "changes": {
+                    "description": "What are the changes to data in case there is a field level event is required, but encrypted using AES 256",
+                    "items": {
+                        "properties": {
+                            "fieldName": {
+                                "type": "string"
+                            },
+                            "fromValue": {
+                                "type": "string"
+                            },
+                            "toValue": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "type": "array",
+                    "default": []
+                },
+                "fullObject": {
+                    "description": "The data itself in JSON format encrypted",
+                    "type": "string"
+                }
+            },
+            "type": "object",
+            "required": [
+                "eventType",
+                "sourceSystem",
+                "objectId",
+                "objectType",
+                "objectVersion",
+                "fullObject",
+                "correlationId",
+                "domain",
+                "apiVersion"
+            ]
+        }
+    },
+    "securityDefinitions": {
+        "nike_auth": {
+            "type": "oauth2",
+            "description": "Method Nike we will leverage centralized authentication to get the JWT token to uniquely identify users",
+            "flow": "application",
+            "tokenUrl": "https://nike.okta.com/oauth2/aus27z7p76as9Dz0H1t7/v1/token",
+            "scopes": {
+                "read": "permission to read data from this service"
+            }
+        }
+    },
+    "produces": [
+        "application/json"
+    ],
+    "parameters": {
+        "traceParam": {
+            "name": "X-B3-TraceId",
+            "in": "header",
+            "description": "A UUID that will uniquely identify a reqest for tracking purposes, if not passed one will be assigned",
+            "required": false,
+            "type": "string"
+        },
+        "apiKeyParam": {
+            "name": "x-api-key",
+            "in": "header",
+            "description": "The api key that will identify an application with the AWS API Gateway and is used for tracking and throttling",
+            "required": true,
+            "type": "string"
+        }
+    }
+}

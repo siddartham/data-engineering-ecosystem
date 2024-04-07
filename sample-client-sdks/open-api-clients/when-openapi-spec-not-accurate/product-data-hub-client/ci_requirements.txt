@@ -1,0 +1,2 @@
+daves-dev-tools~=2.21.4
+mail-client~=0.8

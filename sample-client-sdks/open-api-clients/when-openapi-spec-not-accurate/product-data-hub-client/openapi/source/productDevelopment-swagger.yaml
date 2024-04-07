@@ -1,0 +1,4941 @@
+swagger: '2.0'
+info:
+  title: Product Development Service
+  description: This is the API for the Product Development Domain and should be the way to get or search Product Development data.
+  version: 1.3.0
+host: productdevelopment.api-product.pes-prod.nike.com
+schemes:
+  - https
+basePath: /v1/productDevelopment
+produces:
+  - application/json
+paths:
+
+# Entity Methods
+  /data/colorwaySeasons/{objectId}:
+    get:
+      summary: Development Colorway Data
+      description: How you get a single development colorway.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Product Development Development Colorway)
+          required: true
+          type: integer
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - dcSeasonCore
+            - dcSeasonStatus
+            - dcSeasonSourcingConfig
+            - dcSeasonQuantity
+            - dcSeasonTrial
+            - dcSeasonFOB
+            - dcSeasonAudit
+            - dsSeasonCore
+            - dsSeasonResource
+            - dsSeasonTechnicalDifficulty
+            - dsSeasonFOB
+            - dsSeasonTrack
+            - dsSeasonStatus
+            - dsSeasonAudit
+            - dcCore
+            - dcStatus
+            - dcAudit
+            - dsCore
+            - dsClassification
+            - dsLast
+            - dsStatus
+            - dsAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Development Colorway Season
+      responses:
+        '200':
+          description: Returns response object which contains development colorway core with requested data units
+          schema:
+            $ref: '#/definitions/developmentColorwayResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/colorwaySeasons:
+    get:
+      summary: Development Colorway Data (Bulk)
+      description: How you get development colorway in a Bulk fashion.
+      parameters:
+        - name: objectId
+          in: query
+          description: A comma separated list of Ids of the object (in this case Product Development Development Colorway)
+          required: true
+          type: array
+          items:
+            type: integer
+            format: int64
+          collectionFormat: csv
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - dcSeasonCore
+            - dcSeasonStatus
+            - dcSeasonSourcingConfig
+            - dcSeasonQuantity
+            - dcSeasonTrial
+            - dcSeasonFOB
+            - dcSeasonAudit
+            - dsSeasonCore
+            - dsSeasonResource
+            - dsSeasonTechnicalDifficulty
+            - dsSeasonFOB
+            - dsSeasonTrack
+            - dsSeasonStatus
+            - dsSeasonAudit
+            - dcCore
+            - dcStatus
+            - dcAudit
+            - dsCore
+            - dsClassification
+            - dsLast
+            - dsStatus
+            - dsAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Development Colorway Season
+      responses:
+        '200':
+          description: Returns response object which contains development colorway core with requested data units
+          schema:
+            $ref: '#/definitions/developmentColorwayBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: You have requested a data unit that does not exist or the number of IDs requested exceeded the maximum number allowed.  Each bulk request should not exceed 25 Object IDs.
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+# Relationship Methods
+
+  /data/colorwaySeasons/{objectId}/relationships:
+    get:
+      summary: Development Colorway by Season Relationships
+      description: 'How you get all the relationships to the single object requested, in other words the children in the hierarchy (BOMs) to the requested entity'
+      parameters:
+        - name: objectId
+          in: path
+          description: The Id of the object (in this case Product Development Development Colorway Style) where the relationships are desired
+          required: true
+          type: integer
+        - name: depth
+          in: query
+          required: false
+          description: "This determines how many levels in the hierarcy you wish to traverse, default is 2"
+          type: integer
+        - name: X-B3-TraceId
+          in: header
+          type: string
+          required: false
+          description: 'A UUID that will uniquely identify a reqest for tracking purposes, if not passed one will be assigned'
+        - name: x-api-key
+          in: header
+          type: string
+          required: true
+          description: The api key that will identify an application with the AWS API Gateway and is used for tracking and throttling
+      tags:
+        - Development Colorway Season
+        - Relationships
+      responses:
+        '200':
+          description: Returns response object which contains development style core with requested data units
+          schema:
+            $ref: '#/definitions/relationshipResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '204':
+          description: The request was successful but we were unable to find any relationships.
+          schema:
+            $ref: '#/definitions/relationshipResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '400':
+          description: A data unit that you asked for does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+          schema:
+            $ref: '#/definitions/_error'
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /search/colorwaySeasons:
+    get:
+      summary: Development Colorway by Season Search
+      description: How you search against all fields contained within the development colorway by Season entity
+      parameters:
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+        - name: q
+          in: query
+          description: 'This parameter is how you pass free text search, if any string is passed here it will be searched as free text'
+          required: false
+          type: string
+  # Enum for search
+        - name: developmentColorwayIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentStyleSeasonIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: productOfferingIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwaySeasonStatusIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item:'
+        - name: prototypeQuantity
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The number associated with prototypeQuantity'
+        - name: sampleQuantity
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The number associated with sampleQuantity'
+        - name: nikeProductionTrial
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: targetFOB
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+          collectionFormat: csv
+          description: 'The number for target FOB'
+        - name: sourcingConfigurationColorwaySeason
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentStyleIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The Id for develpment style season'
+        - name: cycleYear
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item: cycleYear'
+        - name: whqColorDesignerUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqCostingUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqDesignerUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqDeveloperUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqFootwearDevelopmentDirectorUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqKnitDeveloperUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqKnitEngineerUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqKnitProgrammerUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqMaterialUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqProductEngineerUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: whqProductTestingUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: knitCenterDeveloperUserIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The email address for this user'
+        - name: newUpperIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item'
+        - name: newMidsoleIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item'
+        - name: newOutsoleIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item'
+        - name: productSeasonDevelopmentTeam
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: technicalDifficulty
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwayTargetFOB
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentTrack
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: productTrack
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: startDate
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+            format: date
+          collectionFormat: csv
+          description: 'The date assocated with the start of development'
+        - name: developmentStyleSeasonStatusIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item'
+        - name: lastIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: additionalLastIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentStyleStatusIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item'
+        - name: developmentColorwayDescription
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwayType
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwayState
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwayGate
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: productIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwayStatusIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item:'
+        - name: developmentStyleType
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: division
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+      tags:
+        - Development Colorway Season
+        - Search
+      responses:
+        '200':
+          description: Returns response object which contains links to the development colorway by season endpoint
+          schema:
+            $ref: '#/definitions/searchResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: A field that has been queried does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [legacy]
+
+# Entity Methods
+  /data/developmentStyles/{objectId}:
+    get:
+      summary: Development Style Data
+      description: How you get a single development style data
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Development Style Identifier)
+          required: true
+          type: integer
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - dsCore
+            - dsClassification
+            - dsLast
+            - dsStatus
+            - dsAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Development Style
+      responses:
+        '200':
+          description: Returns response object which contains development style core with requested data units
+          schema:
+            $ref: '#/definitions/developmentStyleResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /search/developmentStyles:
+    get:
+      summary: Development Style Search
+      description: How you search against all fields contained within the development style entity
+      parameters:
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+        - name: q
+          in: query
+          description: 'This parameter is how you pass free text search, if any string is passed here it will be searched as free text'
+          required: false
+          type: string
+  # Enum for search
+        - name: developmentStyleName
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: modelIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: styleNumber
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: lastIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: additionalLastIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentStyleStatusIndicator
+          in: query
+          required: false
+          type: boolean
+          description: 'The true or false flag associated with this item'
+        - name: developmentStyleType
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: division
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+      tags:
+        - Development Style
+        - Search
+      responses:
+        '200':
+          description: Returns response object which contains links to the development style endpoint
+          schema:
+            $ref: '#/definitions/searchResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: A field that has been queried does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+# Entity Methods
+  /data/billOfMaterials/{objectId}:
+    get:
+      summary: Bill Of Materials Data
+      description: How you get a single bill of materials.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Product Development Bill Of Materials)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - bomCore
+            - bomdevStyle
+            - bomSeason
+            - bomSourcingConfiguration
+            - bomClassification
+            - bomDescription
+            - bomStatus
+            - bomHeaderAudit
+            - bomLineItemDetail
+            - bomLineItemComments
+            - bomLineItemAuditComments
+            - bomLineAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Bill Of Materials
+      responses:
+        '200':
+          description: Returns response object which contains bill of materials core with requested data units
+          schema:
+            $ref: '#/definitions/billOfMaterialsResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/billOfMaterials:
+    get:
+      summary: Bill Of Materials Data (Bulk)
+      description: How you get bill of materials in a Bulk fashion.
+      parameters:
+        - name: objectId
+          in: query
+          description: A comma separated list of Ids of the object (in this case Product Development Bill Of Materials)
+          required: true
+          type: array
+          items:
+            type: string
+            format: int64
+          collectionFormat: csv
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - bomCore
+            - bomdevStyle
+            - bomSeason
+            - bomSourcingConfiguration
+            - bomClassification
+            - bomDescription
+            - bomStatus
+            - bomHeaderAudit
+            - bomLineItemDetail
+            - bomLineItemComments
+            - bomLineItemAuditComments
+            - bomLineAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Bill Of Materials
+      responses:
+        '200':
+          description: Returns response object which contains bill of materials core with requested data units
+          schema:
+            $ref: '#/definitions/billOfMaterialsBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: You have requested a data unit that does not exist or the number of IDs requested exceeded the maximum number allowed.  Each bulk request should not exceed 25 Object IDs.
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /search/billOfMaterials:
+    get:
+      summary: Bill Of Materials  Search
+      description: How you search against all fields contained within the BOM entity
+      parameters:
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+        - name: q
+          in: query
+          description: 'This parameter is how you pass free text search, if any string is passed here it will be searched as free text'
+          required: false
+          type: string
+  # Enum for search
+        - name: bomIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwayIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomName
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwaySeasonIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: sourcingConfigurationIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: sourcingConfigurationSeason
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentStyleType
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: division
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomDescription
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomComments
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: billOfMaterialStatusIndicator
+          in: query
+          required: false
+          type: array
+          items:
+            type: boolean
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomLineItemIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomLineItemComments
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomLineItemNumber
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: parentBomLineItemIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: lineItemQuantity
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: color
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: billOfMaterialsSection
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: partPrimary
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: partSecondary
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: partModifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: partSuffix
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: partName
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: materialItemIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: suppliedMaterial
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: suppliedMaterialColorIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: suppliedMaterialColorIsMultipleColors
+          in: query
+          required: false
+          type: array
+          items:
+            type: boolean
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: colorPlaceholderDescription
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: materialItemPlaceholderDescription
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+      tags:
+        - Bill Of Materials
+        - Search
+      responses:
+        '200':
+          description: Returns response object which contains links to the sourcing endpoint
+          schema:
+            $ref: '#/definitions/searchResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: A field that has been queried does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [legacy]
+
+# Entity Methods
+  /data/billOfMaterials/sources/{objectId}:
+    get:
+      summary: Bill Of Materials by Source Data
+      description: How you get a single bill of materials by Source.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Product Development Bill Of Materials by Source)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - bomCore
+            - bomdevStyle
+            - bomSeason
+            - bomSourcingConfiguration
+            - bomClassification
+            - bomDescription
+            - bomStatus
+            - bomHeaderAudit
+            - bomLineItemDetail
+            - bomLineItemComments
+            - bomLineItemAuditComments
+            - bomLineAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Bill Of Materials
+      responses:
+        '200':
+          description: Returns response object which contains bill of materials core with requested data units
+          schema:
+            $ref: '#/definitions/billOfMaterialsSourceResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/billOfMaterials/sources:
+    get:
+      summary: Bill Of Materials by Source Data (Bulk)
+      description: How you get bill of materials by Source in a Bulk fashion.
+      parameters:
+        - name: objectId
+          in: query
+          description: A comma separated list of Ids of the object (in this case Product Development Bill Of Materials)
+          required: true
+          type: array
+          items:
+            type: string
+            format: int64
+          collectionFormat: csv
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - bomCore
+            - bomdevStyle
+            - bomSeason
+            - bomSourcingConfiguration
+            - bomClassification
+            - bomDescription
+            - bomStatus
+            - bomHeaderAudit
+            - bomLineItemDetail
+            - bomLineItemComments
+            - bomLineItemAuditComments
+            - bomLineAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Bill Of Materials
+      responses:
+        '200':
+          description: Returns response object which contains bill of materials core with requested data units
+          schema:
+            $ref: '#/definitions/billOfMaterialsSourceBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: You have requested a data unit that does not exist or the number of IDs requested exceeded the maximum number allowed.  Each bulk request should not exceed 25 Object IDs.
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /search/billOfMaterials/sources:
+    get:
+      summary: Bill Of Materials by Source Search
+      description: How you search against all fields contained within the BOM by Source entity
+      parameters:
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+        - name: q
+          in: query
+          description: 'This parameter is how you pass free text search, if any string is passed here it will be searched as free text'
+          required: false
+          type: string
+  # Enum for search
+        - name: bomIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwayIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomName
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentColorwaySeasonIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: sourcingConfigurationIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: productIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: styleNumber
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: sourcingConfigurationSeason
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: cycleYear
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: developmentStyleType
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: division
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: billOfMaterialStatusIndicator
+          in: query
+          required: false
+          type: array
+          items:
+            type: boolean
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomLineItemIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: bomLineItemNumber
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: parentBomLineItemIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: lineItemQuantity
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: color
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: billOfMaterialsSection
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: part
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: materialItemIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: suppliedMaterial
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: suppliedMaterialColorIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: suppliedMaterialColorIsMultipleColors
+          in: query
+          required: false
+          type: array
+          items:
+            type: boolean
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: colorPlaceholderDescription
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: materialItemPlaceholderDescription
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+        - name: netUsage
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+            format: float # float
+          collectionFormat: csv
+          description: 'The number (float) for netUsage'
+        - name: wasteUsage
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+            format: float # float
+          collectionFormat: csv
+          description: 'The number (float) for wasteUsage'
+        - name: grossUsage
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+            format: float # float
+          collectionFormat: csv
+          description: 'The number (float) for grossUsage'
+        - name: usageUnitOfMeasure
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+          description: 'The reference key associated with this item'
+      tags:
+        - Bill Of Materials
+        - Search
+      responses:
+        '200':
+          description: Returns response object which contains links to the sourcing endpoint
+          schema:
+            $ref: '#/definitions/searchResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: A field that has been queried does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [legacy]
+
+# Entity Methods
+  /data/sourcingConfigurations/{objectId}:
+    get:
+      summary: Source Configuration Data
+      description: How you get a single Source Configuration Data.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Source Configuration Identifier)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - scCore
+            - scClassification
+            - scAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Sourcing Configuration
+      responses:
+        '200':
+          description: Returns response object which contains Sourcing Configuration core with requested data units
+          schema:
+            $ref: '#/definitions/sourcingConfigurationsResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/sourcingConfigurations/:
+    get:
+      summary: Source Configuration Data (Bulk)
+      description: How you get Source Configuration Data in a Bulk fashion.
+      parameters:
+        - name: objectId
+          in: query
+          description: A comma separated list of Ids of the object (in this case Source Configuration Identifier)
+          required: true
+          type: array
+          items:
+            type: string
+            format: int64
+          collectionFormat: csv
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - scCore
+            - scClassification
+            - scAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Sourcing Configuration
+      responses:
+        '200':
+          description: Returns response object which contains Sourcing Configuration core with requested data units
+          schema:
+            $ref: '#/definitions/sourcingConfigurationsBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: You have requested a data unit that does not exist or the number of IDs requested exceeded the maximum number allowed.  Each bulk request should not exceed 25 Object IDs.
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+# Entity Methods
+  /data/sourcingConfigurations/colorwaySeasons/{objectId}:
+    get:
+      summary: Source Configuration Colorway Season Data
+      description: How you get a single Source Configuration Colorway Season Data.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Source Configuration Colorway Season Identifier)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - scColorwaySeasonCore
+            - scColorwaySeasonClassification
+            - scColorwaySeasonStatus
+            - scColorwaySeasonAudit
+            - scSeasonCore
+            - scSeasonStatus
+            - scSeasonResource
+            - scSeasonAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Sourcing Configuration
+      responses:
+        '200':
+          description: Returns response object which contains Sourcing Configuration Season core with requested data units
+          schema:
+            $ref: '#/definitions/sourcingConfigurationsColorwaySeasonResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/sourcingConfigurations/colorwaySeasons:
+    get:
+      summary: Source Configuration Colorway Season Data (Bulk)
+      description: How you get Source Configuration Colorway Season Data in a Bulk fashion.
+      parameters:
+        - name: objectId
+          in: query
+          description: A comma separated list of Ids of the object (in this case Source Configuration Colorway Season Identifier)
+          required: true
+          type: array
+          items:
+            type: string
+            format: int64
+          collectionFormat: csv
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - scColorwaySeasonCore
+            - scColorwaySeasonClassification
+            - scColorwaySeasonStatus
+            - scColorwaySeasonAudit
+            - scSeasonCore
+            - scSeasonStatus
+            - scSeasonResource
+            - scSeasonAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Sourcing Configuration
+      responses:
+        '200':
+          description: Returns response object which contains Sourcing Configuration Season core with requested data units
+          schema:
+            $ref: '#/definitions/sourcingConfigurationsColorwaySeasonBulkResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: You have requested a data unit that does not exist or the number of IDs requested exceeded the maximum number allowed.  Each bulk request should not exceed 25 Object IDs.
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+
+# Entity Methods
+  /data/developmentSamples/samples/{objectId}:
+    get:
+      summary: Development Sample Data
+      description: How you get a single Development Sample Data.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Development Sample Identifier)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - dSampleCore
+            - dSampleStatus
+            - dSampleClassification
+            - dSampleComments
+            - dSampleAudit
+            - dSampleRequestCore
+            - dSampleRequestComments
+            - dSampleRequestStatus
+            - dSampleRequestAudit
+            - dSampleOrderDetail
+            - dSampleEvaluation
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Development Sample
+      responses:
+        '200':
+          description: Returns response object which contains Development Sample and Development Sample Request core with requested data units
+          schema:
+            $ref: '#/definitions/developmentSampleResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /data/developmentSamples/shipments/{objectId}:
+    get:
+      summary: Development Sample Data Shipment
+      description: How you get a single Development Sample Shipment Data.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Development Sample Identifier)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - dSampleShipmentCore
+            - dSampleShipmentFactoryComments
+            - dSampleShipmentAudit
+            - dSampleShipmentDetail
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Development Sample
+      responses:
+        '200':
+          description: Returns response object which contains Development Sample and Development Sample Request core with requested data units
+          schema:
+            $ref: '#/definitions/developmentSampleShipmentResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that is does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+# Entity Methods
+  /data/measurementSets/{objectId}:
+    get:
+      summary: Development Measurement Set Data
+      description: How you get a single Development Measurement Data.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Development Measurement Identifier)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - msCore
+            - msTemplate
+            - msSize
+            - msPointOfMeasurement
+            - msAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Measurement Set
+      responses:
+        '200':
+          description: Returns response object which contains Development Measurement core with requested data units
+          schema:
+            $ref: '#/definitions/developmentMeasurementResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+  /search/measurementSets:
+    get:
+      summary: Development Measurement Set Data Search
+      description: How you search against all fields contained within the Development Measurement Set entity
+      parameters:
+        - name: count
+          in: query
+          description: "Number of entries the API should attempt to fetch, default is 10"
+          required: false
+          type: integer
+        - name: offset
+          in: query
+          description: "Offset of the entries the API should attempt to fetch, default is 0"
+          required: false
+          type: integer
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+        - name: q
+          in: query
+          description: 'This parameter is how you pass free text search, if any string is passed here it will be searched as free text'
+          required: false
+          type: string
+  # Enum for search
+        - name: measurementSetName
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: measurementSetState
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+        - name: developmentStyleIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+        - name: styleNumber
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: cycleYear
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: sourcingConfigurationIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+        - name: sourcingConfigurationSeasonIdentifier
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+        - name: measurementSetTemplateName
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: sizeDefinitionTemplate
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: gradeRuleTemplate
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: measurementTemplateType
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+        - name: developmentStyleSizeDefinition
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: measurementValueUnitOfMeasure
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: baseSize
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: sizeSelectionList
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: size
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: measurementCode
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: pointOfMeasurementName
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: sortOrder
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: measurementInstructions
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: measurementDetail
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: pointOfMeasurementCriticality
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+        - name: toleranceNegative
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+            format: float
+          collectionFormat: csv
+        - name: tolerancePositive
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+            format: float
+          collectionFormat: csv
+        - name: measurementSizeValue
+          in: query
+          required: false
+          type: array
+          items:
+            type: number
+            format: float
+          collectionFormat: csv
+        - name: pointOfMeasurement
+          in: query
+          required: false
+          type: array
+          items:
+            type: integer
+          collectionFormat: csv
+        - name: measurementSetStatusIndicator
+          in: query
+          required: false
+          type: array
+          items:
+            type: boolean
+          collectionFormat: csv
+      tags:
+        - Measurement Set
+        - Search
+      responses:
+        '200':
+          description: Returns response object which contains links to the development colorway by season endpoint
+          schema:
+            $ref: '#/definitions/searchResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: A field that has been queried does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [legacy]
+
+# Entity Methods
+  /data/pointsOfMeasurement/{objectId}:
+    get:
+      summary: Development Points of Measurement Data
+      description: How you get a single Development Point of Measurement Data.
+      parameters:
+        - name: objectId
+          in: path
+          description: A single Id of the object (in this case Development Point of Measurement Identifier)
+          required: true
+          type: string
+        - name: _dataunits
+          in: query
+          description: 'The data units that would be desired, default returns just core data'
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+          enum:
+            - pomCore
+            - pomStatus
+            - pomAudit
+        - $ref: '#/parameters/traceParam'
+        - $ref: '#/parameters/apiKeyParam'
+      tags:
+        - Points of Measurement
+      responses:
+        '200':
+          description: Returns response object which contains Development Point of Measurement core with requested data units
+          schema:
+            $ref: '#/definitions/developmentPointOfMeasurementResponse'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+            cache-control:
+              description: Will indicate rules around caching of the content returned.
+              type: string
+            expires:
+              description: Will indicate a time when this data should be expired in the cache, though cache-control takes precedence
+              type: string
+              format: date-time
+        '400':
+          description: If you ask for a data unit that does not exist
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '401':
+          description: You are not authorized to access this resource
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '403':
+          description: Access Denied to Object
+          schema:
+            $ref: '#/definitions/_error'
+          headers:
+            X-B3-TraceId:
+              description: A UUID that will uniquely identify a reqest for tracking purposes
+              type: string
+        '404':
+          description: The object you have requested is not found
+          schema:
+            $ref: '#/definitions/_error'
+        '500':
+          description: There has been an internal server error.
+        '503':
+          description: "The service is overloaded, please contact support"
+          schema:
+            $ref: '#/definitions/_error'
+      security:
+        - nike_auth: [read]
+
+parameters:
+  traceParam:
+    name: X-B3-TraceId
+    in: header
+    type: string
+    required: false
+    description: 'A UUID that will uniquely identify a reqest for tracking purposes, if not passed one will be assigned'
+  apiKeyParam:
+    name: x-api-key
+    in: header
+    type: string
+    required: true
+    description: The api key that will identify an application with the AWS API Gateway and is used for tracking and throttling
+
+definitions:
+
+# Responses
+
+  relationshipResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            relationships:
+              $ref: '#/definitions/_reference'
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  searchResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            relationships:
+              $ref: '#/definitions/_reference'
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      offset:
+        type: integer
+        description: The number of entries offset (can be used to derive the "Page Number" by using count)
+      totalCount:
+        type: integer
+        description: The total number of records in this search
+      next:
+        $ref: '#/definitions/_links'
+      prev:
+        $ref: '#/definitions/_links'
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  developmentColorwayResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/developmentColorway_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  developmentColorwayBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/developmentColorway_dataunits'
+            relationships:
+              $ref: '#/definitions/_links'
+              description: Link to the relationships endpoint to get any relationships for this entity
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Development Style Data Units
+
+  dsCore:
+    type: object
+    properties:
+      developmentStyleIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      modelIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      styleNumber:
+        type: string
+        description: 'No Definition Available'
+      developmentStyleName:
+        type: string
+        description: 'No Definition Available'
+      developmentStyleDescription:
+        type: string
+        description: 'No Definition Available'
+
+  dsClassification:
+    type: object
+    properties:
+      developmentStyleType:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Development Style Type'
+      division:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to LM Division'
+
+  dsLast:
+    type: object
+    properties:
+      lastIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      additionalLastIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+
+  dsStatus:
+    type: object
+    properties:
+      developmentStyleStatusIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  dsAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+# Development Style Season Data Units
+
+
+  dsSeasonCore:
+    type: object
+    properties:
+      developmentStyleSeasonIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentStyleIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      # modelOfferingIdentifier:
+      #   type: integer # INTEGER
+      #   description: 'No Definition Available'
+      cycleYear:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+
+  dsSeasonResource:
+    type: object
+    properties:
+      nloChemicalEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      nloCostingUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      nloDeveloperUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      nloKnitEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      nloKnitProgrammerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      nloMaterialUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      nloProductEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      nloCategoryDirectorUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqColorDesignerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqCostingUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqDesignerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqDeveloperUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqFootwearDevelopmentDirectorUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqKnitDeveloperUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqKnitEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqKnitProgrammerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqMaterialUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqProductEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      whqProductTestingUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      knitCenterDeveloperUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      newUpperIndicator:
+        type: boolean # BOOLEAN
+        description: 'No Definition Available'
+      newMidsoleIndicator:
+        type: boolean # BOOLEAN
+        description: 'No Definition Available'
+      newOutsoleIndicator:
+        type: boolean # BOOLEAN
+        description: 'No Definition Available'
+      productSeasonDevelopmentTeam:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+
+  dsSeasonTechnicalDifficulty:
+    type: object
+    properties:
+      technicalDifficulty:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+
+  dsSeasonFOB:
+    type: object
+    properties:
+      targetFOB:
+        type: number
+        format: float # FLOAT
+        description: 'No Definition Available'
+
+  dsSeasonTrack:
+    type: object
+    properties:
+      developmentTrack:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+      productTrack:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+      startDate:
+        type: string
+        format: date # VARCHAR2
+        description: 'No Definition Available'
+
+  dsSeasonStatus:
+    type: object
+    properties:
+      developmentStyleSeasonStatusIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  dsSeasonAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+# Development Colorway Data
+
+  developmentColorway_dataunits:
+    type: object
+    required:
+      - dcCore
+      - dcSeasonCore
+      - dcSeasonSourcingConfig
+      - dsCore
+      - dsClassification
+      - dsSeasonCore
+    properties:
+      dcSeasonCore:
+         $ref: '#/definitions/dcSeasonCore'
+      dcSeasonStatus:
+         $ref: '#/definitions/dcSeasonStatus'
+      dcSeasonSourcingConfig:
+         $ref: '#/definitions/dcSeasonSourcingConfig'
+      dcSeasonQuantity:
+         $ref: '#/definitions/dcSeasonQuantity'
+      dcSeasonTrial:
+         $ref: '#/definitions/dcSeasonTrial'
+      dcSeasonFOB:
+         $ref: '#/definitions/dcSeasonFOB'
+      dcSeasonAudit:
+         $ref: '#/definitions/dcSeasonAudit'
+      dsSeasonCore:
+         $ref: '#/definitions/dsSeasonCore'
+      dsSeasonResource:
+         $ref: '#/definitions/dsSeasonResource'
+      dsSeasonTechnicalDifficulty:
+         $ref: '#/definitions/dsSeasonTechnicalDifficulty'
+      dsSeasonFOB:
+         $ref: '#/definitions/dsSeasonFOB'
+      dsSeasonTrack:
+         $ref: '#/definitions/dsSeasonTrack'
+      dsSeasonStatus:
+         $ref: '#/definitions/dsSeasonStatus'
+      dsSeasonAudit:
+         $ref: '#/definitions/dsSeasonAudit'
+      dcCore:
+         $ref: '#/definitions/dcCore'
+      dcStatus:
+         $ref: '#/definitions/dcStatus'
+      dcAudit:
+         $ref: '#/definitions/dcAudit'
+      dsCore:
+         $ref: '#/definitions/dsCore'
+      dsClassification:
+         $ref: '#/definitions/dsClassification'
+      dsLast:
+         $ref: '#/definitions/dsLast'
+      dsStatus:
+         $ref: '#/definitions/dsStatus'
+      dsAudit:
+         $ref: '#/definitions/dsAudit'
+
+# Development Colorway Data Units
+
+  dcCore:
+    type: object
+    properties:
+      developmentColorwayIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentColorwayDescription:
+        type: string # VARCHAR2(2000)
+        description: 'No Definition Available'
+      developmentColorwayName:
+        type: string
+        description: 'No Definition Available'
+      developmentStyleIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentColorwayType:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+      developmentColorwayState:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+      developmentColorwayGate:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+      productIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+
+  dcStatus:
+    type: object
+    properties:
+      developmentColorwayStatusIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  dcAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+
+# Development Colorway Season Data Units
+
+  dcSeasonCore:
+    type: object
+    properties:
+      developmentColorwaySeasonIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentColorwayIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentStyleSeasonIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      productOfferingIdentifier:
+        $ref: '#/definitions/_reference'
+        description: 'No Definition Available'
+
+  dcSeasonStatus:
+    type: object
+    properties:
+      developmentColorwaySeasonStatusIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  dcSeasonSourcingConfig:
+    type: object
+    properties:
+      sourcingConfigurationColorwaySeason:
+        type: array
+        description: 'Reference Link to Sourcing Configuration Colorway Season endpoint'
+        items:
+          $ref: '#/definitions/_reference'
+
+
+  dcSeasonQuantity:
+    type: object
+    properties:
+      prototypeQuantity:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      sampleQuantity:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+
+  dcSeasonTrial:
+    type: object
+    properties:
+      nikeProductionTrial:
+        description: 'No Definition Available'
+        $ref: '#/definitions/_reference'
+
+  dcSeasonFOB:
+    type: object
+    properties:
+      targetFOB:
+        type: number
+        format: float # FLOAT
+        description: 'No Definition Available'
+
+  dcSeasonAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+# Development Style
+
+  developmentStyleResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/developmentStyle_dataunits'
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Development Style Data
+
+  developmentStyle_dataunits:
+    type: object
+    required:
+      - dsCore
+      - dsClassification
+    properties:
+      dsCore:
+        allOf:
+          - $ref: '#/definitions/dsCore'
+      dsClassification:
+        allOf:
+          - $ref: '#/definitions/dsClassification'
+      dsLast:
+        allOf:
+          - $ref: '#/definitions/dsLast'
+      dsStatus:
+        allOf:
+          - $ref: '#/definitions/dsStatus'
+      dsAudit:
+        allOf:
+          - $ref: '#/definitions/dsAudit'
+
+# Sourcing Configuration Season
+
+  sourcingConfigurationsResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/sourcingConfiguration_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  sourcingConfigurationsBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/sourcingConfiguration_dataunits'
+            relationships:
+              $ref: '#/definitions/_links'
+              description: Link to the relationships endpoint to get any relationships for this entity
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Sourcing Configuration Data
+
+  sourcingConfiguration_dataunits:
+    type: object
+    required:
+      - scCore
+      - scClassification
+    properties:
+      scCore:
+         $ref: '#/definitions/scCore'
+      scClassification:
+         $ref: '#/definitions/scClassification'
+      scAudit:
+         $ref: '#/definitions/scAudit'
+
+# Sourcing Configuration Data Units
+
+  scCore:
+    type: object
+    properties:
+      sourcingConfigurationIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      sourcingConfigurationName:
+        type: string
+        description: 'No Definition Available'
+      developmentStyleIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      productCreationCenterIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      legacyFactoryCode:
+        type: string # varchar2
+        description: 'No Definition Available'
+      legacyProductCreationCenterCode:
+        type: string
+      sourcingConfigurationPrimaryIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  scClassification:
+    type: object
+    properties:
+      developmentStyleType:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Development Style Type'
+      division:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to LM Division'
+
+  scAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+# Sourcing Configuration Colorway Season
+
+  sourcingConfigurationsColorwaySeasonResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/sourcingConfigurationColorwaySeason_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  sourcingConfigurationsColorwaySeasonBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/sourcingConfigurationColorwaySeason_dataunits'
+            relationships:
+              $ref: '#/definitions/_links'
+              description: Link to the relationships endpoint to get any relationships for this entity
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Sourcing Configuration Season Data
+
+  sourcingConfigurationColorwaySeason_dataunits:
+    type: object
+    required:
+      - scColorwaySeasonCore
+      - scColorwaySeasonClassification
+      - scColorwaySeasonStatus
+      - scSeasonCore
+      - scSeasonStatus
+    properties:
+      scColorwaySeasonCore:
+         $ref: '#/definitions/scColorwaySeasonCore'
+      scColorwaySeasonClassification:
+        $ref: '#/definitions/scColorwaySeasonClassification'
+      scColorwaySeasonStatus:
+         $ref: '#/definitions/scColorwaySeasonStatus'
+      scColorwaySeasonAudit:
+         $ref: '#/definitions/scColorwaySeasonAudit'
+      scSeasonCore:
+         $ref: '#/definitions/scSeasonCore'
+      scSeasonStatus:
+         $ref: '#/definitions/scSeasonStatus'
+      scSeasonAudit:
+         $ref: '#/definitions/scSeasonAudit'
+      scSeasonResource:
+         $ref: '#/definitions/scSeasonResource'
+
+# Sourcing Configuration Colorway Season Data Units
+
+  scColorwaySeasonCore:
+    type: object
+    properties:
+      sourcingConfigurationColorwaySeasonIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentColorwaySeasonIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      sourcingConfigurationColorwaySeasonPrimaryIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  scColorwaySeasonClassification:
+    type: object
+    properties:
+      developmentStyleType:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Development Style Type'
+      division:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to LM Division'
+
+  scColorwaySeasonStatus:
+    type: object
+    properties:
+      sourcingConfigurationColorwaySeasonStatusIndicator:
+        type: boolean # BOOLEAN
+        description: 'No Definition Available'
+
+  scColorwaySeasonAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  scSeasonCore:
+    type: object
+    properties:
+      sourcingConfigurationIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      sourcingConfigurationSeasonIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      productCreationCenterIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      legacyProductCreationCenterCode:
+        type: string
+      productCreationCentreDeveloper:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      developmentStyleSeasonIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      sourcingIdentifier:
+        type: integer
+        description: 'Sourcing Identifier linked to Global Sourcing - Sourcing endpoint'
+      sourcingConfigurationSeasonPrimaryIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  scSeasonStatus:
+    type: object
+    properties:
+      sourcingConfigurationSeasonStatusIndicator:
+        type: boolean # BOOLEAN
+        description: 'No Definition Available'
+
+  scSeasonAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  scSeasonResource:
+    type: object
+    properties:
+      pmoChemicalEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      pmoCostingUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      pmoDeveloperUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      pmoMaterialUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      pmoProductEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      pmoCategoryDirectorUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      pmoManufacturingEngineerUserIdentifier:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      pmoManufacturingChemicalEngineerUserIdentifier:
+        type: string # VARCHAR2
+
+# Bill of Materials
+
+  billOfMaterialsResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/billOfMaterials_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  billOfMaterialsBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/billOfMaterials_dataunits'
+            relationships:
+              $ref: '#/definitions/_links'
+              description: Link to the relationships endpoint to get any relationships for this entity
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Bill of Materials (BOM) Data
+
+  billOfMaterials_dataunits:
+    type: object
+    required:
+      - bomCore
+    properties:
+      bomCore:
+         $ref: '#/definitions/bomCore'
+      bomSeason:
+         $ref: '#/definitions/bomSeason'
+      bomSourcingConfiguration:
+         $ref: '#/definitions/bomSourcingConfiguration'
+      bomClassification:
+         $ref: '#/definitions/bomClassification'
+      bomDescription:
+         $ref: '#/definitions/bomDescription'
+      bomStatus:
+         $ref: '#/definitions/bomStatus'
+      bomHeaderAudit:
+         $ref: '#/definitions/bomHeaderAudit'
+      bomLineItemDetail:
+         $ref: '#/definitions/bomLineItemDetail'
+      bomLineItemComments:
+         $ref: '#/definitions/bomLineItemComments'
+      bomLineAudit:
+         $ref: '#/definitions/bomLineAudit'
+
+# Bill of Materials (BOM) Data Units
+
+  bomCore:
+    type: object
+    properties:
+      bomIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentColorwayIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      bomName:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  bomSeason:
+    type: object
+    properties:
+      developmentColorwaySeasonIdentifier:
+        type: array
+        items:
+          $ref: '#/definitions/_reference'
+          description: 'No Definition Available'
+
+  bomSourcingConfiguration:
+    type: object
+    properties:
+        sourcingConfigurationList:
+          type: array
+          items:
+            properties:
+              sourcingConfigurationIdentifier:
+                type: integer
+              sourcingConfigurationSeason: # references
+                type: array
+                items:
+                  $ref: '#/definitions/_reference'
+                  description: 'Reference Link to Sourcing Configuration Season endpoint'
+
+  bomDescription:
+    type: object
+    properties:
+      bomDescription:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      bomComments:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  bomStatus:
+    type: object
+    properties:
+      billOfMaterialStatusIndicator:
+        type: boolean # VARCHAR2
+        description: 'No Definition Available'
+
+  bomHeaderAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  bomLineItemDetail:
+    type: array
+    items:
+      properties:
+        bomLineItemIdentifier:
+          type: integer # INTEGER
+          description: 'No Definition Available'
+        bomLineItemNumber:
+          type: string # VARCHAR2
+          description: 'No Definition Available'
+        parentBomLineItemIdentifier:
+          type: integer # INTEGER
+          description: 'No Definition Available'
+        lineItemQuantity:
+          type: integer # INTEGER
+          description: 'No Definition Available'
+        color:
+          description: 'No Definition Available'
+          $ref: '#/definitions/_reference'
+        billOfMaterialsSection:
+          description: 'No Definition Available'
+          $ref: '#/definitions/_reference'
+        partPrimary:
+          description: 'No Definition Available'
+          $ref: '#/definitions/_reference'
+        partSecondary:
+          description: 'No Definition Available'
+          $ref: '#/definitions/_reference'
+        partModifier:
+          description: 'No Definition Available'
+          $ref: '#/definitions/_reference'
+        partSuffix:
+          description: 'No Definition Available'
+          $ref: '#/definitions/_reference'
+        partName:
+          type: string # VARCHAR2
+          description: 'No Definition Available'
+        materialItemIdentifier:
+          description: 'No Definition Available'
+          type: integer # INTEGER
+        suppliedMaterial:
+          description: 'No Definition Available'
+          $ref: '#/definitions/_reference'
+        suppliedMaterialColorIdentifier:
+          type: integer # INTEGER
+        suppliedMaterialColorIsMultipleColors:
+          type: boolean #boolean
+          description: 'No Definition Available'
+        colorPlaceholderDescription:
+          type: string #varchar2
+          description: 'Freeform text for users to input color description when it does not exist in PCX library yet'
+        materialItemPlaceholderDescription:
+          type: string #varchar2
+          description: 'Freeform text for users to input material description when it does not exist in PCX library yet'
+
+
+  bomLineItemComments:
+    type: array
+    items:
+      properties:
+        bomLineItemIdentifier:
+          type: integer # INTEGER
+          description: 'No Definition Available'
+        bomLineItemComments:
+          type: string # VARCHAR2
+          description: 'No Definition Available'
+
+  bomLineAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+# Bill of Materials by Source
+
+  billOfMaterialsSourceResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/billOfMaterialsSource_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+  billOfMaterialsSourceBulkResponse:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            objectId:
+              type: string
+              description: The business key related to items requested.
+            objectType:
+              type: string
+              description: The type of key that has been requested.
+            data:
+              $ref: '#/definitions/billOfMaterialsSource_dataunits'
+            relationships:
+              $ref: '#/definitions/_links'
+              description: Link to the relationships endpoint to get any relationships for this entity
+      count:
+        type: integer
+        description: The number of entries returned in this responses
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Bill of Materials (BOM) by Source Data
+
+  billOfMaterialsSource_dataunits:
+    type: object
+    required:
+      - bomCore
+    properties:
+      bomCore:
+        allOf:
+          - $ref: '#/definitions/bomCore'
+          - properties:
+              bomColorwaySourceIdentifier:
+                type: string
+                description: 'Generated Id for the Bom Colorway Source combination'
+              sourcingConfigurationIdentifier:
+                type: integer
+              productIdentifier:
+                type: integer
+              styleNumber:
+                type: string
+      bomSeason::
+        allOf:
+          - $ref: '#/definitions/bomSeason'
+          - properties:
+              cycleYear:
+                type: array
+                items:
+                  $ref: '#/definitions/_reference'
+                  description: 'Reference Link to LM Cycle Year'
+      bomSourcingConfigurationColorwaySeason:
+        $ref: '#/definitions/bomSourcingConfigurationColorwaySeason'
+      bomClassification:
+        $ref: '#/definitions/bomClassification'
+      bomDescription:
+        $ref: '#/definitions/bomDescription'
+      bomStatus:
+        $ref: '#/definitions/bomStatus'
+      bomHeaderAudit:
+        $ref: '#/definitions/bomHeaderAudit'
+      bomLineItemDetail:
+        $ref: '#/definitions/bomLineItemDetailSource'
+      bomLineItemComments:
+        $ref: '#/definitions/bomLineItemComments'
+      bomLineAudit:
+        $ref: '#/definitions/bomLineAudit'
+
+# Bill of Materials (BOM) by Source Data Units
+
+  bomSourcingConfigurationColorwaySeason:
+    type: object
+    properties:
+      sourcingConfigurationColorwaySeason: # references
+        type: array
+        items:
+          $ref: '#/definitions/_reference'
+          description: 'Reference Link to Sourcing Configuration Colorway Season endpoint'
+
+  bomClassification:
+    type: object
+    properties:
+      developmentStyleType:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Development Style Type'
+      division:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to LM Division'
+
+  bomLineItemDetailSource:
+    type: array
+    items:
+      properties:
+        bomLineItemIdentifier:
+          type: integer # INTEGER
+        bomLineItemNumber:
+          type: string # VARCHAR2
+        parentBomLineItemIdentifier:
+          type: integer # INTEGER
+        lineItemQuantity:
+          type: integer # INTEGER
+        color:
+          $ref: '#/definitions/_reference'
+          description: 'Reference Link to CM Color End Point'
+        billOfMaterialsSection:
+          $ref: '#/definitions/_reference'
+          description: 'Reference Link to Bill Of Material Section'
+        part:
+          $ref: '#/definitions/_reference'
+          description: 'Reference Link to Part Name'
+        patternPart:
+          $ref: '#/definitions/_reference'
+          description: 'Reference Link to Part Name'
+        materialItemIdentifier:
+          type: integer # INTEGER
+        suppliedMaterial:
+          $ref: '#/definitions/_reference'
+          description: 'Reference Link to MM Supplied Material End Point'
+        suppliedMaterialColorIdentifier:
+          type: integer # INTEGER
+        suppliedMaterialColorIsMultipleColors:
+          type: boolean #boolean
+        colorPlaceholderDescription:
+          type: string #varchar2
+          description: 'Freeform text for users to input color description when it does not exist in PCX library yet'
+        materialItemPlaceholderDescription:
+          type: string #varchar2
+          description: 'Freeform text for users to input material description when it does not exist in PCX library yet'
+        netUsage:
+          type: number
+          format: float
+        wasteUsage:
+          type: number
+          format: float
+        grossUsage:
+          type: number
+          format: float
+        usageUnitOfMeasure:
+          $ref: '#/definitions/_reference'
+          description: 'Reference Link to Bill Of Material Unit Of Measurement'
+
+
+# Development Sample
+
+  developmentSampleResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/developmentSample_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Development Sample Request Data
+
+  developmentSample_dataunits:
+    type: object
+    required:
+      - dSampleCore
+      - dSampleRequestCore
+    properties:
+      dSampleCore:
+         $ref: '#/definitions/dSampleCore'
+         description: 'This data will always be returned by default'
+      dSampleStatus:
+         $ref: '#/definitions/dSampleStatus'
+      dSampleClassification:
+         $ref: '#/definitions/dSampleClassification'
+      dSampleComments:
+         $ref: '#/definitions/dSampleComments'
+      dSampleAudit:
+         $ref: '#/definitions/dSampleAudit'
+      dSampleRequestCore:
+         $ref: '#/definitions/dSampleRequestCore'
+         description: 'This data will always be returned by default'
+      dSampleRequestComments:
+         $ref: '#/definitions/dSampleRequestComments'
+      dSampleRequestStatus:
+         $ref: '#/definitions/dSampleRequestStatus'
+      dSampleRequestAudit:
+         $ref: '#/definitions/dSampleRequestAudit'
+      dSampleOrderDetail:
+         $ref: '#/definitions/dSampleOrderDetail'
+      dSampleEvaluation:
+         $ref: '#/definitions/dSampleEvaluation'
+
+
+# Development Sample Data Units
+
+  dSampleCore:
+    type: object
+    properties:
+      developmentSampleIdentifier:
+        type: integer # INTEGER
+        description: 'Dev Sample Identifier - Same Identifier as Dev Sample Shipment Identifier'
+      developmentStyleIdentifier:
+        type: integer # INTEGER
+      developmentColorwayIdentifier:
+        type: integer # INTEGER
+      developmentSampleType:
+        description: 'Reference Link to Dev Sample Style Type'
+        $ref: '#/definitions/_reference'
+      developmentSampleFormat:
+        description: 'Reference Link to Dev Sample Format'
+        $ref: '#/definitions/_reference'
+      developmentSampleNeedByDate:
+        type: string
+        format: date
+      developmentSampleShipment:
+        description: 'Reference Link to Dev Sample Shipment endpoint'
+        $ref: '#/definitions/_reference'
+
+  dSampleStatus:
+    type: object
+    properties:
+      developmentSampleStatusIndicator:
+        type: boolean
+        description: 'No Definition Available'
+
+  dSampleClassification:
+    type: object
+    properties:
+      developmentStyleType:
+        description: 'Reference Link to Dev Style Type'
+        $ref: '#/definitions/_reference'
+      division:
+        description: 'Reference Link to LM Division'
+        $ref: '#/definitions/_reference'
+
+  dSampleComments:
+    type: object
+    properties:
+      developmentSampleComments:
+        type: string
+        description: 'No Definition Available'
+
+  dSampleAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  dSampleRequestCore:
+    type: object
+    properties:
+      developmentSampleRequestIdentifier:
+        type: integer # INTEGER
+        description: 'No Definition Available'
+      developmentSampleRequestName:
+        type: string
+        description: 'No Definition Available'
+      sourcingConfiguration:
+        description: 'Reference Link to Sourcing Configuration endpoint'
+        $ref: '#/definitions/_reference'
+      developmentSampleRequestSeason:
+        description: 'Reference Link to LM Cycle Year'
+        $ref: '#/definitions/_reference'
+      developmentSampleRequestDate:
+        type: string
+        format: date
+      developmentSampleRequestPurpose:
+        description: 'Reference Link to Dev Sample Purpose'
+        $ref: '#/definitions/_reference'
+
+  dSampleRequestComments:
+    type: object
+    properties:
+      developmentSampleRequestComments:
+        type: string
+        description: 'No Definition Available'
+
+  dSampleRequestStatus:
+    type: object
+    properties:
+      developmentSampleRequestStatusIndicator:
+        type: boolean
+        description: 'No Definition Available'
+
+  dSampleRequestAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  dSampleOrderDetail:
+    type: object
+    properties:
+      developmentSampleDestinationName:
+        type: string
+        description: 'Development Sample Destination Description'
+      developmentSampleAddress:
+        type: string
+        description: 'No Definition Available'
+      developerDestinationAddress:
+        type: string
+        description: 'No Definition Available'
+      attentionTo:
+        type: string
+        description: 'No Definition Available'
+      sampleSize:
+        type: string
+        description: 'No Definition Available'
+      developerOrderQuantity:
+        type: integer
+        description: 'No Definition Available'
+      sampleOrderQuantityOrPairQuantity:
+        type: integer
+        description: 'No Definition Available'
+      sampleOrderRightQuantity:
+        type: integer
+        description: 'No Definition Available'
+      sampleOrderLeftQuantity:
+        type: integer
+        description: 'No Definition Available'
+      costCenterNumber:
+        type: string
+        description: 'Cost Center Name'
+      costCenterApprover:
+        type: string
+        description: 'No Definition Available'
+      generalLedgerNumber:
+        type: string
+        description: 'No Definition Available'
+      requestedOnBehalfOf:
+        type: string
+        description: 'No Definition Available'
+      fabricInstruction:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Dev Sample Fabric Instruction'
+      quoteRequirement:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Quote Requirement'
+
+  dSampleEvaluation:
+    type: object
+    properties:
+      reviewedDate:
+        type: string
+        format: date
+      developmentSampleEvaluationState:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Dev Sample Evaluation State'
+      fitDate:
+        type: string
+        format: date
+      changeRequestReasonCode:
+        $ref: '#/definitions/_reference'
+        description: 'Reference Link to Dev Sample Evaluation State'
+      developmentSampleEvaluationComments:
+        type: string
+        description: 'No Definition Available'
+
+# Development Sample Shipment
+
+  developmentSampleShipmentResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/developmentSampleShipment_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Development Sample Shipment Data
+
+  developmentSampleShipment_dataunits:
+    type: object
+    required:
+      - dSampleShipmentCore
+    properties:
+      dSampleShipmentCore:
+         $ref: '#/definitions/dSampleShipmentCore'
+         description: 'This data will always be returned by default'
+      dSampleShipmentFactoryComments:
+         $ref: '#/definitions/dSampleShipmentFactoryComments'
+      dSampleShipmentAudit:
+         $ref: '#/definitions/dSampleShipmentAudit'
+      dSampleShipmentDetail:
+         $ref: '#/definitions/dSampleShipmentDetail'
+
+# Development Sample Shipment Data Units
+
+  dSampleShipmentCore:
+    type: object
+    properties:
+      developmentSampleShipmentIdentifier:
+        type: integer # INTEGER
+        description: 'Dev Sample Identifier - Same Identifier as Dev Sample Identifier'
+      developmentSample:
+        description: 'Reference Link to Dev Sample endpoint'
+        $ref: '#/definitions/_reference'
+      developmentSampleState:
+        description: 'Reference Link to Dev Sample State'
+        $ref: '#/definitions/_reference'
+
+  dSampleShipmentFactoryComments:
+    type: object
+    properties:
+      factorySampleComments:
+        type: string
+        description: 'No Definition Available'
+      factorySubLocationIMNumber:
+        type: string
+        description: 'No Definition Available'
+
+  dSampleShipmentAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+  dSampleShipmentDetail:
+    type: array
+    items:
+      properties:
+        estimatedShipDate:
+          type: string
+          format: date
+        actualShipDate:
+          type: string
+          format: date
+        receivedDate:
+          type: string
+          format: date
+        shippingService:
+          description: 'Reference Link to Shipping Service'
+          $ref: '#/definitions/_reference'
+        shipmentTrackingNumber:
+          type: string
+          description: 'No Definition Available'
+        shipPairsQuantity:
+          type: integer
+          description: 'No Definition Available'
+        shipRightQuantity:
+          type: integer
+          description: 'No Definition Available'
+        shipLeftQuantity:
+          type: integer
+          description: 'No Definition Available'
+        goodsAtConsolidatorReason:
+          description: 'Reference Link to Good At Consolidator Reason'
+          $ref: '#/definitions/_reference'
+        goodsAtConsolidatorAPReason:
+          description: 'Reference Link to Good At Consolidator Reason AP'
+          $ref: '#/definitions/_reference'
+
+# Development Measurement
+
+  developmentMeasurementResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/developmentMeasurement_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Development Measurement Request Data
+
+  developmentMeasurement_dataunits:
+    type: object
+    required:
+      - msCore
+    properties:
+      msCore:
+         $ref: '#/definitions/msCore'
+         description: 'This data will always be returned by default'
+      msTemplate:
+         $ref: '#/definitions/msTemplate'
+      msSize:
+         $ref: '#/definitions/msSize'
+      msPointOfMeasurement:
+         $ref: '#/definitions/msPointOfMeasurementBreakdown'
+      msStatus:
+         $ref: '#/definitions/msStatus'
+      msAudit:
+         $ref: '#/definitions/msAudit'
+
+
+# Development Measurement Data Units
+
+  msCore:
+    type: object
+    properties:
+      measurementSetIdentifier:
+        type: integer # INTEGER
+        description: 'Dev Measurement Identifier'
+      measurementSetName:
+        type: string
+      measurementSetState:
+        description: 'Reference Link to Measurement Set State'
+        $ref: '#/definitions/_reference'
+      measurementSetApplicabilityList:
+        type: array
+        items:
+          properties:
+            developmentStyleIdentifier:
+              type: integer # INTEGER
+            styleNumber:
+              type: string
+            cycleYear:
+              $ref: '#/definitions/_reference'
+              description: 'Reference Link to LM Cycle Year'
+            sourcingConfigurationIdentifier:
+              $ref: '#/definitions/_reference'
+              description: 'Reference Link to Sourcing Configuration Endpoint'
+            sourcingConfigurationSeasonIdentifier:
+              type: integer # INTEGER
+              description: 'Sourcing Configuration Season Identifier'
+
+  msTemplate:
+    type: object
+    properties:
+      measurementSetTemplateName:
+        type: string
+        description: 'No Definition Available'
+      sizeDefinitionTemplate:
+        type: string
+        description: 'No Definition Available'
+      gradeRuleTemplate:
+        type: string
+        description: 'No Definition Available'
+      measurementTemplateType:
+        description: 'Reference Link to Measurement Template Type'
+        $ref: '#/definitions/_reference'
+
+  msSize:
+    type: object
+    properties:
+      developmentStyleSizeDefinition:
+        type: string
+        description: 'No Definition Available'
+      measurementValueUnitOfMeasure:
+        description: 'Reference Link to UOM'
+        $ref: '#/definitions/_reference'
+      baseSize:
+        type: string
+        description: 'No Definition Available'
+      sizeSelectionList:
+        type: string
+
+  msPointOfMeasurementBreakdown:
+    type: array
+    items:
+      properties:
+        size:
+          type: string
+        sizeBreakdown:
+          type: array
+          items:
+            properties:
+              measurementCode:
+                type: string
+                description: 'No Definition Available'
+              pointOfMeasurementName:
+                type: string
+                description: 'No Definition Available'
+              sortOrder:
+                type: string
+                description: 'No Definition Available'
+              measurementInstructions:
+                type: string
+                description: 'No Definition Available'
+              measurementDetail:
+                type: string
+                description: 'No Definition Available'
+              pointOfMeasurementCriticality:
+                description: 'Reference Link to Point of Measurement Criticality'
+                $ref: '#/definitions/_reference'
+              toleranceNegative:
+                type: number
+                format: float # float
+              tolerancePositive:
+                type: number
+                format: float # float
+              measurementSizeValue:
+                type: number
+                format: float # float
+              pointOfMeasurement:
+                description: 'Reference Link to Point of Measurement Endpoint'
+                $ref: '#/definitions/_reference'
+
+  msStatus:
+    type: object
+    properties:
+      measurementSetStatusIndicator:
+        type: boolean
+        description: 'No Definition Available'
+
+  msAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      createdBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+      modifiedBy:
+        type: string # VARCHAR2
+        description: 'No Definition Available'
+
+# Development Point of Measurement
+
+  developmentPointOfMeasurementResponse:
+    type: object
+    properties:
+      content:
+        type: object
+        properties:
+          objectId:
+            type: string
+            description: The business key related to items requested.
+          objectType:
+            type: string
+            description: The type of key that has been requested.
+          data:
+            $ref: '#/definitions/developmentPointOfMeasurement_dataunits'
+          relationships:
+            $ref: '#/definitions/_links'
+            description: Link to the relationships endpoint to get any relationships for this entity
+      self:
+        $ref: '#/definitions/_links'
+        description: The resource that was called
+      requestTime:
+        type: string
+        format: date-time
+        description: "A UTC timestamp for when the response was given, also for tracking purposes"
+      requestStatus:
+        type: string
+        description: "This is a status code that will list out the status of the request, e.g. success, partial or something to tell the user what has happened"
+
+# Development Point of Measurement Request Data
+
+  developmentPointOfMeasurement_dataunits:
+    type: object
+    required:
+      - pomCore
+    properties:
+      pomCore:
+         $ref: '#/definitions/pomCore'
+         description: 'This data will always be returned by default'
+      pomStatus:
+         $ref: '#/definitions/pomStatus'
+      pomAudit:
+         $ref: '#/definitions/pomAudit'
+
+# Development Point of Measurement Data Units
+
+  pomCore:
+    type: object
+    properties:
+      sortOrder:
+        type: string
+        description: 'No Definition Available'
+      measurementCode:
+        type: string
+        description: 'No Definition Available'
+      pointOfMeasurementName:
+        type: string
+        description: 'No Definition Available'
+      measurementInstructions:
+        type: string
+        description: 'No Definition Available'
+      measurementDetail:
+        type: string
+        description: 'No Definition Available'
+      pointOfMeasurementCriticality:
+        description: 'Reference Link to Point of Measurement Criticality'
+        $ref: '#/definitions/_reference'
+      toleranceNegative:
+        type: number
+        format: float # float
+      tolerancePositive:
+        type: number
+        format: float # float
+      pointOfMeasurementIdentifier:
+        type: number
+        format: integer # integer
+
+  pomStatus:
+    type: object
+    properties:
+      pointOfMeasurementStatusIndicator:
+        type: boolean
+        description: 'No Definition Available'
+
+  pomAudit:
+    type: object
+    properties:
+      createTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+      changeTimestamp:
+        type: string
+        format: date-time # TIMESTAMP
+        description: 'No Definition Available'
+
+# Common Structures
+
+  _links:
+    type: object
+    properties:
+      rel:
+        description: The type of relationship
+        type: string
+      href:
+        description: The reference link
+        type: string
+
+  _reference:
+    type: object
+    properties:
+      referenceKey:
+        type: string
+        description: The key for the described field
+      link:
+        $ref: '#/definitions/_links'
+        description: The url link to the reference service to get descriptions and other data related to the reference key
+
+#Error Structure
+  _error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      detailType:
+        type: string
+      message:
+        type: string
+
+#Security
+
+securityDefinitions:
+  nike_auth:
+    type: oauth2
+    tokenUrl: https://nike.okta.com/oauth2/aus27z7p76as9Dz0H1t7/v1/token
+    flow: application
+    description: Method Nike we will leverage centralized authentication to get the JWT token to uniquely identify users
+    scopes:
+     read: permission to read data from this service
+     legacy: permission to read data for legacy
