@@ -88,12 +88,11 @@ Above 3 functionalities can be achieved by 3 packages.
 - [x] `file-system-client`
 - [x] `orm-framework`
 - [x] `etl-framework`
-- [x] `data-quality-framework`
+- [x] `my-datastore-validation` - can factor out common code to `data-quality-framework`
 
 #### Data Store Wide Libraries
 - [x] `my-datastore-orm`
 - [x] `my-datastore-etl-wrapper`
-- [ ] `my-datastore-data-quality`
 
 #### Example ETL to load objects to Data Store
 - [x] `my-sample-etl`

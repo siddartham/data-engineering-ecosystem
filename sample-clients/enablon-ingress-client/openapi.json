@@ -1,0 +1,228 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Enablon Ingress API 2",
+        "version": "0.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://ehs.uat.eu.enablon.io/org.uat",
+            "description": "Enablon UAT"
+        }
+    ],
+    "paths": {
+        "/go.aspx": {
+            "parameters": [
+                {
+                    "name": "v",
+                    "in": "query",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "enum": [
+                            "/SD/CS_DataFoundationImport"
+                        ]
+                    }
+                }
+            ],
+            "post": {
+                "description": "Update Indicator Value",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/update-indicator-value-request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/update-indicator-value-response"
+                                }
+                            }
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/gateway-timeout-response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "update-indicator-value-request": {
+                "description": "Body sent to update indicator values",
+                "type": "object",
+                "properties": {
+                    "fct_name": {
+                        "type": "string",
+                        "description": "The table in Enablon where this activity is recorded",
+                        "enum": [
+                            "CS_ImportMetricsData"
+                        ]
+                    },
+                    "params": {
+                        "$ref": "#/components/schemas/params"
+                    },
+                    "authentication": {
+                        "$ref": "#/components/schemas/authentication"
+                    }
+                },
+                "required": [
+                    "fct_name",
+                    "params",
+                    "authentication"
+                ]
+            },
+            "params": {
+                "description": "Parameters sent to API to locate Indicator in Enablon",
+                "properties": {
+                    "sEntityCode": {
+                        "type": "string"
+                    },
+                    "nCalendarYear": {
+                        "type": "integer"
+                    },
+                    "nCalendarMonth": {
+                        "type": "integer",
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12
+                        ]
+                    },
+                    "nCalendarDay": {
+                        "type": "integer",
+                        "enum": [
+                            1
+                        ]
+                    },
+                    "anIndicatorsRef": {
+                        "description": "All of the array type fields must be of same length",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "anIndicatorsValues": {
+                        "description": "All the arrays must be of same length. Provide value of the corresponding indicator",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "anIndicatorsUOM": {
+                        "description": "All the arrays must be of same length. Provide an empty string, for the corresponding indicator, in case of no UOM",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "anIndicatorsComments": {
+                        "description": "All the arrays must be of same length. Provide an empty string, for the corresponding indicator, in case of no Comment",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sEntityCode",
+                    "nCalendarYear",
+                    "nCalendarMonth",
+                    "nCalendarDay",
+                    "anIndicatorsRef",
+                    "anIndicatorsValues",
+                    "anIndicatorsUOM"
+                ]
+            },
+            "authentication": {
+                "description": "Authentication Credentials",
+                "properties": {
+                    "userid": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "siteid": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "userid",
+                    "password"
+                ]
+            },
+            "update-indicator-value-response": {
+                "properties": {
+                    "status": {
+                        "description": "Indicates the result of the execution of the function. Its value is either OK or KO",
+                        "type": "string",
+                        "enum": [
+                            "OK",
+                            "KO"
+                        ]
+                    },
+                    "login": {
+                        "description": "Determine if there is a session connected with the server. 0: you are not connected. If you there is an error of connection you can see the loginErrNum:0: unknown error\n 1: login or password is wrong\n 2: login/password are ok but your password is expired. You need to change this. Actually, you can only connect to the web solution to change it.\n1: you are connected.",
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1,
+                            2
+                        ]
+                    },
+                    "loginErrNum": {
+                        "description": "An optional parameter. It contains the number result",
+                        "type": "integer",
+                        "enum": [
+                            1
+                        ]
+                    },
+                    "error": {
+                        "description": "Defined only if status is KO, contains the error that prevented the Nabsic function to be executed",
+                        "type": "string"
+                    },
+                    "data": {
+                        "description": "Defined only if the status is OK, contains the result of the Nabsic function. It can be null, a scalar (number, boolean, string), an array, a hash table.",
+                        "type": "string",
+                        "pattern": "Response\\|20\\d(\\\\r\\\\n.*\\|.*)*"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "login",
+                    "status"
+                ]
+            },
+            "gateway-timeout-response": {
+                "type": "string"
+            }
+        }
+    }
+}
