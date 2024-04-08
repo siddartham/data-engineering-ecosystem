@@ -1,0 +1,37 @@
+name: test
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - setup.py
+      - setup.cfg
+      - pyproject.toml
+      - mail_client/**
+      - tests/**
+      - requirements.txt
+      - tox.ini
+      - .github/**
+jobs:
+  test:
+    runs-on: self-hosted
+    strategy:
+      max-parallel: 2
+      matrix:
+        python:
+          - 3.8
+          - 3.9
+          - "3.10"
+          - 3.11
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'  # use zulu for databricks
+          java-version: '8'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+          cache: "pip"
+          cache-dependency-path: "requirements.txt"
+      - run: make ci-install
+      - run: make test

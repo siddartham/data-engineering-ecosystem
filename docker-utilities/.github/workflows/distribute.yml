@@ -1,0 +1,26 @@
+name: distribute
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - setup.py
+    - setup.cfg
+    - pyproject.toml
+jobs:
+  distribute:
+    runs-on: self-hosted
+    steps:
+    - run: docker context create mbuilder
+    - uses: docker/setup-buildx-action@v2
+      with:
+        endpoint: mbuilder
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    - run: make ci-install
+    - run: make distribute

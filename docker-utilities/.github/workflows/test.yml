@@ -1,0 +1,38 @@
+name: test
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches:
+    - '*'
+    paths:
+    - docker_utilities/**
+    - setup.py
+    - setup.cfg
+    - tests/**
+    - requirements.txt
+    - tox.ini
+    - .github/**
+jobs:
+  test:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        python:
+        - 3.8
+        - 3.9
+        - '3.10'
+        - '3.11'
+    steps:
+    - run: docker context create mbuilder
+    - uses: docker/setup-buildx-action@v2
+      with:
+        endpoint: mbuilder
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    - run: make ci-install
+    - run: make test

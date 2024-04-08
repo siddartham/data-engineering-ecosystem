@@ -1,0 +1,3 @@
+daves-dev-tools~=2.21
+mail-client~=0.8
+tox
