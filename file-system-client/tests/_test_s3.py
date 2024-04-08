@@ -166,7 +166,7 @@ class TestS3(unittest.TestCase):
     def test_get_url(self) -> None:
         """
         This method verifies that
-        `etl_framework.file_system.s3.S3.get_url` returns
+        `analytics_etl.file_system.s3.S3.get_url` returns
         an S3 URL formatted in the expected fashion.
         """
         url: str = self.file_system.get_url(TEST1_CSV)
