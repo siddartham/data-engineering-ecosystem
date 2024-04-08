@@ -21,7 +21,7 @@ pip3 install git+https://github.com/siddartham/data-engineering-ecosystem/analyt
 
 ## Modules
 
-### [analytics_etl.broker](./etl_frameworl/broker.py)
+### [analytics_etl.broker](./analytics_etl/broker.py)
 
 #### Broker
 
@@ -31,22 +31,27 @@ of [Work](#work) or a [Work](#work) sub-class.
 
 Parameters:
 
+
+- file_system (file_system_client.base.FileSystem)
 - parallelism (int) = None: If this is 0 or `None`, the default
       parallelism for the Spark cluster will be used.
 - concurrency (analytics_etl.concurrency.Concurrency)
   = analytics_etl.concurrency.Concurrency.MULTIPROCESSING
-- file_system (file_system_client.base.FileSystem)
 - databricks_base (typing.Type[analytics_orm.declarative.Base]|None)
 - snowflake_base (typing.Type[analytics_orm.declarative.Base]|None)
 - postgresql_base (typing.Type[analytics_orm.declarative.Base]|None)
 - postgresql_connection_string (str)
 - snowflake_connection_string (str)
 - databricks_connection_string (str)
+- tables_directory: str = "tables/"
+- temp_directory: str = "temp/"
+- snowflake_s3_stage_name: str = ""
 for writing dataframes to s3, in lieu of the file system root
 - started (datetime.datetime|None):
 The date and time at which the job started, for bookmarking purposes.
 - echo (bool) = False: If `True`, all logging will be printed to the
     console.
+- work: Union[Work, Type[Work]] = Work
 - consolidate_dont_raise_exceptions ((Exception, ...)) = ():
 A tuple of exceptions which should not be raised by the `consolidate`
 method, only logged. This should only be used for known local testing
@@ -66,6 +71,9 @@ Parameters:
 - postgresql_connection_string (str)
 - snowflake_connection_string (str)
 - databricks_connection_string (str)
+- tables_directory: str = "tables/"
+- temp_directory: str = "temp/"
+- snowflake_s3_stage_name: str = ""
   for writing dataframes to s3, in lieu of the file system root
 - started (datetime.datetime|None):
   The date and time at which the job started, for bookmarking purposes.

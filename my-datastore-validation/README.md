@@ -1,13 +1,13 @@
 # my-datastore-validation
 
-[![test](https://github.com/siddartham/data-ecosystem/my-datastore-validation/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-ecosystem/my-datastore-validation/actions/workflows/test.yml)
-[![distribute](https://github.com/siddartham/data-ecosystem/my-datastore-validation/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-ecosystem/my-datastore-validation/actions/workflows/distribute.yml)
+[![test](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-validation/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-validation/actions/workflows/test.yml)
+[![distribute](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-validation/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-validation/actions/workflows/distribute.yml)
 
-[Development Environment Setup](https://github.com/siddartham/data-ecosystem/dev-env-setup)
+[Development Environment Setup](https://github.com/siddartham/data-engineering-ecosystem/dev-env-setup)
 
 This package performs validations against the
 databases defined in [my-datastore-orm
-](https://github.com/siddartham/data-ecosystem/my-datastore-validation).
+](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-validation).
 
 ## Install
 
@@ -22,7 +22,7 @@ pip3 install my-datastore-validation
 ### Development Installation
 
 ```shell script
-git clone https://github.com/siddartham/data-ecosystem/my-datastore-validation.git
+git clone https://github.com/siddartham/data-engineering-ecosystem/my-datastore-validation.git
 cd my-datastore-validation
 make
 ```

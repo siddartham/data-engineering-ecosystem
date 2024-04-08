@@ -1,9 +1,9 @@
 # cerberus-assistant
 
-[![test](https://github.com/siddartham/data-ecosystem/cerberus-assistant/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/cerberus-assistant/actions/workflows/test.yml)
-[![distribute](https://github.com/siddartham/data-ecosystem/cerberus-assistant/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/cerberus-assistant/actions/workflows/distribute.yml)
+[![test](https://github.com/siddartham/data-engineering-ecosystem/cerberus-assistant/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/cerberus-assistant/actions/workflows/test.yml)
+[![distribute](https://github.com/siddartham/data-engineering-ecosystem/cerberus-assistant/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/cerberus-assistant/actions/workflows/distribute.yml)
 
-[Development Environment Setup](https://github.com/siddartham/data-ecosystem/dev-env-setup)
+[Development Environment Setup](https://github.com/siddartham/data-engineering-ecosystem/dev-env-setup)
 
 This package provides a CLI and library for retrieving and setting Cerberus secrets
 without needing to explicitly specify an AWS profile.

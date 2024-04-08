@@ -1,0 +1,18 @@
+[build-system]
+requires = [
+    "setuptools",
+    "wheel",
+    "pip",
+    "cython",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+extend-exclude = "/airtable_client/model.py"
+line-length = 79
+target-version = [
+    "py37",
+    "py38",
+    "py39",
+    "py310",
+]

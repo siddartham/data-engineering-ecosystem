@@ -1,7 +1,7 @@
 # enablon-ingress-client
 
-[![test](https://github.com/siddartham/data-ecosystem/sample-clients/enablon-ingress-client/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-ecosystem/sample-clients/enablon-ingress-client/actions/workflows/test.yml)
-[![distribute](https://github.com/siddartham/data-ecosystem/sample-clients/enablon-ingress-client/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-ecosystem/sample-clients/enablon-ingress-client/actions/workflows/distribute.yml)
+[![test](https://github.com/siddartham/data-engineering-ecosystem/sample-client-sdks/open-api-clients/when-openapi-spec-provided/enablon-ingress-client/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/sample-client-sdks/open-api-clients/when-openapi-spec-provided/enablon-ingress-client/actions/workflows/test.yml)
+[![distribute](https://github.com/siddartham/data-engineering-ecosystem/sample-client-sdks/open-api-clients/when-openapi-spec-provided/enablon-ingress-client/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/sample-client-sdks/open-api-clients/when-openapi-spec-provided/enablon-ingress-client/actions/workflows/distribute.yml)
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for information pertaining to
 development of this package.
