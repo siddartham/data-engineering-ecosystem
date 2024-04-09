@@ -44,7 +44,7 @@ class Client(oapi.client.Client):
       be found.
     """
 
-    __slots__: typing.Tuple[str, ...] = oapi.client.CLIENT_SLOTS
+    __slots__: typing.Tuple[str, ...] = ()
 
     @apply_cerberus_path_arguments(
         cerberus_url_parameter_name="cerberus_url",
