@@ -1,7 +1,7 @@
 # sample-datastore-model
 
-[![test](https://github.com/siddartham/sample-datastore-model/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/sample-datastore-model/actions/workflows/test.yml)
-[![distribute](https://github.com/siddartham/sample-datastore-model/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/sample-datastore-model/actions/workflows/distribute.yml)
+[![test](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/test.yml)
+[![distribute](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/distribute.yml)
 
 
 This library defines a SQLAlchemy object relational model (ORM) for my datastore
@@ -17,13 +17,13 @@ This library defines a SQLAlchemy object relational model (ORM) for my datastore
 To install this library with all optional extras:
 
 ```shell script
-pip3 install 'git+https://github.com/siddartham/my-datastore-orm.git[all]'
+pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm.git[all]'
 ```
 
 To install this library only for use with sqlite:
 
 ```shell script
-pip3 install 'git+https://github.com/siddartham/my-datastore-orm.git'
+pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm.git'
 ```
 
 Extras available for this package include:
@@ -41,7 +41,7 @@ For example, to install this library for use with Snowflake, and with `pyarrow`
 data-frame utilities:
 
 ```shell script
-pip3 install 'git+https://github.com/siddartham/my-datastore-orm.git[snowflake,pyarrow]'
+pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm.git[snowflake,pyarrow]'
 ```
 
 ### Development Installation
@@ -53,7 +53,7 @@ need to:
 - Initialize or perform schema migrations on one of the Snowflake databases
 
 ```shell script
-git clone https://github.com/siddartham/my-datastore-orm && \
+git clone https://github.com/siddartham/data-engineering-ecosystem && \
 cd my-datastore-orm && \
 make
 ```

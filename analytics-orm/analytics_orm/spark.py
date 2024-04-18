@@ -31,8 +31,9 @@ from urllib.error import HTTPError
 from urllib.request import urlopen
 from warnings import warn
 from xml.etree.ElementTree import Element
-
+print("before lxml tree")
 import lxml.etree
+print("after lxml tree")
 import sqlalchemy  # type: ignore
 from ordered_set import OrderedSet
 from pyspark import sql as pyspark_sql  # type: ignore

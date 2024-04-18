@@ -1,0 +1,3 @@
+lxml==4.9.3
+-e ../file-system-client[s3]
+-e ../analytics-orm[pyarrow]

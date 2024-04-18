@@ -6,7 +6,7 @@ library
 import importlib
 from typing import Any
 
-from orm_framework import declarative
+from analytics_orm import declarative
 from sqlalchemy import Numeric  # type: ignore
 
 Base: Any = declarative.declarative_base()

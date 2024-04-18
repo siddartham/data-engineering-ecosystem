@@ -20,7 +20,7 @@ from file_system_client.base import FileSystem
 from my_datastore_etl.broker import Broker, Work
 from my_datastore_orm.common_dimension import Calculator
 
-from etl_framework.concurrency import Concurrency
+from analytics_etl.concurrency import Concurrency
 
 lru_cache: Any = functools.lru_cache
 TEST_CSV: str = "test_csv/"

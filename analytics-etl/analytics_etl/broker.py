@@ -1,10 +1,12 @@
 import copyreg
 import errno
 import functools
+import importlib.metadata
 import inspect
 import itertools
 import json
 import os
+import re
 import ssl
 import sys
 import threading
@@ -18,6 +20,8 @@ from logging import Logger
 from multiprocessing import queues
 from multiprocessing.pool import Pool
 from multiprocessing.util import Finalize, debug, info, is_exiting
+from re import Match, Pattern
+from subprocess import check_output
 from traceback import format_exception
 from typing import (
     Any,
@@ -33,10 +37,11 @@ from typing import (
     Union,
     cast,
 )
+from warnings import warn
 
-import file_system_client.s3 as s3
+from file_system_client import s3
 import pyarrow  # type: ignore
-from orm_framework.declarative import (
+from analytics_orm.declarative import (
     Base,
     get_base_table_name_subclass,
     get_class_mapper,
@@ -44,8 +49,8 @@ from orm_framework.declarative import (
     get_class_table_name,
     iter_base_sorted_subclasses,
 )
-from orm_framework.errors import append_exception_text
-from orm_framework.utilities import lru_cache
+from analytics_orm.errors import append_exception_text
+from analytics_orm.utilities import lru_cache
 from file_system_client import from_url
 from file_system_client.base import FileSystem
 from file_system_client.errors import get_exception_text
@@ -71,14 +76,14 @@ from .utilities import get_print_logger, is_spark_path_not_found_error, retry
 
 has_snowflake_extra: bool = False
 try:
-    import orm_framework.snowflake  # noqa
+    import analytics_orm.snowflake  # noqa
 
     has_snowflake_extra = True
 except ImportError:
     pass
 has_databricks_extra: bool = False
 try:
-    import orm_framework.databricks  # noqa
+    import analytics_orm.databricks  # noqa
 
     has_databricks_extra = True
 except ImportError:
@@ -86,7 +91,7 @@ except ImportError:
 has_spark_extra: bool = False
 try:
     # isort: off
-    from orm_framework.spark import (
+    from analytics_orm.spark import (
         get_data_frame_with_unique_primary_keys,
         get_struct_type_from_mapping,
         merge_data_frames,
@@ -405,8 +410,8 @@ def _get_spark_session(name: str = "etl-framework") -> SparkSession:
     if not has_spark_extra:
         raise AttributeError(
             "Use of this property requires installation of the "
-            '"spark" extra for etl-framework:\n'
-            "pip3 install 'etl-framework[spark]'"
+            '"spark" extra for analytics-etl:\n'
+            "pip3 install 'analytics-etl[spark]'"
         )
     return SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
 

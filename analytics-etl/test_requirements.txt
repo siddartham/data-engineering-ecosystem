@@ -4,11 +4,11 @@ flake8
 isort
 mypy
 file-system-client
-my-datastore-etl-wrapper
-my-datastore-etl-wrapper[all]
-my-datastore-etl-wrapper[postgresql]
-my-datastore-etl-wrapper[snowflake,spark]
-my-datastore-etl-wrapper[spark]
+../my-datastore-etl
+../my-datastore-etl[all]
+../my-datastore-etl[postgresql]
+../my-datastore-etl[snowflake,spark]
+../my-datastore-etl[spark]
 pyspark
 pytest
 tox

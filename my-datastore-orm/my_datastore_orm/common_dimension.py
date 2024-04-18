@@ -1,9 +1,10 @@
+from sqlalchemy.sql.expression import literal  # type: ignore
 from sqlalchemy.sql.schema import (  # type: ignore # noqa
     Column,
     ForeignKey,
     ForeignKeyConstraint,
 )
-from sqlalchemy.types import String  # type: ignore
+from sqlalchemy.types import Integer, String  # type: ignore
 
 from .base import Base
 
@@ -24,3 +25,39 @@ class AlembicVersion(Base):
     """
 
     version_num = Column("VERSION_NUM", String, primary_key=True)
+
+
+class Calculator(Base):
+    """
+    CALCULATOR
+
+    This table stores calculator version
+
+    Primary Key:
+
+    - calculator_version (str)
+
+    Other columns/properties:
+
+    - ordinal (int)
+    - current (int) = 0
+    """
+
+    calculator_version = Column(
+        "CALCULATOR_VERSION",
+        String,
+        primary_key=True,
+        nullable=False,
+    )
+    ordinal = Column(
+        "ORDINAL",
+        Integer,
+        nullable=False,
+    )
+    current = Column(
+        "CURRENT",
+        Integer,
+        default=0,
+        server_default=literal(0),
+        nullable=False,
+    )

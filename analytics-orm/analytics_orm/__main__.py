@@ -8,7 +8,7 @@ from . import __name__ as _module_name
 def _print_help() -> None:
     print(
         "Usage:\n"
-        "  orm-framework <command> <sub-command> [options]\n\n"
+        "  analytics-orm <command> <sub-command> [options]\n\n"
         "Commands:\n"
         "  spark\n"
         "                              Spark utilities\n"
@@ -36,7 +36,8 @@ def main() -> None:
                 module = import_module(f"{_module_name}.{command}.__main__")
             except ImportError:
                 module = import_module(f"{_module_name}.{command}")
-        except ImportError:
+        except ImportError as e:
+            print(e.msg)
             _print_help()
             sys.exit(1)
         module.main()  # type: ignore

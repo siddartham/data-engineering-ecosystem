@@ -8,7 +8,7 @@ install:
 	pip3 install --upgrade pip && \
 	pip3 install -r dev_requirements.txt && \
 	pip3 install -r requirements.txt -e '.[all]' && \
-	orm-framework spark install-snowflake-jdbc-driver && \
+	analytics-orm spark install-snowflake-jdbc-driver && \
 	{ mypy --install-types --non-interactive || echo "" ; } && \
 	echo "Success!"
 

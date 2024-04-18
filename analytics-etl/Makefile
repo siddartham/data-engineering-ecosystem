@@ -8,7 +8,7 @@ install:
 	pip3 install --upgrade setuptools && \
 	pip3 install --upgrade pip wheel && \
 	pip3 install -r dev_requirements.txt && \
-	pip3 install -r requirements.txt -e '.[all]' && \
+	pip3 install -r requirements.txt -e '.[all]' --config-settings editable_mode=compat && \
 	analytics-orm spark install-snowflake-jdbc-driver && \
 	analytics-orm spark install-databricks-jdbc-driver && \
 	{ mypy --install-types --non-interactive || echo "" ; } && \

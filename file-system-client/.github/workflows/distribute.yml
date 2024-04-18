@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - fsc
+    - main
     paths:
     - pyproject.toml
     - setup.py

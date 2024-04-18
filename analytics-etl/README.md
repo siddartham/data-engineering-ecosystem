@@ -29,30 +29,29 @@ Instances of this class, or more typically sub-classes of this class,
 broker exchanges data between systems and distribute tasks to instances
 of [Work](#work) or a [Work](#work) sub-class.
 
-Parameters:
+**Parameters:**
 
 
-- file_system (file_system_client.base.FileSystem)
-- parallelism (int) = None: If this is 0 or `None`, the default
+- `file_system: Union[file_system_client.base.FileSystem, str]`
+- `parallelism: Optional[int] = None`: If this is `0` or `None`, the default
       parallelism for the Spark cluster will be used.
-- concurrency (analytics_etl.concurrency.Concurrency)
-  = analytics_etl.concurrency.Concurrency.MULTIPROCESSING
-- databricks_base (typing.Type[analytics_orm.declarative.Base]|None)
-- snowflake_base (typing.Type[analytics_orm.declarative.Base]|None)
-- postgresql_base (typing.Type[analytics_orm.declarative.Base]|None)
-- postgresql_connection_string (str)
-- snowflake_connection_string (str)
-- databricks_connection_string (str)
-- tables_directory: str = "tables/"
-- temp_directory: str = "temp/"
-- snowflake_s3_stage_name: str = ""
+- `concurrency: analytics_etl.concurrency.Concurrency = analytics_etl.concurrency.Concurrency.MULTIPROCESSING`
+- `databricks_base: Optional[typing.Type[analytics_orm.declarative.Base]] = None`)
+- `snowflake_base: Optional[typing.Type[analytics_orm.declarative.Base]] = None`)
+- `postgresql_base: Optional[typing.Type[analytics_orm.declarative.Base] = None`)
+- `postgresql_connection_string: str = ""`
+- `snowflake_connection_string: str = ""`
+- `databricks_connection_string: str = ""`
+- `tables_directory: str = "tables/"`
+- `temp_directory: str = "temp/"`
+- `snowflake_s3_stage_name: str = ""`
 for writing dataframes to s3, in lieu of the file system root
-- started (datetime.datetime|None):
+- `started: Optional[datetime.datetime] = None`:
 The date and time at which the job started, for bookmarking purposes.
-- echo (bool) = False: If `True`, all logging will be printed to the
+- `echo: bool = False`: If `True`, all logging will be printed to the
     console.
-- work: Union[Work, Type[Work]] = Work
-- consolidate_dont_raise_exceptions ((Exception, ...)) = ():
+- `work: Union[Work, Type[Work]] = Work`
+- `consolidate_dont_raise_exceptions: Tuple[Type[Exception], ...] = ()`:
 A tuple of exceptions which should not be raised by the `consolidate`
 method, only logged. This should only be used for known local testing
 scenarios.
@@ -62,22 +61,22 @@ scenarios.
 This class encapsulates work to be performed by individual processes in a
 multi-process pool.
 
-Parameters:
+**Parameters:**
 
-- file_system (file_system_client.base.FileSystem)
-- databricks_base (typing.Type[analytics_orm.declarative.Base]|None)
-- snowflake_base (typing.Type[analytics_orm.declarative.Base]|None)
-- postgresql_base (typing.Type[analytics_orm.declarative.Base]|None)
-- postgresql_connection_string (str)
-- snowflake_connection_string (str)
-- databricks_connection_string (str)
-- tables_directory: str = "tables/"
-- temp_directory: str = "temp/"
-- snowflake_s3_stage_name: str = ""
+- `file_system: Optional[file_system_client.base.FileSystem] = None`
+- `databricks_base: Optional[typing.Type[analytics_orm.declarative.Base]] = None`
+- `snowflake_base: Optional[typing.Type[analytics_orm.declarative.Base]] = None`
+- `postgresql_base Optional[typing.Type[analytics_orm.declarative.Base]] = None`
+- `postgresql_connection_string: str = ""`
+- `snowflake_connection_string: str = ""`
+- `databricks_connection_string: str = ""`
+- `tables_directory: str = "tables/"`
+- `temp_directory: str = "temp/"`
+- `snowflake_s3_stage_name: str = ""`
   for writing dataframes to s3, in lieu of the file system root
-- started (datetime.datetime|None):
+- `started: Optional[datetime.datetime] = None`
   The date and time at which the job started, for bookmarking purposes.
-- echo (bool) = False: If `True`, all logging will be printed to the
+- `echo: bool = False`: If `True`, all logging will be printed to the
     console.
 
 ### [analytics_etl.concurrency](analytics_etl/concurrency.py)
@@ -86,8 +85,8 @@ Parameters:
 
 This class enumerates the types of concurrency supported by this package,
 and is primarily used to determine the concurrency model applied to
-functions called with `my_datastore_etl_wrapper.broker.Broker.map` and
-`my_datastore_etl_wrapper.broker.Broker.starmap`:
+functions called with `my_datastore_etl.broker.Broker.map` and
+`my_datastore_etl.broker.Broker.starmap`:
 
 -  `analytics_etl.concurrency.Concurrency.NONE`:
    Use sequential processing (no concurrency)
@@ -109,27 +108,27 @@ in [my-datastore-orm](https://github.com/data-engineering-ecosystem/my-datastore
 #### Transformer
 
 A base class for transforming source data into (validated) iterables
-of named tuples suitable for populating Sustainability Analytics'
+of named tuples suitable for populating the Datastore's
 Snowflake, Hive/Presto, and PostgreSQL databases.
 
 Iterating over an instance of this class will yield 3-part tuples:
 
-- [0] (str) The table name
-- [1] (type) The table ORM class
-- [2] (typing.Iterable[tuple]) The results from `SELECT * from
+- [0] (`str`) The table name
+- [1] (`type`) The table ORM class
+- [2] (`typing.Iterable[tuple]`) The results from `SELECT * from
     {SCHEMA}.{TABLE}`, as named tuples
 
-Public Properties:
+**Public Properties:**
 
-- session (sqlalchemy.orm.Session): A SQLAlchemy ORM session
+- `session` (`sqlalchemy.orm.Session`): A SQLAlchemy ORM session
   for interacting with the in-memory SQLite database representation of `data`
 
-Initialization Parameters:
+**Initialization Parameters:**
 
-- data: If provided, this is passed to `.add()`
-- echo (bool): If `True`, all SQL statements are printed to
+- `data`: If provided, this is passed to `.add()`
+- `echo` (bool): If `True`, all SQL statements are printed to
   `sys.stdout`
-- base (typing.Type[analytics_orm.declarative.Base]):
+- `base: typing.Type[analytics_orm.declarative.Base]`:
       A SQLAlchemy ORM declarative base
 
 #### Session
