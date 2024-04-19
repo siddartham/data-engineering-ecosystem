@@ -1,3 +1,7 @@
 lxml==4.9.3
 -e ../file-system-client[s3]
 -e ../analytics-orm[pyarrow]
+-e ../cerberus-assistant
+-e ../daves-dev-tools
+-e ../my-datastore-etl
+-e ../my-datastore-orm

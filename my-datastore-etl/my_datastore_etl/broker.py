@@ -1,21 +1,22 @@
 import tempfile
 from datetime import datetime
 from logging import Logger
+from subprocess import CalledProcessError
 from typing import Any, Dict, FrozenSet, List, Optional, Tuple, Type, Union
 
 import file_system_client.s3 as s3
-from etl_framework.broker import WORK_SLOTS as _WORK_SLOTS
-from etl_framework.broker import Broker as _Broker
-from etl_framework.broker import Work as _Work
-from etl_framework.broker import (
+from analytics_etl.broker import WORK_SLOTS as _WORK_SLOTS
+from analytics_etl.broker import Broker as _Broker
+from analytics_etl.broker import Work as _Work
+from analytics_etl.broker import (
     has_databricks_extra,
     has_postgresql_extra,
     has_snowflake_extra,
 )
-from etl_framework.concurrency import Concurrency
-from etl_framework.utilities import call_arguments, get_print_logger
-from orm_framework.declarative import Base as ORMBase
-from orm_framework.utilities import apply_environment_defaults
+from analytics_etl.concurrency import Concurrency
+from analytics_etl.utilities import call_arguments, get_print_logger
+from analytics_orm.declarative import Base as ORMBase
+from analytics_orm.utilities import apply_environment_defaults
 from file_system_client.base import FileSystem
 from file_system_client.dbfs import DatabricksFileSystem
 from file_system_client.local import Local
@@ -101,13 +102,13 @@ def get_environment_snowflake_connection_string(environment: str) -> str:
     if environment == "local":
         # For local unit-testing, allow read-only interactions with QA
         return snowflake.get_environment_connection_url(
-            role="GSA_FOUNDATION_READ_QA"
+            role="MY_SNOWFLAKE_READ_QA"
         ).render_as_string(False)
     else:
         environment = environment.rpartition("-")[-1].lower()
         assert environment in snowflake.ENVIRONMENTS
         return snowflake.get_environment_connection_url(
-            role=("GSA_FOUNDATION_READWRITE_" f"{environment.upper()}")
+            role=("MY_SNOWFLAKE_READWRITE_" f"{environment.upper()}")
         ).render_as_string(False)
 
 
@@ -133,7 +134,7 @@ def get_environment_databricks_connection_string(environment: str) -> str:
 def get_environment_postgresql_connection_string(environment: str) -> str:
     if not has_postgresql_extra:
         return ""
-    from orm_framework import postgresql as orm_postgresql
+    from analytics_orm import postgresql as orm_postgresql
     from my_datastore_orm.dialects import postgresql
 
     if environment == "local":
@@ -143,13 +144,18 @@ def get_environment_postgresql_connection_string(environment: str) -> str:
         host: str
         port: int
         database: str
-        (
-            user,
-            password,
-            host,
-            port,
-            database,
-        ) = orm_postgresql.get_local_docker_user_password_host_port_database()
+        try:
+            (
+                user,
+                password,
+                host,
+                port,
+                database,
+            ) = (
+                orm_postgresql
+            ).get_local_docker_user_password_host_port_database()
+        except CalledProcessError:
+            return ""
         return postgresql.get_environment_connection_string(
             user=user,
             password=password,
@@ -209,7 +215,8 @@ SOLE_QA_DEFAULTS: Dict[str, Any] = {
 SOLE_PROD_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("sole-prod"),
     "databricks_connection_string": lambda: (
-        get_environment_databricks_connection_string("sole-prod")
+        # TODO: Remove this after prod database is set up
+        get_environment_databricks_connection_string("sole-test")
     ),
     "snowflake_connection_string": lambda: (
         get_environment_snowflake_connection_string("sole-prod")

@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 
-from analytics_orm.pyspark import (
+from analytics_orm.spark import (
     DELTA_CORE,
     SCALA_LIBRARY,
     SNOWFLAKE_JDBC,

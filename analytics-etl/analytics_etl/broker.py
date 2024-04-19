@@ -345,9 +345,9 @@ def _patch_mutliprocessing_queue() -> None:
         # For python 3.9, test to see if this is a patch version which has
         # already implemented the fix
         or (
-        sys.version_info[:2] <= (3, 9)
-        and "try:" in inspect.getsource(queues.Queue.close)
-    )
+            sys.version_info[:2] <= (3, 9)
+            and "try:" in inspect.getsource(queues.Queue.close)
+        )
     ):
         queues.Queue.close = _queue_close  # type: ignore
         queues.Queue._start_thread = _queueu_start_thread  # type: ignore
@@ -412,13 +412,13 @@ def _write_parquet_retry_hook(error: Exception) -> bool:
 @spark_session_lru_cache()
 def _get_spark_session(name: str = "etl-framework") -> SparkSession:
     from delta import configure_spark_with_delta_pip
+
     if not has_spark_extra:
         raise AttributeError(
             "Use of this property requires installation of the "
             '"spark" extra for analytics-etl:\n'
             "pip3 install 'analytics-etl[spark]'"
         )
-    # return SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
     return configure_spark_with_delta_pip(
         SparkSession.builder.appName(name)
         .config(
@@ -547,10 +547,10 @@ class Work:
                 _get_first,
                 filter(
                     lambda item: item[1].kind
-                                 not in (
-                                     inspect.Parameter.VAR_POSITIONAL,
-                                     inspect.Parameter.POSITIONAL_ONLY,
-                                 ),
+                    not in (
+                        inspect.Parameter.VAR_POSITIONAL,
+                        inspect.Parameter.POSITIONAL_ONLY,
+                    ),
                     parameters,
                 ),
             )
@@ -639,8 +639,8 @@ class Work:
                 task: RunTask
                 for task in (
                     WorkspaceClient(host=url.host, token=url.password)
-                        .jobs.get_run(int(matched.group("run_id") or 0))
-                        .tasks
+                    .jobs.get_run(int(matched.group("run_id") or 0))
+                    .tasks
                     or ()
                 ):
                     library: Library
@@ -1486,9 +1486,9 @@ class Broker:
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
-                # A function which receives both a source data frame *and*
-                # a pre-existing, "target" data frame (spark or pandas), and an
-                # ORM table class
+            # A function which receives both a source data frame *and*
+            # a pre-existing, "target" data frame (spark or pandas), and an
+            # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
@@ -1621,9 +1621,9 @@ class Broker:
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
-                # A function which receives both a source data frame *and*
-                # a pre-existing, "target" data frame (spark or pandas), and an
-                # ORM table class
+            # A function which receives both a source data frame *and*
+            # a pre-existing, "target" data frame (spark or pandas), and an
+            # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
@@ -1721,9 +1721,9 @@ class Broker:
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
-                # A function which receives both a source data frame *and*
-                # a pre-existing, "target" data frame (spark or pandas), and an
-                # ORM table class
+            # A function which receives both a source data frame *and*
+            # a pre-existing, "target" data frame (spark or pandas), and an
+            # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             None,
         ] = None,
@@ -1743,9 +1743,9 @@ class Broker:
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
             Callable[[SparkDataFrame, type], SparkDataFrame],
-                # A function which receives both a source data frame *and*
-                # a pre-existing, "target" data frame (spark or pandas), and an
-                # ORM table class
+            # A function which receives both a source data frame *and*
+            # a pre-existing, "target" data frame (spark or pandas), and an
+            # ORM table class
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
         ] = None,
@@ -1985,9 +1985,9 @@ class Broker:
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
-                # A function which receives both a source data frame *and*
-                # a pre-existing, "target" data frame (spark or pandas), and an
-                # ORM table class
+            # A function which receives both a source data frame *and*
+            # a pre-existing, "target" data frame (spark or pandas), and an
+            # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             None,
         ] = None,
@@ -2024,9 +2024,9 @@ class Broker:
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
-                # A function which receives both a source data frame *and*
-                # a pre-existing, "target" data frame (spark or pandas), and an
-                # ORM table class
+            # A function which receives both a source data frame *and*
+            # a pre-existing, "target" data frame (spark or pandas), and an
+            # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,

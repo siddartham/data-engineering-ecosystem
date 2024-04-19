@@ -1,12 +1,12 @@
 import unittest
 from typing import Any, Callable
 
-from analytics_orm import (
+from analytics_orm.postgresql import (
     DEFAULT_DATABASE,
     DEFAULT_HOST,
     DEFAULT_PORT,
     DEFAULT_USER,
-    get_connection_string,
+    get_connection_url,
 )
 from analytics_orm.utilities import (
     apply_conditional_defaults,

@@ -17,7 +17,7 @@ from typing import (
 import sqlalchemy  # type: ignore
 from databricks.sql.types import Row  # type: ignore
 from databricks.sqlalchemy.dialect import DatabricksDialect  # type: ignore
-from org.cerberus_assistant.get import get_secret
+from cerberus_assistant.get import get_secret
 from pyspark.sql import SparkSession  # type: ignore
 from sqlalchemy import Table, types  # type: ignore
 from sqlalchemy.engine import CursorResult  # type: ignore

@@ -1,17 +1,14 @@
 import functools
-import sys
 import os
+import sys
 from functools import wraps
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger
 from time import sleep
-from typing import Any, Callable, Tuple, Type, Optional
+from typing import Any, Callable, Optional, Tuple, Type
 from warnings import warn
 
 import boto3
-from file_system_client.errors import (
-    append_exception_text,
-    get_exception_text
-)
+from file_system_client.errors import append_exception_text, get_exception_text
 
 lru_cache: Callable[..., Any] = functools.lru_cache
 SMTP_USER: str = "a.EMAIL"
@@ -31,6 +28,7 @@ def get_print_logger(name: str = "") -> Logger:
         )
         log.addHandler(handler)
     return log
+
 
 @lru_cache()
 def url_is_local(url: str) -> bool:
@@ -58,6 +56,7 @@ def s3_is_local(session: Optional[boto3.session.Session] = None) -> bool:
     endpoint_url: str = session.client("s3").meta.endpoint_url
     is_local: bool = url_is_local(endpoint_url)
     return is_local
+
 
 def _default_retry_hook(error: Exception) -> bool:
     assert error

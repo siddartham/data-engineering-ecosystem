@@ -4,9 +4,10 @@ PYTHON_VERSION := 3.8
 dev-install:
 	{ python$(PYTHON_VERSION) -m venv venv || py -$(PYTHON_VERSION) -m venv venv ; } && \
 	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \
-	pip3 install --upgrade pip && \
+	pip3 install --upgrade setuptools pip wheel && \
 	pip3 install -r dev_requirements.txt && \
-	pip3 install -r requirements.txt -e . && \
+	pip3 install -r requirements.txt -e '.[all]' && \
+	analytics-orm spark install-snowflake-jdbc-driver && \
 	echo "Success!"
 
 ci-install:
@@ -24,11 +25,12 @@ reinstall:
 	{ rm -R venv || echo "" ; } && \
 	{ python$(PYTHON_VERSION) -m venv venv || py -$(PYTHON_VERSION) -m venv venv ; } && \
 	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \
-	pip3 install --upgrade pip wheel && \
+	pip3 install --upgrade setuptools pip wheel && \
 	pip3 install -r dev_requirements.txt && \
-	pip3 install -r test_requirements.txt -r ci_requirements.txt -e . && \
+	pip3 install -r test_requirements.txt -r ci_requirements.txt -e '.[all]' --upgrade --upgrade-strategy eager && \
 	{ mypy --install-types --non-interactive || echo "" ; } && \
 	make requirements && \
+	nike-analytics-orm spark install-snowflake-jdbc-driver && \
 	echo "Success!"
 
 upgrade:
@@ -69,8 +71,16 @@ requirements:
 
 test:
 	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \
-	tox -r -p
+	if [[ "$$(python -V)" = "Python $(PYTHON_VERSION)."* ]] ;\
+	then tox run -r ;\
+	else tox run -r --skip-env 'black|mypy|isort|flake8' ;\
+	fi
+
 format:
 	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \
 	mypy && flake8 & isort . && black .
 
+download-tests:
+	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \
+	python$(PYTHON_VERSION) scripts/download_tests.py && \
+	make format

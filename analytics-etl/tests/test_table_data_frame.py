@@ -26,7 +26,9 @@ class TestTableDataFrame(unittest.TestCase):
         measure_id: int
         self.broker.merge(
             (
-                tuple(common_dimension.Measure(measure_id=measure_id, name=name))
+                tuple(
+                    common_dimension.Measure(measure_id=measure_id, name=name)
+                )
                 for measure_id, name in iter_measure_names_ids()
             ),
             "MEASURE",
