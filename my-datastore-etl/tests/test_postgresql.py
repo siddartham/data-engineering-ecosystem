@@ -4,12 +4,12 @@ from pathlib import Path
 from time import sleep
 from typing import Callable
 
-from orm_framework.utilities import run
+from analytics_orm.utilities import run
 from my_datastore_orm.dialects.postgresql import (
     create_environment,
 )
 
-from my_datastore_etl_wrapper.broker import Broker
+from my_datastore_etl.broker import Broker
 
 broker_lru_cache: Callable[[], Broker] = functools.lru_cache  # type: ignore
 TESTS_PATH: Path = Path(__file__).absolute().parent

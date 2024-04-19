@@ -39,21 +39,22 @@ from typing import (
 )
 from warnings import warn
 
-from file_system_client import s3
 import pyarrow  # type: ignore
 from analytics_orm.declarative import (
     Base,
     get_base_table_name_subclass,
     get_class_mapper,
+    get_class_primary_key_column_names,
     get_class_qualified_table_name,
     get_class_table_name,
     iter_base_sorted_subclasses,
 )
 from analytics_orm.errors import append_exception_text
 from analytics_orm.utilities import lru_cache
-from file_system_client import from_url
+from file_system_client import from_url, s3
 from file_system_client.base import FileSystem
 from file_system_client.errors import get_exception_text
+from file_system_client.local import Local
 from file_system_client.utilities import (
     get_date_directory_name,
     is_date_partition_directory,
@@ -96,7 +97,6 @@ try:
         get_struct_type_from_mapping,
         merge_data_frames,
     )
-    from py4j.protocol import Py4JJavaError  # type: ignore
     from pyspark import RDD  # type: ignore
     from pyspark.sql import SparkSession  # type: ignore
     from pyspark.sql.dataframe import (  # type: ignore
@@ -106,6 +106,7 @@ try:
     from pyspark.errors.exceptions.captured import (  # type: ignore
         AnalysisException,
     )
+    from delta.tables import DeltaMergeBuilder, DeltaTable, DeltaTableBuilder
 
     # isort: on
 
@@ -113,13 +114,16 @@ try:
 except ImportError:
     RDD = None  # type: ignore
     SparkSession = None  # type: ignore
-    Py4JJavaError = None  # type: ignore
     SparkDataFrame = None  # type: ignore
     merge_data_frames = None  # type: ignore
     get_struct_type_from_mapping = None  # type: ignore
     get_data_frame_with_unique_primary_keys = None  # type: ignore
     AnalysisException = None  # type: ignore
     StructType = None  # type: ignore
+    DeltaMergeBuilder = None  # type: ignore
+    DeltaTableBuilder = None  # type: ignore
+    DeltaTable = None  # type: ignore
+
 has_postgresql_extra: bool = False
 try:
     import orm_framework.postgresql  # noqa
@@ -341,9 +345,9 @@ def _patch_mutliprocessing_queue() -> None:
         # For python 3.9, test to see if this is a patch version which has
         # already implemented the fix
         or (
-            sys.version_info[:2] <= (3, 9)
-            and "try:" in inspect.getsource(queues.Queue.close)
-        )
+        sys.version_info[:2] <= (3, 9)
+        and "try:" in inspect.getsource(queues.Queue.close)
+    )
     ):
         queues.Queue.close = _queue_close  # type: ignore
         queues.Queue._start_thread = _queueu_start_thread  # type: ignore
@@ -407,13 +411,24 @@ def _write_parquet_retry_hook(error: Exception) -> bool:
 
 @spark_session_lru_cache()
 def _get_spark_session(name: str = "etl-framework") -> SparkSession:
+    from delta import configure_spark_with_delta_pip
     if not has_spark_extra:
         raise AttributeError(
             "Use of this property requires installation of the "
             '"spark" extra for analytics-etl:\n'
             "pip3 install 'analytics-etl[spark]'"
         )
-    return SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
+    # return SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
+    return configure_spark_with_delta_pip(
+        SparkSession.builder.appName(name)
+        .config(
+            "spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension"
+        )
+        .config(
+            "spark.sql.catalog.spark_catalog",
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+        )
+    ).getOrCreate()
 
 
 def _iter_snowflake_qualified_table_names(base: Type[Base]) -> Iterable[str]:
@@ -422,7 +437,8 @@ def _iter_snowflake_qualified_table_names(base: Type[Base]) -> Iterable[str]:
     """
     cls: Type[Base]
     for cls in iter_base_sorted_subclasses(base):
-        yield get_class_qualified_table_name(cls, dialect_name="snowflake")
+        if not cls.__table__.info.get("is_view", False):
+            yield get_class_qualified_table_name(cls, dialect_name="snowflake")
 
 
 WORK_SLOTS: Tuple[str, ...] = (
@@ -531,10 +547,10 @@ class Work:
                 _get_first,
                 filter(
                     lambda item: item[1].kind
-                    not in (
-                        inspect.Parameter.VAR_POSITIONAL,
-                        inspect.Parameter.POSITIONAL_ONLY,
-                    ),
+                                 not in (
+                                     inspect.Parameter.VAR_POSITIONAL,
+                                     inspect.Parameter.POSITIONAL_ONLY,
+                                 ),
                     parameters,
                 ),
             )
@@ -552,6 +568,19 @@ class Work:
     @property
     def spark_session(self) -> SparkSession:
         return _get_spark_session()
+
+    @lru_cache()
+    def _is_databricks(self) -> bool:
+        if not has_spark_extra:
+            log.info("Not a Spark job")
+            return False
+        if self.spark_session.sparkContext.getConf().get(
+            "spark.databricks.clusterUsageTags.clusterAllTags", ""
+        ):
+            log.info("Running a Spark Job on Databricks")
+            return True
+        log.info("Running a Spark Job, not on Databricks")
+        return False
 
     @property  # type: ignore
     @sqlalchemy_session_lru_cache()
@@ -580,6 +609,82 @@ class Work:
             connection_string=self.databricks_connection_string,
             echo=self.echo,
         )
+
+    def _validate_databricks_pypi_library_versions(self) -> None:
+        """
+        This method compares the version of libraries specified in the current
+        Databricks job with those installed in the current environment, and
+        raises an error if they do not match.
+        """
+
+        from databricks.sdk import WorkspaceClient
+        from databricks.sdk.service.compute import Library
+        from databricks.sdk.service.jobs import RunTask
+
+        # Get the job and run IDs from the cluster name
+        cluster_name: str = self.spark_session.conf.get(  # type: ignore
+            "spark.databricks.clusterUsageTags.clusterName",
+            self.spark_session.sparkContext.getConf().get(
+                "spark.databricks.clusterUsageTags.clusterName", ""
+            ),
+        )
+        if cluster_name:
+            log.info(f"Cluster Name: {cluster_name}")
+            matched: Optional[Match] = _CLUSTER_NAME_JOB_RUN_PATTERN.match(
+                cluster_name
+            )
+            if matched:
+                error_message: Set[str] = set()
+                url: URL = self.databricks_session.bind.engine.url
+                task: RunTask
+                for task in (
+                    WorkspaceClient(host=url.host, token=url.password)
+                        .jobs.get_run(int(matched.group("run_id") or 0))
+                        .tasks
+                    or ()
+                ):
+                    library: Library
+                    for library in task.libraries or ():
+                        if (
+                            library.pypi
+                            and library.pypi.package
+                            and ("==" in library.pypi.package)
+                        ):
+                            package_name: str
+                            library_version: str
+                            package_name, library_version = (
+                                library.pypi.package.partition("==")[::2]
+                            )
+                            try:
+                                installed_version: str = (
+                                    importlib.metadata.version(package_name)
+                                )
+                                if installed_version != library_version:
+                                    error_message.add(
+                                        f"{package_name}: "
+                                        f"{library_version} "
+                                        f"!= {installed_version}"
+                                    )
+                            except importlib.metadata.PackageNotFoundError:
+                                error_message.add(
+                                    f"{package_name}: "
+                                    f"{library_version} != None"
+                                )
+                if error_message:
+                    raise RuntimeError(
+                        "The following PyPI library versions specified in the "
+                        "Databricks job do not match the installed package "
+                        "version.\n\n"
+                        "Package Name: Library Version != Installed Version\n"
+                        "{}".format("\n".join(sorted(error_message)))
+                    )
+                return
+            warn(
+                "A job ID could not be inferred from the cluster name: "
+                f"{cluster_name}"
+            )
+            return
+        warn("No cluster name found")
 
     @property  # type: ignore
     @sqlalchemy_session_lru_cache()
@@ -666,31 +771,41 @@ class Work:
         - num_partitions (int|None))
         - predicates ([str]|None)
         """
-        raise NotImplementedError()
-        # Get our credentials from the Databricks SQLAlchemy ORM session
         url: URL = self.databricks_session.bind.engine.url
+        schema: str = url.query.get("schema", "default")
         item: Tuple[str, Any]
-        return self.spark_session.read.jdbc(
-            url=f"jdbc:databricks://{url.host}:{url.port}",
-            table=table,
-            properties=dict(
-                user=url.username,
-                password=url.password,
-                SSL="true",
-            ),
-            **dict(
-                filter(
-                    lambda item: item[1] is not None,
-                    (
-                        ("column", column),
-                        ("lowerBound", lower_bound),
-                        ("upperBound", upper_bound),
-                        ("numPartitions", num_partitions),
-                        ("predicates", predicates),
-                    ),
-                )
-            ),
-        )
+        try:
+            return self.spark_session.read.jdbc(
+                url=f"jdbc:databricks://{url.host}:{url.port or 443}/{schema}",
+                table=table,
+                properties=dict(
+                    UID=url.username,
+                    PWD=url.password,
+                    SSL="1",
+                    transportMode="http",
+                    AuthMech="3",
+                    ConnCatalog=url.query.get("catalog", ""),
+                    ConnSchema=schema,
+                    httpPath=url.query.get("http_path", ""),
+                ),
+                **dict(
+                    filter(
+                        lambda item: item[1] is not None,
+                        (
+                            ("column", column),
+                            ("lowerBound", lower_bound),
+                            ("upperBound", upper_bound),
+                            ("numPartitions", num_partitions),
+                            ("predicates", predicates),
+                        ),
+                    )
+                ),
+            )
+        except Exception as error:
+            append_exception_text(
+                error, f"Error retrieving Snowflake data frame: {table}"
+            )
+            raise error
 
     def get_snowflake_spark_dataframe(
         self,
@@ -720,63 +835,129 @@ class Work:
         # Get our credentials from the Snowflake SQLAlchemy ORM session
         url: URL = self.snowflake_session.bind.engine.url
         item: Tuple[str, Any]
-        return self.spark_session.read.jdbc(
-            url=f"jdbc:snowflake://{url.host}.snowflakecomputing.com",
-            table=table,
-            properties=dict(
-                user=url.username,
-                role="ALL",
-                warehouse=url.query["warehouse"],
-                authenticator=url.query["authenticator"],
-                **(
-                    {}
-                    if url.query["authenticator"] == "externalbrowser"
-                    else {
-                        "password": url.password,
-                    }
-                ),
-            ),
-            **dict(
-                filter(
-                    lambda item: item[1] is not None,
-                    (
-                        ("column", column),
-                        ("lowerBound", lower_bound),
-                        ("upperBound", upper_bound),
-                        ("numPartitions", num_partitions),
-                        ("predicates", predicates),
+        try:
+            return self.spark_session.read.jdbc(
+                url=f"jdbc:snowflake://{url.host}.snowflakecomputing.com",
+                table=table,
+                properties=dict(
+                    database=(
+                        url.database.partition("/")[0]
+                        if url.database
+                        else None
                     ),
-                )
-            ),
-        )
+                    user=url.username,
+                    role="ALL",
+                    warehouse=url.query["warehouse"],
+                    authenticator=url.query["authenticator"],
+                    **(
+                        {}
+                        if url.query["authenticator"] == "externalbrowser"
+                        else {
+                            "password": url.password,
+                        }
+                    ),
+                ),
+                **dict(
+                    filter(
+                        lambda item: item[1] is not None,
+                        (
+                            ("column", column),
+                            ("lowerBound", lower_bound),
+                            ("upperBound", upper_bound),
+                            ("numPartitions", num_partitions),
+                            ("predicates", predicates),
+                        ),
+                    )
+                ),
+            )
+        except Exception as error:
+            append_exception_text(
+                error, f"Error retrieving Snowflake data frame: {table}"
+            )
+            raise error
 
-    def get_table_spark_dataframe(
-        self,
-        table_name: str,
+    def _spark_read_parquet_url_pattern(
+        self, url_pattern: str, schema: StructType
     ) -> SparkDataFrame:
+        log.info(f"Reading from {url_pattern}")
+        try:
+            # First attempt without imposing a schema
+            return self.spark_session.read.parquet(url_pattern)
+        except AnalysisException as error:
+            if not is_spark_path_not_found_error(error):
+                try:
+                    # Attempt using the schema
+                    return self.spark_session.read.parquet(
+                        url_pattern, schema=schema  # type: ignore
+                    )
+                except AnalysisException as error:
+                    if not is_spark_path_not_found_error(error):
+                        raise
+        return self.spark_session.createDataFrame((), schema=schema)
+
+    def get_delta_table(
+        self, table_name: str, schema: Optional[StructType] = None
+    ) -> DeltaTable:
         """
-        Get a Spark DataFrame for a delta lake or s3 table
+        Get a Spark DataFrame for a delta lake table
 
         Parameters:
 
         - table_name (str)
         """
-        base: Type[Base] = cast(
-            Type[Base], self.databricks_base or self.snowflake_base
+        if self._is_databricks():
+            bind_url_query: Dict[str, str] = (
+                self.databricks_session.bind.engine.url.query
+            )
+            return DeltaTable.forName(
+                self.spark_session,
+                f"{bind_url_query['catalog']}."
+                f"{bind_url_query['schema']}."
+                f"{table_name.lower()}",
+            )
+        file_system: FileSystem = cast(FileSystem, self.file_system)
+        path: str = f"{self.tables_directory}{table_name}/"
+        url: str = file_system.get_url(path)
+        log.info(f"Retrieving Delta Table {table_name} from {url}")
+        builder: DeltaTableBuilder = (
+            DeltaTable.createIfNotExists(self.spark_session)
+            .tableName(table_name)
+            .location(url)
         )
-        directory: str = f"{self.tables_directory}{table_name}/"
-        assert self.file_system
-        source_url_pattern: str = (
-            f"{self.file_system.get_url(directory)}*.parquet"
-        )
-        log.info(f"Reading data from {source_url_pattern}")
-        # Read parquet files contributing to the table into a data frame
-        return self.spark_session.read.parquet(
-            source_url_pattern,
-            schema=get_struct_type_from_mapping(
-                get_base_table_name_subclass(base, table_name)
-            ),  # type: ignore
-        )
+        if not file_system.is_directory(path):
+            if schema is None:
+                base: Type[Base] = cast(
+                    Type[Base], self.databricks_base or self.snowflake_base
+                )
+                schema = get_struct_type_from_mapping(
+                    get_base_table_name_subclass(base, table_name)
+                )
+            builder.addColumns(schema)
+        return builder.execute()
+
+    def get_table_spark_dataframe(
+        self,
+        table_name: str,
+        schema: Optional[StructType] = None,
+    ) -> SparkDataFrame:
+        """
+        Get a Spark DataFrame for a delta lake or parquet table
+
+        Parameters:
+
+        - table_name (str)
+        """
+        if self._is_databricks():
+            return self.get_delta_table(table_name, schema).toDF()
+        elif has_databricks_extra and not isinstance(self.file_system, Local):
+            # This job can connect to a Databricks warehouse, but is not
+            # running on a Databricks cluster, and is not running local unit
+            # tests
+            return self.get_databricks_spark_dataframe(table_name.lower())
+        else:
+            # This job is running local unit tests or cannot connect to
+            # a databricks warehouse
+            return self.get_delta_table(table_name, schema).toDF()
 
     @retry(
         errors=(RuntimeError,),
@@ -1082,6 +1263,11 @@ def default_snowflake_load_filter_function(qualified_table_name: str) -> bool:
     )
 
 
+_CLUSTER_NAME_JOB_RUN_PATTERN: Pattern = re.compile(
+    r"job-(?P<job_id>\d+)-run-(?P<run_id>\d+)(?:-(?P<job_name>.+))?"
+)
+
+
 class Broker:
     """
     Instances of this class, or more typically sub-classes of this class,
@@ -1132,6 +1318,13 @@ class Broker:
         work: Union[Work, Type[Work]] = Work,
         consolidate_dont_raise_exceptions: Tuple[Type[Exception], ...] = (),
     ) -> None:
+        log.info(
+            "$ pip freeze --all\n{}".format(
+                check_output(
+                    (sys.executable, "-m", "pip", "freeze", "--all"), text=True
+                )
+            )
+        )
         if isinstance(file_system, str):
             file_system = from_url(file_system)
         assert (file_system is None) or isinstance(
@@ -1172,6 +1365,11 @@ class Broker:
         # tasks which execute only on the driver
         if concurrency == Concurrency.SPARK:
             assert self.work.spark_session
+        # To validate PYPI library versions, we need the databricks
+        # extra, in addition to spark, because we infer API connection
+        # information from the databricks SQLAlchemy session URL
+        if has_databricks_extra and self.work._is_databricks():
+            self.work._validate_databricks_pypi_library_versions()
 
     def get_effective_parallelism_concurrency(
         self,
@@ -1288,9 +1486,9 @@ class Broker:
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
-            # A function which receives both a source data frame *and*
-            # a pre-existing, "target" data frame (spark or pandas), and an
-            # ORM table class
+                # A function which receives both a source data frame *and*
+                # a pre-existing, "target" data frame (spark or pandas), and an
+                # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
@@ -1423,9 +1621,9 @@ class Broker:
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
-            # A function which receives both a source data frame *and*
-            # a pre-existing, "target" data frame (spark or pandas), and an
-            # ORM table class
+                # A function which receives both a source data frame *and*
+                # a pre-existing, "target" data frame (spark or pandas), and an
+                # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
@@ -1523,9 +1721,9 @@ class Broker:
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
-            # A function which receives both a source data frame *and*
-            # a pre-existing, "target" data frame (spark or pandas), and an
-            # ORM table class
+                # A function which receives both a source data frame *and*
+                # a pre-existing, "target" data frame (spark or pandas), and an
+                # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             None,
         ] = None,
@@ -1545,9 +1743,9 @@ class Broker:
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
             Callable[[SparkDataFrame, type], SparkDataFrame],
-            # A function which receives both a source data frame *and*
-            # a pre-existing, "target" data frame (spark or pandas), and an
-            # ORM table class
+                # A function which receives both a source data frame *and*
+                # a pre-existing, "target" data frame (spark or pandas), and an
+                # ORM table class
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
         ] = None,
@@ -1587,7 +1785,7 @@ class Broker:
                 table_name = target_directory.rstrip("/ ").split("/")[-1]
             else:
                 table_name = source_directory.rstrip("/ ").split("/")[-1]
-        log.info(f"Reading data from {source_url_pattern}")
+        log.info(f"Reading from {source_url_pattern}")
         # Read parquet files contributing to the table into a data frame
         base: Type[Base] = cast(
             Type[Base], self.work.databricks_base or self.work.snowflake_base
@@ -1610,40 +1808,16 @@ class Broker:
             f"Consolidating {table_name}:\n"
             f"{source_directory} -> {target_directory}"
         )
-        if overwrite:
-            return self._spark_overwrite(
-                source_data_frame,
-                table_name,
-                target_directory,
-            )
-        else:
-            return self._spark_merge(
-                source_data_frame,
-                table_name,
-                target_directory,
-                pre_existing_data_frame_hook,
-                defaults=defaults,
-            )
+        return self._spark_merge(
+            source_data_frame,
+            table_name,
+            target_directory,
+            pre_existing_data_frame_hook,
+            defaults=defaults,
+            overwrite=overwrite,
+        )
 
-    def _spark_read_parquet_url_pattern(
-        self, url_pattern: str, schema: StructType
-    ) -> Optional[SparkDataFrame]:
-        try:
-            # First attempt without imposing a schema
-            return self.work.spark_session.read.parquet(url_pattern)
-        except AnalysisException as error:
-            if not is_spark_path_not_found_error(error):
-                try:
-                    # Attempt using the schema
-                    return self.work.spark_session.read.parquet(
-                        url_pattern, schema=schema  # type: ignore
-                    )
-                except AnalysisException as error:
-                    if not is_spark_path_not_found_error(error):
-                        raise
-        return None
-
-    def _spark_merge(
+    def _spark_merge(  # noqa: C901
         self,
         data_frame: SparkDataFrame,
         table_name: str = "",
@@ -1659,9 +1833,11 @@ class Broker:
             None,
         ] = None,
         defaults: Optional[Dict[str, Any]] = None,
+        overwrite: bool = False,
     ) -> str:
         """
-        Merge a Spark data frame into an S3 parquet "table".
+        Merge a Spark data frame into a databricks table, or a parquet table
+        if working with a local file system.
 
         Parameters:
 
@@ -1677,32 +1853,54 @@ class Broker:
         - defaults ({str: typing.Any}|None) = None: A mapping of column
           names to default values to fill in when/if adding columns.
         """
+        # If a directory is explicitly specified, we don't merge into a delta
+        # table, we just write parquet files
+        parquet_files_only: bool = True if directory else False
         # Infer a table name if needed
         if not table_name:
             table_name = directory.rstrip("/ ").split("/")[-1]
-        target_url: str
         if not directory:
             directory = f"{self.work.tables_directory}{table_name}/"
         assert self.work.file_system
-        target_url = self.work.file_system.get_url(directory)
+        target_url: str = self.work.file_system.get_url(directory)
         temp_directory: str = f"{self.work.temp_directory}{table_name}/"
         temp_url: str = self.work.file_system.get_url(temp_directory)
-        temp_url_pattern: str = f"{temp_url}*.parquet"
-        target_url_pattern: str = f"{target_url}*.parquet"
         base: Type[Base] = cast(
             Type[Base], self.work.databricks_base or self.work.snowflake_base
         )
         schema: StructType = get_struct_type_from_mapping(
             get_base_table_name_subclass(base, table_name)
         )
-        target_data_frame: Optional[SparkDataFrame] = (
-            self._spark_read_parquet_url_pattern(target_url_pattern, schema)
+        table_class: Type[Base] = get_base_table_name_subclass(
+            base, table_name
         )
-        if target_data_frame:
-            table_class: Type[Base] = get_base_table_name_subclass(
-                base, table_name
+        #######################################################################
+        # TODO: Delete the following (and related logic) after all jobs have
+        # been upgraded and run at least once (all delta tables are populated)
+        #######################################################################
+        # Check if the target delta table is empty, and use the corresponding
+        # parquet files if it is.
+        target_delta_table_is_empty: bool = False
+        if (not parquet_files_only) and self.work._is_databricks():
+            target_delta_table_is_empty = (
+                False
+                if self.work.get_table_spark_dataframe(
+                    table_name, schema
+                ).count()
+                else True
             )
-            if pre_existing_data_frame_hook is not None:
+        #######################################################################
+        if (
+            ((pre_existing_data_frame_hook is not None) and not overwrite)
+            or parquet_files_only
+            or target_delta_table_is_empty
+        ):
+            target_data_frame: SparkDataFrame = (
+                self.work._spark_read_parquet_url_pattern(target_url, schema)
+                if parquet_files_only or target_delta_table_is_empty
+                else self.work.get_table_spark_dataframe(table_name, schema)
+            )
+            if (pre_existing_data_frame_hook is not None) and not overwrite:
                 # Make sure we were provided with a function
                 assert callable(pre_existing_data_frame_hook)
                 # Determine how many parameters the function requires,
@@ -1727,57 +1925,55 @@ class Broker:
                         "Your `pre_existing_data_frame_hook` requires an "
                         f"unsupported number of arguments: {parameter_count}"
                     )
-            # Merge and de-duplicate records
-            consolidated_data_frame: SparkDataFrame = merge_data_frames(
-                (data_frame, target_data_frame),
-                table_class,
-                defaults=defaults,
-            )
-            # Write to a temp location
+            if not overwrite:
+                # Merge and de-duplicate records
+                data_frame = merge_data_frames(
+                    (data_frame, target_data_frame),
+                    table_class,
+                    defaults=defaults,
+                )
+            # if we've merged with the target data, we need to use
+            # temporary storage prior to our merge
             log.info(f"Writing to {temp_url}")
-            consolidated_data_frame.write.parquet(temp_url, mode="overwrite")
-            # Write the final output
+            data_frame.write.parquet(temp_url, mode="overwrite")
+            data_frame = self.work.spark_session.read.parquet(
+                temp_url, schema=schema  # type: ignore
+            )
+        if parquet_files_only:
             log.info(f"Writing to {target_url}")
-            self.work.spark_session.read.parquet(
-                temp_url_pattern, schema=schema  # type: ignore
-            ).write.parquet(target_url, mode="overwrite")
+            data_frame.write.parquet(target_url, mode="overwrite")
+        else:
+            # Write to the delta tables
+            log.info(f"Writing {table_name}")
+            alias: str = f"new_{table_name}"
+            merge_builder: DeltaMergeBuilder = (
+                self.work.get_delta_table(table_name, schema)
+                .merge(  # type: ignore
+                    data_frame.alias(alias),
+                    condition=" and ".join(
+                        f"{table_name}.{column_name} = "
+                        f"{alias}.{column_name}"
+                        for column_name in get_class_primary_key_column_names(
+                            table_class
+                        )
+                    ),
+                )
+                .whenMatchedUpdateAll()
+                .whenNotMatchedInsertAll()
+            )
+            if overwrite:
+                merge_builder = merge_builder.whenNotMatchedBySourceDelete()
+            merge_builder.execute()
+            if self.work._is_databricks():
+                # Dump the databricks table to parquet files
+                self.work.get_table_spark_dataframe(
+                    table_name, schema
+                ).write.parquet(target_url, mode="overwrite")
+        if (
+            (pre_existing_data_frame_hook is not None) and not overwrite
+        ) or parquet_files_only:
             # Cleanup temporary files
             self.work.file_system.clear(temp_url)
-        else:
-            # If there is no pre-existing data, just write from the source
-            # data frame
-            data_frame.write.parquet(target_url, mode="overwrite")
-        return target_url
-
-    def _spark_overwrite(
-        self,
-        data_frame: SparkDataFrame,
-        table_name: str = "",
-        directory: str = "",
-    ) -> str:
-        """
-        Overwrite a Spark S3 parquet "table" with the contents of a data frame.
-
-        Parameters:
-
-        - data_frame (pyspark.sql.DataFrame)
-        - table_name (str) = "": If not provided, this will be inferred from
-          the target directory name.
-        - directory (str) = "": If not provided, this will be inferred
-          from the table name.
-        """
-        # Infer a table name if needed
-        if not table_name:
-            table_name = directory.rstrip("/ ").split("/")[-1]
-        target_url: str
-        if not directory:
-            directory = f"{self.work.tables_directory}{table_name}/"
-        assert self.work.file_system
-        target_url = self.work.file_system.get_url(directory)
-        data_frame.write.parquet(
-            target_url,
-            mode="overwrite",
-        )
         return target_url
 
     def _pandas_merge(
@@ -1789,13 +1985,14 @@ class Broker:
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
-            # A function which receives both a source data frame *and*
-            # a pre-existing, "target" data frame (spark or pandas), and an
-            # ORM table class
+                # A function which receives both a source data frame *and*
+                # a pre-existing, "target" data frame (spark or pandas), and an
+                # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             None,
         ] = None,
         defaults: Optional[Dict[str, Any]] = None,
+        overwrite: bool = False,
     ) -> None:
         """
         Merge a Pandas data frame into an S3 parquet "table".
@@ -1827,9 +2024,9 @@ class Broker:
             # frame (spark or pandas), and an ORM table class
             Callable[[DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
-            # A function which receives both a source data frame *and*
-            # a pre-existing, "target" data frame (spark or pandas), and an
-            # ORM table class
+                # A function which receives both a source data frame *and*
+                # a pre-existing, "target" data frame (spark or pandas), and an
+                # ORM table class
             Callable[[DataFrame, DataFrame, type], DataFrame],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
@@ -1837,6 +2034,7 @@ class Broker:
         defaults: Optional[Dict[str, Any]] = None,
         directory: str = "",
         concurrency: Optional[Concurrency] = None,
+        overwrite: bool = False,
     ) -> None:
         """
         Merge a Spark data frame into an S3 parquet "table".
@@ -1899,6 +2097,7 @@ class Broker:
                     pre_existing_data_frame_hook,
                 ),
                 defaults=defaults,
+                overwrite=overwrite,
             )
         else:
             assert isinstance(data, DataFrame)
@@ -1918,6 +2117,7 @@ class Broker:
                     pre_existing_data_frame_hook,
                 ),
                 defaults=defaults,
+                overwrite=overwrite,
             )
 
     def snowflake_load(
@@ -1940,9 +2140,7 @@ class Broker:
             self.work.snowflake_base and self.work.snowflake_connection_string
         )
         log.info("Loading tables into Snowflake...")
-        base: Type[Base] = cast(
-            Type[Base], self.work.databricks_base or self.work.snowflake_base
-        )
+        base: Type[Base] = cast(Type[Base], self.work.snowflake_base)
         deque(
             self.map(
                 self.work.snowflake_load_table,

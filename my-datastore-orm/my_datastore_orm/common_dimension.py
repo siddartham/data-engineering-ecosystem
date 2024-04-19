@@ -7,9 +7,18 @@ from sqlalchemy.sql.schema import (  # type: ignore # noqa
 from sqlalchemy.types import Integer, String  # type: ignore
 
 from .base import Base
+from analytics_orm.types import Enum
 
 SCHEMA: str = __name__.split(".")[-1].upper()
 
+MEASURES: Enum = Enum(
+    "Global Warming",
+    "Eutrophication",
+    "Water Scarcity",
+    "Abiotic Resource Depletion, Fossil Fuels",
+    "Chemistry",
+    name="MEASURES",
+)
 
 class AlembicVersion(Base):
     """
@@ -61,3 +70,68 @@ class Calculator(Base):
         server_default=literal(0),
         nullable=False,
     )
+
+class Measure(Base):
+    """
+    MEASURE
+
+    | measure_id | name                                     |
+    |:---------- |:-----------------------------------------|
+    | 1          | Global Warming                           |
+    | 2          | Eutrophication                           |
+    | 3          | Water Scarcity                           |
+    | 4          | Abiotic Resource Depletion, Fossil Fuels |
+    | 5          | Chemistry                                |
+
+    Each row in this table represents a type of sustainability measure defined
+    by the Sustainable Apparel Coalition (SAC) in the [Higg Materials
+    Sustainability Index (MSI)](
+    https://bit.ly/3u3w3ET).
+
+    Primary Key:
+
+    - measure_id (int)
+
+    Other Columns/Properties:
+
+    - name (str)
+
+    Definitions:
+
+    - "Global Warming" (1): For this measure, the midpoint indicates the
+      kilograms of *carbon dioxide equivalency* (the number of kilograms of
+      carbon dioxide which would be required to produce the same greenhouse
+      effect) added to the atmosphere for each kilogram of the material
+      produced.
+    - "Eutrophication" (2): Excessive concentration of minerals and nutrients
+      in a body of water, typically due to agricultural runoff, causing an
+      overgrowth of algae (with potential for myriad secondary affects such as
+      oxygen depletion). For this measure, the midpoint indicates a *kilograms
+      of phosphate equivalency* (the number of kilograms of phosphate which
+      would be required to produce the same affect) per kilogram of this
+      material which is produced.
+    - "Water Scarcity" (3): For this measure, the midpoint indicates the cubic
+      metres of water depleted (rendered ecologically unusable) per kilogram
+      of this material which is produced.
+    - "Abiotic Resource Depletion, Fossil Fuels" (4): This is a measure
+      of the fossil fuels expended/utilized, expressed in megajoules (MJ), for
+      each kilogram of the material produced. As a point of reference,
+      petrol/gasoline represents approximately 132 MJ per gallon (45 MJ per
+      kilogram).
+    - "Chemistry" (5): This measure currently reflects a qualitative rather
+      than quantitative measure of toxicity, and as a result has no midpoint.
+      Raw materials are attributed a score of 15. This score can be reduced
+      by obtaining chemistry-related certifications, employing certain
+      standards, or participating in relevant programs. This score can
+      increase through employment of chemical finishes. The lowest possible
+      score is 15. **Please note that Nike does *not* currently use the
+      *Chemistry* measure**.
+    """
+
+    measure_id = Column(
+        "MEASURE_ID",
+        Integer,
+        primary_key=True,
+        autoincrement=False,
+    )
+    name = Column("NAME", MEASURES)

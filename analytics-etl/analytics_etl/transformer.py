@@ -14,11 +14,7 @@ from typing import (
 
 import sqlalchemy.engine  # type: ignore
 import sqlalchemy.orm  # type: ignore
-from orm_framework.declarative import (
-    Base,
-    create_engine,
-    get_class_table_name,
-)
+from orm_framework.declarative import Base, create_engine, get_class_table_name
 from sqlalchemy.engine import Connection  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
 

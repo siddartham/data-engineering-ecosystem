@@ -2,8 +2,9 @@ black
 daves-dev-tools
 flake8
 isort
+localstack-s3-pyspark
 mypy
-file-system-client
+../file-system-client
 ../my-datastore-etl
 ../my-datastore-etl[all]
 ../my-datastore-etl[postgresql]

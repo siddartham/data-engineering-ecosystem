@@ -786,7 +786,7 @@ def install_snowflake_jars() -> None:
 def _print_help() -> None:
     print(
         "Usage:\n"
-        "  orm-framework spark <command> [options]\n\n"
+        "  analytics-orm spark <command> [options]\n\n"
         "Commands:\n"
         "  install-snowflake-jdbc-driver\n"
         "                              Configure Spark to load and use a "
@@ -805,14 +805,14 @@ def main() -> None:
     """
     This function is the CLI entry point for the following commands:
 
-    - `orm-framework spark install-snowflake-jdbc-driver`
+    - `analytics-orm spark install-snowflake-jdbc-driver`
     """
     command = _get_command()
     if command in ("-h", "--help"):
         _print_help()
     elif command == "install-snowflake-jdbc-driver":
         argparse.ArgumentParser(
-            prog="orm-framework spark install-snowflake-jdbc-driver",
+            prog="analytics-orm spark install-snowflake-jdbc-driver",
             description=(
                 "Configure Spark to load and use a Snowflake JDBC driver"
             ),

@@ -1,8 +1,8 @@
 import unittest
 from typing import Any
 
-from my_datastore_etl.transformer import Transformer as _Transformer
 from my_datastore_etl.dialects.sqlite import validate
+from my_datastore_etl.transformer import Transformer as _Transformer
 from sqlalchemy.orm.session import Session  # type: ignore
 
 

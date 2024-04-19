@@ -166,30 +166,30 @@ class TestLocal(unittest.TestCase):
         self.file_system.delete(TEST1_TXT)
 
     @property  # type: ignore
-    def calculator_target(self) -> Dict[str, int]:
+    def calculator_target(self) -> Dict[str, Tuple[int, int]]:
         return {
-            "0.0.0": 1,
-            "0.0.2": 2,
-            "0.1.0": 3,
-            "1.0.0": 4,
-            "1.0.1": 5,
-            "1.1.0": 6,
+            "0.0.0": (1, 0),
+            "0.0.2": (2, 0),
+            "0.1.0": (3, 0),
+            "1.0.0": (4, 0),
+            "1.0.1": (5, 0),
+            "1.1.0": (6, 1),
         }
 
     @property  # type: ignore
-    def calculator_source(self) -> Dict[str, int]:
+    def calculator_source(self) -> Dict[str, Tuple[int, int]]:
         return {
-            "0.0.1": 2,
-            "0.0.2": 3,
-            "0.1.0": 4,
-            "1.0.0": 5,
-            "1.0.1": 6,
-            "1.1.0": 7,
+            "0.0.1": (2, 0),
+            "0.0.2": (3, 0),
+            "0.1.0": (4, 0),
+            "1.0.0": (5, 0),
+            "1.0.1": (6, 0),
+            "1.1.0": (7, 1),
         }
 
     @property  # type: ignore
-    def calculator(self) -> Dict[str, int]:
-        calculator: Dict[str, int] = copy(self.calculator_target)
+    def calculator(self) -> Dict[str, Tuple[int, int]]:
+        calculator: Dict[str, Tuple[int, int]] = copy(self.calculator_target)
         calculator.update(**self.calculator_source)
         return calculator
 
@@ -206,17 +206,36 @@ class TestLocal(unittest.TestCase):
         column_names: Tuple[str, ...] = get_class_column_names(Calculator)
         schema: pyarrow.Schema = get_schema_from_mapping(Calculator)
         work.write_parquet(
-            self.calculator_source.items(),
+            map(
+                lambda item: (item[0],) + item[1],
+                self.calculator_source.items(),
+            ),
             f"{CALCULATOR_SOURCE}2.parquet",
             column_names=column_names,
             schema=schema,
         )
+        item: Tuple[str, Tuple[int, int]]
         work.write_parquet(
-            self.calculator_target.items(),
+            map(
+                lambda item: (item[0],) + item[1],
+                self.calculator_target.items(),
+            ),
             f"{CALCULATOR_TARGET}1.parquet",
             column_names=column_names,
             schema=schema,
         )
+        # work.write_parquet(
+        #     self.calculator_source.items(),
+        #     f"{CALCULATOR_SOURCE}2.parquet",
+        #     column_names=column_names,
+        #     schema=schema,
+        # )
+        # work.write_parquet(
+        #     self.calculator_target.items(),
+        #     f"{CALCULATOR_TARGET}1.parquet",
+        #     column_names=column_names,
+        #     schema=schema,
+        # )
         broker.consolidate_table(
             CALCULATOR_SOURCE,
             CALCULATOR_TARGET,
@@ -225,11 +244,21 @@ class TestLocal(unittest.TestCase):
             overwrite=False,
         )
         consolidated_data_frame: DataFrame = spark_session.read.parquet(
-            f"{file_system.get_url(CALCULATOR_TARGET)}*.parquet"
+            file_system.get_url(CALCULATOR_TARGET)
         )
         assert tuple(
             sorted(map(tuple, consolidated_data_frame.toLocalIterator()))
-        ) == tuple(sorted(self.calculator.items()))
+        ) == tuple(
+            sorted(
+                map(
+                    lambda item: (item[0],) + item[1],
+                    self.calculator.items(),
+                )
+            )
+        )
+        # assert tuple(
+        #     sorted(map(tuple, consolidated_data_frame.toLocalIterator()))
+        # ) == tuple(sorted(self.calculator.items()))
         file_system.delete_directory(CALCULATOR_SOURCE)
         file_system.delete_directory(CALCULATOR_TARGET)
 

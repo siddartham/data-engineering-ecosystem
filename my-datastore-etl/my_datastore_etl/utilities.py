@@ -5,7 +5,7 @@ from smtplib import SMTPException
 from subprocess import CalledProcessError, check_output
 from typing import Any, Callable, Tuple
 
-from etl_framework.utilities import retry
+from analytics_etl.utilities import retry
 from mail_client.smtp import send
 
 lru_cache: Callable[..., Any] = functools.lru_cache

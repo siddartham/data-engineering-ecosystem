@@ -26,7 +26,7 @@ class TestSnowflake(unittest.TestCase):
     def test_get_snowflake_spark_dataframe_from_table(self) -> None:
         assert isinstance(
             self.broker.work.get_snowflake_spark_dataframe(
-                table="GSA_FOUNDATION_PROD.COMMON_DIMENSION.CALCULATOR",
+                table="COMMON_DIMENSION.CALCULATOR",
             ),
             DataFrame,
         )

@@ -1,14 +1,16 @@
 import functools
 import sys
+import os
 from functools import wraps
 from logging import INFO, Formatter, Logger, StreamHandler, getLogger
 from time import sleep
-from typing import Any, Callable, Tuple, Type
+from typing import Any, Callable, Tuple, Type, Optional
 from warnings import warn
 
+import boto3
 from file_system_client.errors import (
     append_exception_text,
-    get_exception_text,
+    get_exception_text
 )
 
 lru_cache: Callable[..., Any] = functools.lru_cache
@@ -30,6 +32,32 @@ def get_print_logger(name: str = "") -> Logger:
         log.addHandler(handler)
     return log
 
+@lru_cache()
+def url_is_local(url: str) -> bool:
+    """
+    Check to see if a URL references a local endpoint, such as would be used
+    with localstack
+    """
+    localstack_hostname: str = os.environ.get(
+        "LOCALSTACK_HOSTNAME", "localhost"
+    )
+    return bool(
+        url.startswith(f"http://{localstack_hostname}")
+        or url.startswith("http://127.0.0.1")
+        or url.startswith("http://localhost")
+    )
+
+
+def s3_is_local(session: Optional[boto3.session.Session] = None) -> bool:
+    """
+    Determine if a boto3 session has been patched for use with a local
+    s3 endpoint, such as would be the case if using localstack
+    """
+    if session is None:
+        session = boto3.session.Session()
+    endpoint_url: str = session.client("s3").meta.endpoint_url
+    is_local: bool = url_is_local(endpoint_url)
+    return is_local
 
 def _default_retry_hook(error: Exception) -> bool:
     assert error

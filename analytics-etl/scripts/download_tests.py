@@ -4,8 +4,8 @@ https://github.com/siddartham/data-engineering-ecosystem/my-datastore-etl, and
 uses these tests to validate this package's functionality
 """
 
-from daves_dev_tools.git.download import download
 from cerberus_assistant.get import get_secret
+from daves_dev_tools.git.download import download
 
 GITHUB_USER: str = "a-github-actions-user"
 GITHUB_PASSWORD_CERBERUS_PATH: str = f"app/team/github/{GITHUB_USER}"

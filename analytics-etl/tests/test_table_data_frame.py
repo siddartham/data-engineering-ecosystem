@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Callable, Iterable, Tuple
 
 from my_datastore_etl.broker import Broker
-from my_datastore_orm import schema_a
+from my_datastore_orm import common_dimension
 from pyspark.sql.dataframe import DataFrame  # type: ignore
 
 from analytics_etl.concurrency import Concurrency
@@ -12,7 +12,7 @@ broker_lru_cache: Callable[[], Broker] = lru_cache  # type: ignore
 
 
 def iter_measure_names_ids() -> Iterable[Tuple[int, str]]:
-    yield from enumerate(schema_a.MEASURES.enums, 1)
+    yield from enumerate(common_dimension.MEASURES.enums, 1)
 
 
 class TestTableDataFrame(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestTableDataFrame(unittest.TestCase):
         measure_id: int
         self.broker.merge(
             (
-                tuple(fnd_material.Measure(measure_id=measure_id, name=name))
+                tuple(common_dimension.Measure(measure_id=measure_id, name=name))
                 for measure_id, name in iter_measure_names_ids()
             ),
             "MEASURE",
