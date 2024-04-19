@@ -72,8 +72,8 @@ requirements:
 	python3 -m pip install -e . && \
 	daves-dev-tools requirements update \
 		data-quality-framework -e pyspark \
-		-nv my-datastore-etl-wrapper \
-		-nv my-datastore-orm \
+		-nv my-datastore-etl \
+		-nv my-datastore-model \
 		-r airflow/code/validation_requirements.txt && \
 	echo "Success!"
 

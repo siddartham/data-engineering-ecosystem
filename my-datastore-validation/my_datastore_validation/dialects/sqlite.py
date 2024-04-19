@@ -50,7 +50,7 @@ def main() -> None:
     """
     This function is the entry point for the
     `my-datastore-validation sqlite` command.
-    Execute `my-datastore-orm sqlite -h` for information
+    Execute `my-datastore-model sqlite -h` for information
     about his command.
     """
     arguments: Namespace = parse_arguments(

@@ -65,7 +65,7 @@ def parse_arguments(
 
     - prog (str): The CLI command or command + sub-command
       triggering this function. For example:
-      "my-datastore-orm sqlite".
+      "my-datastore-model sqlite".
     - commands ([str]) = ("dev", "qa", "prod"):
       Valid values for the `command` argument. If an empty tuple/list is
       provided, no "command" argument is added to the parser
@@ -186,7 +186,7 @@ def main(base: Type[Base], prog: str = "") -> None:
 
     - base (type)
     - prog (str) = "": The command or command + sub-command triggering this
-      function. For example: "my-datastore-orm create".
+      function. For example: "my-datastore-model create".
     """
     arguments: Namespace = parse_arguments(prog)
     if arguments.command in COMMANDS:

@@ -57,7 +57,7 @@ SOB_TYPE_MAPPING: Dict[type, str] = {
 FND_ENABLON_PATH: Path = (
     Path(__file__)
     .absolute()
-    .parent.parent.joinpath("my_datastore_orm", "fnd_enablon.py")
+    .parent.parent.joinpath("my_datastore_model", "fnd_enablon.py")
 )
 
 

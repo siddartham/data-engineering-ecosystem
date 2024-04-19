@@ -24,21 +24,21 @@ jobs:
     - name: Deploy to DEV
       run: |
         venv/bin/alembic -n snowflake-dev upgrade head
-        venv/bin/my-datastore-orm snowflake create dev -vo -cf
-        venv/bin/my-datastore-orm snowflake drop dev -udo
-        venv/bin/my-datastore-orm snowflake validate dev -ifk '*'
+        venv/bin/my-datastore-model snowflake create dev -vo -cf
+        venv/bin/my-datastore-model snowflake drop dev -udo
+        venv/bin/my-datastore-model snowflake validate dev -ifk '*'
     - name: Deploy to QA
       run: |
         venv/bin/alembic -n snowflake-qa upgrade head
-        venv/bin/my-datastore-orm snowflake create qa -vo -cf
-        venv/bin/my-datastore-orm snowflake drop qa -udo
-        venv/bin/my-datastore-orm snowflake validate qa -ifk '*'
+        venv/bin/my-datastore-model snowflake create qa -vo -cf
+        venv/bin/my-datastore-model snowflake drop qa -udo
+        venv/bin/my-datastore-model snowflake validate qa -ifk '*'
     - name: Deploy to PROD
       run: |
         venv/bin/alembic -n snowflake-prod upgrade head
-        venv/bin/my-datastore-orm snowflake create prod -vo -cf
-        venv/bin/my-datastore-orm snowflake drop prod -udo
-        venv/bin/my-datastore-orm snowflake validate prod -ifk '*'
+        venv/bin/my-datastore-model snowflake create prod -vo -cf
+        venv/bin/my-datastore-model snowflake drop prod -udo
+        venv/bin/my-datastore-model snowflake validate prod -ifk '*'
     - name: configure git
       run: |
         git config --global user.email "$(git --no-pager show -s --format=%ae)" && \

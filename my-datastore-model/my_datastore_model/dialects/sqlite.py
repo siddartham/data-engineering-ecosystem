@@ -79,11 +79,11 @@ def validate(
 def main() -> None:
     """
     This function is the entry point for the
-    `my-datastore-orm sqlite` command.
-    Execute `my-datastore-orm sqlite -h` for information
+    `my-datastore-model sqlite` command.
+    Execute `my-datastore-model sqlite -h` for information
     about his command.
     """
-    sqlite.main(Base, "my-datastore-orm sqlite")
+    sqlite.main(Base, "my-datastore-model sqlite")
 
 
 if __name__ == "__main__":

@@ -660,7 +660,7 @@ def parse_arguments(
 
     - prog (str): The CLI command or command + sub-command
       triggering this function. For example:
-      "my-datastore-orm snowflake".
+      "my-datastore-model snowflake".
     - environments ([str]) = ("dev", "qa", "prod"): The environment names
       to consider valid
     - roles ([str]) = (): The roles to consider valid. If none are provided,

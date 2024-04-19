@@ -383,7 +383,7 @@ Parameters:
 
 - prog (str): The CLI command or command + sub-command
   triggering this function. For example:
-  "my-datastore-orm snowflake".
+  "my-datastore-model snowflake".
 - environments ([str]) = ("dev", "qa", "prod"): The environment names
   to consider valid
 - roles ([str]) = (): The roles to consider valid. If none are provided,
@@ -483,7 +483,7 @@ Parameters:
 
 - prog (str): The CLI command or command + sub-command
   triggering this function. For example:
-  "my-datastore-orm postgresql".
+  "my-datastore-model postgresql".
 - environments ([str]) = ("dev", "qa", "prod"): The environment names
   to consider valid
 
@@ -529,7 +529,7 @@ Parameters:
 
 - prog (str): The CLI command or command + sub-command
   triggering this function. For example:
-  "my-datastore-orm sqlite".
+  "my-datastore-model sqlite".
 
 This function returns a `Namespace` object with the following
 properties:
@@ -549,7 +549,7 @@ Parameters:
 
 - declarative_base (type)
 - prog (str) = "": The command or command + sub-command triggering this
-  function. For example: "my-datastore-orm create".
+  function. For example: "my-datastore-model create".
 
 ## Running Unit Tests
 

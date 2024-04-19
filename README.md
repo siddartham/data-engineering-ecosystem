@@ -4,7 +4,7 @@
 ### Fundamental Questions in building a Data Engineering environment?
 * Why and How to build a common file-system interface to interact with databricks file system, local file system, s3 etc. ? - `file-system-client`
 * Why and How to build an ORM framework - internal mechanics of ORM ? - `analytics-orm`
-* Why and How to build an ORM model for your database, to set urls, permissions? - `my-datastore-orm`
+* Why and How to build an ORM model for your database, to set urls, permissions? - `my-datastore-model`
 * Why and How to build an ETL framework? - `analytics-etl`
 * Why and How to build an ETL wrapper for your team, to set permissions? - `my-datastore-etl`
 * How to build an ETL based on framework? - `sample-etl`
@@ -63,7 +63,7 @@ Using foundational libraries, we can build team/org specific data engineering ec
 
 Above 3 functionalities can be achieved by 3 packages.
 
-1. `my-datastore-orm` - Hosting schema of your data store(using analytics-orm base class), across different environments, different data stores(Hive, Delta Lake, Snowflake etc).
+1. `my-datastore-model` - Hosting schema of your data store(using analytics-orm base class), across different environments, different data stores(Hive, Delta Lake, Snowflake etc).
 2. `my-datastore-etl` - a wrapper over `analytics-etl` to provide a common interface for all ETLs over your data stores and file systems.
 3. `my-datastore-data-quality` - This package provides an example of how to use the data-quality-framework to perform data quality checks
 
@@ -96,7 +96,7 @@ Above 3 functionalities can be achieved by 3 packages.
 - [x] `my-datastore-validation` - can factor out common code to `data-quality-framework`
 
 #### Data Store Wide Libraries
-- [x] `my-datastore-orm`
+- [x] `my-datastore-model`
 - [x] `my-datastore-etl`
 
 #### Example ETL to load objects to Data Store

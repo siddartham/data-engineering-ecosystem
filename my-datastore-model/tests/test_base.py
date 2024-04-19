@@ -12,12 +12,12 @@ class TestBroker(unittest.TestCase):
 
     def test_repr(self) -> None:
         """
-        Verify that `my_datastore_orm.base.Base.__repr__()`
+        Verify that `my_datastore_model.base.Base.__repr__()`
         returns the expected value when called by a sub-class.
         """
 
         assert repr(AlembicVersion()) == (
-            "my_datastore_orm.common_dimension.AlembicVersion(\n"  # noqa
+            "my_datastore_model.common_dimension.AlembicVersion(\n"  # noqa
             "    version=None,\n"
             ")"
         )

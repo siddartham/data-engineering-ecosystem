@@ -4,5 +4,5 @@ lxml==4.9.3
 -e ../cerberus-assistant
 -e ../daves-dev-tools
 -e ../my-datastore-etl
--e ../my-datastore-orm
+-e ../my-datastore-model
 -e ../mail-client

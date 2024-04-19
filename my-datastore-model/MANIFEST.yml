@@ -1,17 +1,17 @@
 manifest: "1.0"
-title: my-datastore-orm
+title: my-datastore-model
 description:
 type: documentation
 tags:
   - Cerberus
 urls:
-  repository: https://github.com/siddartham/my-datastore-orm
+  repository: https://github.com/siddartham/my-datastore-model
 maintainerEmail: reddy.siddartha53@gmail.com
 documents: &documents
   documents:
     - title: README
       type: markdown
-      url: https://raw.githubusercontent.com/siddartham/my-datastore-orm/main/README.md
+      url: https://raw.githubusercontent.com/siddartham/my-datastore-model/main/README.md
 defaultVersion: "latest"
 versions:
   "latest":

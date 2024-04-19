@@ -103,7 +103,7 @@ functions called with `my_datastore_etl.broker.Broker.map` and
 
 This module provides a mechanism for *safely* transforming data into rows of
 named tuples with column names and data types matching the data model defined
-in [my-datastore-orm](https://github.com/data-engineering-ecosystem/my-datastore-orm).
+in [my-datastore-model](https://github.com/data-engineering-ecosystem/my-datastore-model).
 
 #### Transformer
 

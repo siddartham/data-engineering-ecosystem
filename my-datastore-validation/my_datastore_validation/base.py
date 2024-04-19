@@ -181,7 +181,7 @@ def validate(
     """
     Parameters:
 
-    - base (my_datastore_orm.base.Base)
+    - base (my_datastore_model.base.Base)
     - bind (
         sqlalchemy.engine.base.Engine |
         sqlalchemy.engine.base.Connection |

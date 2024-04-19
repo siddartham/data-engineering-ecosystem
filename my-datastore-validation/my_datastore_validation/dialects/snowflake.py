@@ -64,7 +64,7 @@ def validate_environment(
 ) -> Engine:
     """
     Validate the specified `environment` or `bind` against sub-classes of
-    `my_datastore_orm.base.Base`.
+    `my_datastore_model.base.Base`.
 
     Parameters:
 
@@ -135,7 +135,7 @@ def validate_environment(
 def main() -> None:
     """
     This function is the entry point for the
-    `my-datastore-orm snowflake` command.
+    `my-datastore-model snowflake` command.
     """
     arguments: Namespace = parse_arguments(
         "my-datastore-validation snowflake",

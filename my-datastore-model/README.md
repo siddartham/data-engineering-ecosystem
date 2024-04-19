@@ -1,7 +1,7 @@
-# sample-datastore-model
+# my-datastore-model
 
-[![test](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/test.yml)
-[![distribute](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm/actions/workflows/distribute.yml)
+[![test](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model/actions/workflows/test.yml)
+[![distribute](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model/actions/workflows/distribute.yml)
 
 
 This library defines a SQLAlchemy object relational model (ORM) for my datastore
@@ -17,13 +17,13 @@ This library defines a SQLAlchemy object relational model (ORM) for my datastore
 To install this library with all optional extras:
 
 ```shell script
-pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm.git[all]'
+pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model.git[all]'
 ```
 
 To install this library only for use with sqlite:
 
 ```shell script
-pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm.git'
+pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model.git'
 ```
 
 Extras available for this package include:
@@ -41,7 +41,7 @@ For example, to install this library for use with Snowflake, and with `pyarrow`
 data-frame utilities:
 
 ```shell script
-pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-orm.git[snowflake,pyarrow]'
+pip3 install 'git+https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model.git[snowflake,pyarrow]'
 ```
 
 ### Development Installation
@@ -54,7 +54,7 @@ need to:
 
 ```shell script
 git clone https://github.com/siddartham/data-engineering-ecosystem && \
-cd my-datastore-orm && \
+cd my-datastore-model && \
 make
 ```
 
@@ -78,15 +78,15 @@ multiple schemas is Snowflake. In order to create a new Snowflake schema,
 you need to:
 
 1. Create a new module under
-   [`my_datastore_orm`](my_datastore_orm), named as you
+   [`my_datastore_model`](my_datastore_model), named as you
    want the schema to be named, except lowercase (and with the extension ".py",
    of course)
 2. Add your module to the imports in
-  [`my_datastore_orm.__init__`](my_datastore_orm/__init__.py),
+  [`my_datastore_model.__init__`](my_datastore_model/__init__.py),
   as well as to `my_datastore_orm.__init__.__all__`.
-3. In [`my_datastore_orm.dialects.snowflake.py`](my_datastore_orm/dialects/snowflake.py),
+3. In [`my_datastore_model.dialects.snowflake.py`](my_datastore_model/dialects/snowflake.py),
    add the name of your schema to the tuple
-   `my_datastore_orm.dialects.snowflake.SCHEMAS`.
+   `my_datastore_model.dialects.snowflake.SCHEMAS`.
 
 ### Adding a Table or View
 
@@ -227,9 +227,9 @@ The simplest way to run unit tests locally is with `tox`:
 
 ```shell script
 git clone\
- https://github.com/siddarthm/my-datastore-orm.git\
- my-datastore-orm
-cd ./my-datastore-orm
+ https://github.com/siddarthm/my-datastore-model.git\
+ my-datastore-model
+cd ./my-datastore-model
 pip3 install tox  # Install tox
 tox  # Run tox in the repository's root directory
 ```
@@ -271,8 +271,8 @@ schema, table, and column names with the following modifications:
 ### sqlite
 
 ```text
-$ my-datastore-orm slite -h
-usage: my-datastore-orm sqlite [-h] [-e] [-cf] [-vo] [-ud] [-udo]
+$ my-datastore-model slite -h
+usage: my-datastore-model sqlite [-h] [-e] [-cf] [-vo] [-ud] [-udo]
                                         [-l LOG] [-ov ONLY_VALIDATE]
                                         command [path]
 
@@ -304,8 +304,8 @@ optional arguments:
 ### snowflake
 
 ```text
-$ my-datastore-orm snowflake -h
-usage: my-datastore-orm snowflake [-h] [-u USER] [-p PASSWORD]
+$ my-datastore-model snowflake -h
+usage: my-datastore-model snowflake [-h] [-u USER] [-p PASSWORD]
                                            [-d DATABASE] [-w WAREHOUSE]
                                            [-s SCHEMA] [-r ROLE]
                                            [-a AUTHENTICATOR] [-sn STAGE_NAME]
@@ -430,9 +430,9 @@ AWS credentials with `gimme-aws-creds`, then execute one (or all) of the
 following commands (depending on which environment you want to initialize):
 
 ```shell script
-my-datastore-orm snowflake create dev -cf -e
-my-datastore-orm snowflake create qa -cf -e
-my-datastore-orm snowflake create prod -cf -e
+my-datastore-model snowflake create dev -cf -e
+my-datastore-model snowflake create qa -cf -e
+my-datastore-model snowflake create prod -cf -e
 ```
 
 If you don't have any migration scripts generated yet, create one:

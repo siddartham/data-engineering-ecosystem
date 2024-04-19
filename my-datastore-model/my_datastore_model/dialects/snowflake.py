@@ -1216,10 +1216,10 @@ def validate_environment(
 def main() -> None:
     """
     This function is the entry point for the
-    `my-datastore-orm snowflake` command.
+    `my-datastore-model snowflake` command.
     """
     arguments: argparse.Namespace = parse_arguments(
-        "my-datastore-orm snowflake",
+        "my-datastore-model snowflake",
         environments=ENVIRONMENTS,
         roles=ROLES,
     )

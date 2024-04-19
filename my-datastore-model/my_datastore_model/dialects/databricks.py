@@ -309,10 +309,10 @@ def validate_environment(
 def main() -> None:
     """
     This function is the entry point for the
-    `my-datastore-orm databricks` command.
+    `my-datastore-model databricks` command.
     """
     arguments: argparse.Namespace = parse_arguments(
-        "my-datastore-orm databricks",
+        "my-datastore-model databricks",
         environments=ENVIRONMENTS,
     )
 

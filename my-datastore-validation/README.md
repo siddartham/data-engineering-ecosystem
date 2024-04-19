@@ -6,7 +6,7 @@
 [Development Environment Setup](https://github.com/siddartham/data-engineering-ecosystem/dev-env-setup)
 
 This package performs validations against the
-databases defined in [my-datastore-orm
+databases defined in [my-datastore-model
 ](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-validation).
 
 ## Install

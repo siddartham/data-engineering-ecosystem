@@ -363,7 +363,7 @@ class Broker(my_datastore_etl.broker.Broker):
                 select_statement
             )
         # The following assumes a table exists in our ORM
-        # (my-datastore-orm) named "SEASON_YEAR". Please note
+        # (my-datastore-model) named "SEASON_YEAR". Please note
         # that this is not a real table, it is just used as an example.
         table_name: str = "SEASON_YEAR"
         # Resolve the correct S3 prefix for the current environment + table
@@ -436,7 +436,7 @@ class Broker(my_datastore_etl.broker.Broker):
             ).alias("SEASON_YEAR_START")
         )
         # The following assumes a table exists in our ORM
-        # (my-datastore-orm) named "SEASON_YEAR". Please note
+        # (my-datastore-model) named "SEASON_YEAR". Please note
         # that this is not a real table, it is just used as an example.
         table_name: str = "SEASON_YEAR"
         # Resolve the correct S3 prefix for the current environment + table
@@ -494,7 +494,7 @@ class Broker(my_datastore_etl.broker.Broker):
             table=f"({select_statement})"
         )
         # The following assumes a table exists in our ORM
-        # (my-datastore-orm) named "SEASON_YEAR". Please note
+        # (my-datastore-model) named "SEASON_YEAR". Please note
         # that this is not a real table, it is just used as an example.
         table_name: str = "SEASON_YEAR"
         # Resolve the correct S3 prefix for the current environment + table
@@ -1057,7 +1057,7 @@ This module holds public constants for use by this package and dependants.
 
 This module provides a mechanism for *safely* transforming data into rows of
 named tuples with column names and data types matching the data model defined
-in [my-datastore-orm](https://github.com/siddartham/my-datastore-orm).
+in [my-datastore-model](https://github.com/siddartham/my-datastore-model).
 
 #### Transformer
 
