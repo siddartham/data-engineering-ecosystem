@@ -26,7 +26,7 @@ reinstall:
 	pip3 install --upgrade pip wheel && \
 	pip3 install -r dev_requirements.txt && \
 	pip3 install -r test_requirements.txt -r ci_requirements.txt --upgrade --upgrade-strategy eager -e '.[all]' && \
-	orm-framework spark install-snowflake-jdbc-driver && \
+	analytics-orm spark install-snowflake-jdbc-driver && \
 	{ mypy --install-types --non-interactive || echo "" ; } && \
 	make requirements && \
 	echo "Success!"

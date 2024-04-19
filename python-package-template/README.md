@@ -1,5 +1,5 @@
 # python-package-template
-[![cicd](https://github.com/siddartham/python-package-template/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/python-package-template/actions/workflows/cicd.yml)
+[![cicd](https://github.com/siddartham/data-engineering-ecosystem/python-package-template/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/python-package-template/actions/workflows/cicd.yml)
 
 
 To create a repository based on this template:
@@ -13,12 +13,12 @@ To create a repository based on this template:
   pip3 install --upgrade pip && \
   pip3 install cookiecutter && \
   cookiecutter\
-   "git+https://github.com/siddartham/python-package-template.git"
+   "git+https://github.com/siddartham/data-engineering-ecosystem/python-package-template.git"
   ```
 - Follow the prompts to enter template fields. For example:
   ```
   $ cookiecutter\
-   "git+https://github.com/siddartham/python-package-template.git"
+   "git+https://github.com/siddartham/data-engineering-ecosystem/python-package-template.git"
 
   ```
   The resulting directory/file structure created by the above example input

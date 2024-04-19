@@ -1057,7 +1057,7 @@ This module holds public constants for use by this package and dependants.
 
 This module provides a mechanism for *safely* transforming data into rows of
 named tuples with column names and data types matching the data model defined
-in [my-datastore-model](https://github.com/siddartham/my-datastore-model).
+in [my-datastore-model](https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model).
 
 #### Transformer
 

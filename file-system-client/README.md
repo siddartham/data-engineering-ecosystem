@@ -1,9 +1,9 @@
 # file-system-client
 
-[![test](https://github.com/siddartham/file-system-client/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/file-system-client/actions/workflows/test.yml)
-[![distribute](https://github.com/siddartham/file-system-client/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/file-system-client/actions/workflows/distribute.yml)
+[![test](https://github.com/siddartham/data-engineering-ecosystem/file-system-client/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/file-system-client/actions/workflows/test.yml)
+[![distribute](https://github.com/siddartham/data-engineering-ecosystem/file-system-client/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/file-system-client/actions/workflows/distribute.yml)
 
-[Development Environment Setup](https://github.com/siddartham/development-environment-setup)
+[Development Environment Setup](https://github.com/siddartham/data-engineering-ecosystem/dev-env-setup)
 
 This library provides:
 
@@ -25,7 +25,7 @@ This library provides:
 ## Install
 
 ```shell script
-pip3 install git+https://github.com/siddartham/file-system-client.git
+pip3 install git+https://github.com/siddartham/data-engineering-ecosystem/file-system-client
 ```
 
 ## Usage

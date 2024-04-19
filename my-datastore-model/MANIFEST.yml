@@ -5,7 +5,7 @@ type: documentation
 tags:
   - Cerberus
 urls:
-  repository: https://github.com/siddartham/my-datastore-model
+  repository: https://github.com/siddartham/data-engineering-ecosystem/my-datastore-model
 maintainerEmail: reddy.siddartha53@gmail.com
 documents: &documents
   documents:

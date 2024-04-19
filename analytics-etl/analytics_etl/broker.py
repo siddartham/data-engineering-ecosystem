@@ -410,7 +410,7 @@ def _write_parquet_retry_hook(error: Exception) -> bool:
 
 
 @spark_session_lru_cache()
-def _get_spark_session(name: str = "etl-framework") -> SparkSession:
+def _get_spark_session(name: str = "analytics-etl") -> SparkSession:
     from delta import configure_spark_with_delta_pip
 
     if not has_spark_extra:
@@ -591,8 +591,8 @@ class Work:
         if not has_databricks_extra:
             raise AttributeError(
                 "Use of this property requires installation of the "
-                '"databricks" extra for etl-framework:\n'
-                "pip3 install 'etl-framework[databricks]'"
+                '"databricks" extra for analytics-etl:\n'
+                "pip3 install 'analytics-etl[databricks]'"
             )
         if not self.databricks_connection_string:
             raise AttributeError(
@@ -695,8 +695,8 @@ class Work:
         if not has_snowflake_extra:
             raise AttributeError(
                 "Use of this property requires installation of the "
-                '"snowflake" extra for etl-framework:\n'
-                "pip3 install 'etl-framework[snowflake]'"
+                '"snowflake" extra for analytics-etl:\n'
+                "pip3 install 'analytics-etl[snowflake]'"
             )
         if not self.snowflake_connection_string:
             raise AttributeError(
@@ -727,8 +727,8 @@ class Work:
         if not has_postgresql_extra:
             raise AttributeError(
                 "Use of this property requires installation of the "
-                '"postgresql" extra for etl-framework:\n'
-                "pip3 install 'etl-framework[postgresql]'"
+                '"postgresql" extra for analytics-etl:\n'
+                "pip3 install 'analytics-etl[postgresql]'"
             )
         if not self.postgresql_connection_string:
             raise AttributeError(

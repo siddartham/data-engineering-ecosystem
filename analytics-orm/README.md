@@ -1,25 +1,25 @@
 # analytics-orm
 
-[![test](https://github.com/siddartham/analytics-orm/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/analytics-orm/actions/workflows/test.yml)
-[![distribute](https://github.com/siddartham/analytics-orm/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/analytics-orm/actions/workflows/distribute.yml)
+[![test](https://github.com/siddartham/data-engineering-ecosystem/analytics-orm/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/analytics-orm/actions/workflows/test.yml)
+[![distribute](https://github.com/siddartham/data-engineering-ecosystem/analytics-orm/actions/workflows/distribute.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/analytics-orm/actions/workflows/distribute.yml)
 
 This library defines a declarative base and related utilities for defining
 a SQLAlchemy ORM (object relational model) which is compatible with Hive, Databricks,
 Snowflake, PostgreSQL, and SQLite.
 
-[Setting up your Development Environment](https://github.com/siddartham/development-environment-setup)
+[Setting up your Development Environment](https://github.com/siddartham/data-engineering-ecosystem/dev-env-setup)
 ## Installation
 
 To install this library with all optional utilities:
 
 ```shell script
-pip3 install git+https://github.com/siddartham/orm-framwork.git[all]
+pip3 install git+https://github.com/siddartham/data-engineering-ecosystem/analytics-orm[all]
 ```
 
 To install this library only for use with sqlite:
 
 ```shell script
-pip3 install git+https://github.com/siddartham/orm-framwork.git
+pip3 install git+https://github.com/siddartham/data-engineering-ecosystem/analytics-orm
 ```
 
 ### Clone and Install
@@ -29,9 +29,8 @@ need to develop, test, or distribute *this* library.
 
 ```shell script
 git clone\
- https://github.com/siddartham/analytics-orm.git\
- analytics-orm
-cd ./analytics-orm
+ https://github.com/siddartham/data-engineering-ecosystem.git\
+cd ./data-engineering-ecosystem/analytics-orm
 make
 ```
 
@@ -556,8 +555,7 @@ Parameters:
 The simplest way to run unit tests locally is with `tox`:
 ```shell script
 git clone\
- https://github.com/siddartham/data-engineering-ecosystem/analytics-orm.git\
- analytics-orm
+ https://github.com/siddartham/data-engineering-ecosystem.git\
 cd ./data-engineering-ecosystem/analytics-orm
 make  # Install tox
 tox  # Run tox in the repository's root directory

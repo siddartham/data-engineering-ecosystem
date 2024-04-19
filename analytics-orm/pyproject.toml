@@ -17,7 +17,7 @@ target-version = [
 profile = "black"
 src_paths = [
     "alembic",
-    "orm-framework",
+    "analytics-orm",
     "tests",
     "scripts",
     "setup.py",
