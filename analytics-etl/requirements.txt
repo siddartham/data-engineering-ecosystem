@@ -5,3 +5,4 @@ lxml==4.9.3
 -e ../daves-dev-tools
 -e ../my-datastore-etl
 -e ../my-datastore-orm
+-e ../mail-client

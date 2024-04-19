@@ -7,7 +7,9 @@ from . import __name__ as _module_name
 
 def _get_dialect() -> str:
     dialect: str = "sqlite"
-    if len(sys.argv) > 1 and (sys.argv[1] in ("sqlite", "snowflake")):
+    if len(sys.argv) > 1 and (
+        sys.argv[1] in ("sqlite", "snowflake", "databricks")
+    ):
         dialect = sys.argv.pop(1).lower().replace("-", "_")
     return dialect
 

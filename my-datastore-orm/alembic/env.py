@@ -4,13 +4,13 @@ from pathlib import Path
 from subprocess import check_call
 from typing import Tuple
 
-from orm_framework.alembic.migrations import run
+from analytics_orm.alembic.migrations import run
 from sqlalchemy.engine import URL, make_url  # type: ignore
 
 import alembic  # type: ignore
 from alembic.runtime.environment import EnvironmentContext  # type: ignore
 from my_datastore_orm.base import Base
-from my_datastore_orm.dialects import snowflake
+from my_datastore_orm.dialects import databricks, snowflake
 
 context: EnvironmentContext = getattr(alembic, "context")
 
@@ -35,6 +35,13 @@ def get_bind() -> URL:
         return url
     elif url.drivername == "snowflake":
         return snowflake.get_environment_connection_url(role=url.query["role"])
+    elif url.drivername == "databricks":
+        environment: str = context.config.config_ini_section.partition(
+            "databricks-"
+        )[-1]
+        return databricks.get_environment_connection_url(
+            environment=environment
+        )
     else:
         raise ValueError(url)
 

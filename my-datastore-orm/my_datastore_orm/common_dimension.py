@@ -71,6 +71,7 @@ class Calculator(Base):
         nullable=False,
     )
 
+
 class Measure(Base):
     """
     MEASURE

@@ -12,9 +12,9 @@ from typing import (
     Union,
 )
 
-from orm_framework.snowflake import COMMANDS
-from orm_framework.snowflake import DEFAULT_ENVIRONMENTS as ENVIRONMENTS
-from orm_framework.snowflake import (
+from analytics_orm.snowflake import COMMANDS
+from analytics_orm.snowflake import DEFAULT_ENVIRONMENTS as ENVIRONMENTS
+from analytics_orm.snowflake import (
     DEFAULT_ROLE,
     DEFAULT_SCHEMA,
     DEFAULT_STAGE_FILE_FORMAT,
@@ -26,11 +26,11 @@ from orm_framework.snowflake import (
     get_connection_url,
     parse_arguments,
 )
-from orm_framework.utilities import (
+from analytics_orm.utilities import (
     apply_environment_defaults,
     apply_role_defaults,
 )
-from orm_framework.validation import validate
+from analytics_orm.validation import validate
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.engine.mock import MockConnection  # type: ignore
 from sqlalchemy.engine.result import Result  # type: ignore
@@ -39,7 +39,7 @@ from sqlalchemy.engine.url import URL, make_url  # type: ignore
 from sqlalchemy.sql.schema import ForeignKeyConstraint, Table  # type: ignore
 
 from ..base import Base
-from .s3 import ENVIRONMENTS_URLS
+from .s3 import BUCKET_NAME, ENVIRONMENTS_URLS, SEMANTIC_PATH
 
 __all__: List[str] = [
     "get_environment_connection_url",
@@ -55,7 +55,7 @@ __all__: List[str] = [
 
 SCHEMAS: Tuple[str, ...] = (
     "COMMON_DIMENSION",
-    "FND_SUSTAINABILITY",
+    "FND_SAMPLE",
     "STAGE",
 )
 ADMIN_ROLES: Tuple[str, ...] = (
@@ -85,8 +85,8 @@ DEFAULTS: Dict[str, Any] = dict(
 DEV_DEFAULTS: Dict[str, Any] = dict(
     database="SDF_FOUNDATION_DEV",
     warehouse="SDF_FOUNDATION_PREPROD",
-    # stage_storage_integration="S3_SF_SDF_DEV_INTEGRATION",
-    # stage_url=f"s3://{BUCKET_NAME}/dev/{SEMANTIC_PATH}",
+    stage_storage_integration="S3_SF_SDF_DEV_INTEGRATION",
+    stage_url=f"s3://{BUCKET_NAME}/dev/{SEMANTIC_PATH}",
     create_stage_arguments=(
         CreateStageArguments(
             name="STAGE.S3_SUSTAINABILITY_FOUNDATION",
@@ -100,6 +100,8 @@ DEV_DEFAULTS: Dict[str, Any] = dict(
 QA_DEFAULTS: Dict[str, Any] = dict(
     database="SDF_FOUNDATION_QA",
     warehouse="SDF_FOUNDATION_PREPROD",
+    stage_storage_integration="NGAP_SF_SUSTAINABILITY_QA_INTEGRATION",
+    stage_url=f"s3://{BUCKET_NAME}/qa/{SEMANTIC_PATH}",
     create_stage_arguments=(
         CreateStageArguments(
             name="STAGE.S3_SUSTAINABILITY_FOUNDATION",
@@ -113,6 +115,8 @@ QA_DEFAULTS: Dict[str, Any] = dict(
 PROD_DEFAULTS: Dict[str, Any] = dict(
     database="SDF_FOUNDATION_PROD",
     warehouse="SDF_FOUNDATION_PROD",
+    stage_storage_integration="NGAP_SF_SUSTAINABILITY_PROD_INTEGRATION",
+    stage_url=f"s3://{BUCKET_NAME}/prod/{SEMANTIC_PATH}",
     create_stage_arguments=(
         CreateStageArguments(
             name="STAGE.S3_SUSTAINABILITY_FOUNDATION",
@@ -262,6 +266,11 @@ def _iter_environment_grants(
         )
 
 
+@apply_role_defaults("GSA_FOUNDATION_ADMIN_DEV", **ADMIN_DEV_DEFAULTS)
+@apply_role_defaults("GSA_FOUNDATION_ADMIN_QA", **ADMIN_QA_DEFAULTS)
+@apply_role_defaults("GSA_FOUNDATION_ADMIN_PROD", **ADMIN_PROD_DEFAULTS)
+@apply_role_defaults("GSA_FOUNDATION_READWRITE_DEV", **READWRITE_DEV_DEFAULTS)
+@apply_role_defaults("GSA_FOUNDATION_READWRITE_QA", **READWRITE_QA_DEFAULTS)
 @apply_role_defaults(
     "APP_SNOWFLAKE_DEV_SDF_FOUNDATION_ADMIN", **ADMIN_DEV_DEFAULTS
 )
@@ -661,7 +670,7 @@ def create_environment(
 
     ...the following parameters are a path + key to a cerberus secret stored
     in a one of Org's [vaults](https://prod.cerberus.mycloud.com). For
-    example: "app/sustainability/snowlake-prod/password".
+    example: "app/sustainability/snowflake-prod/password".
 
     - user_cerberus_path (str) = ""
     - password_cerberus_path (str) = ""

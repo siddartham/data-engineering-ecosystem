@@ -12,7 +12,7 @@ from my_datastore_orm.dialects.sqlite import (
 
 lru_cache: Callable[..., Any] = functools.lru_cache
 SQLITE_PATH: Path = (
-    Path(__file__).absolute().parent.joinpath("data", "org.sqlite")
+    Path(__file__).absolute().parent.joinpath("data", "my_org.sqlite")
 )
 
 

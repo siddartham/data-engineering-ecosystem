@@ -655,11 +655,26 @@ def get_base_table_name_subclass(
             table_name, table_names_subclasses[table_name.rpartition(".")[-1]]
         )
     except KeyError as error:
+        # Check to see if we just have a casing mismatch.
+        # We use `any` rather than `all` to save computation time,
+        # because all tables should have the same casing.
+        if table_name.isupper():
+            if any(
+                map(str.islower, filter(None, table_names_subclasses.keys()))
+            ):
+                return get_base_table_name_subclass(base, table_name.lower())
+        elif table_name.islower():
+            if any(
+                map(str.isupper, filter(None, table_names_subclasses.keys()))
+            ):
+                return get_base_table_name_subclass(base, table_name.upper())
+        # Raise the error
         error.args = (
             f"{table_name} not in "
             f"{tuple(sorted(table_names_subclasses.keys()))}",
         )
         raise error
+
 
 
 def get_base_table_names_subclasses(

@@ -1,7 +1,7 @@
 import unittest
 
-from my_datastore_orm.fnd_common import (
-    EnablonIngressConversion,
+from my_datastore_orm.common_dimension import (
+    AlembicVersion,
 )
 
 
@@ -16,8 +16,8 @@ class TestBroker(unittest.TestCase):
         returns the expected value when called by a sub-class.
         """
 
-        assert repr(EnablonIngressConversion()) == (
-            "my_datastore_orm.common_dimention.AlembicVersion(\n"  # noqa
+        assert repr(AlembicVersion()) == (
+            "my_datastore_orm.common_dimension.AlembicVersion(\n"  # noqa
             "    version=None,\n"
             ")"
         )

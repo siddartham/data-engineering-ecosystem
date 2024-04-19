@@ -1,10 +1,11 @@
 from typing import List
 
-from . import base, common_dimension, fnd_sample_snowflake_schema, stage
+from . import base, common_dimension, fnd_sample, stage, fnd_enablon
 
 __all__: List[str] = [
     "base",
     "common_dimension",
-    "fnd_sample_snowflake_schema.py",
+    "fnd_sample",
+    "fnd_enablon",
     "stage",
 ]
