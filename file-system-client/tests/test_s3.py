@@ -236,5 +236,6 @@ class TestS3(unittest.TestCase):
         url: str = self.file_system.get_url()
         assert from_url(url).get_url() == url
 
+
 if __name__ == "__main__":
     unittest.main()

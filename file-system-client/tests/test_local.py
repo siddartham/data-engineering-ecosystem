@@ -8,10 +8,7 @@ from typing import Any, Optional, Tuple
 
 import file_system_client.local as local
 from file_system_client import from_url
-from file_system_client.utilities import (
-    is_date_partition_directory,
-    lru_cache,
-)
+from file_system_client.utilities import is_date_partition_directory, lru_cache
 
 TEST_DIRECTORY: str = "test_directory/"
 TEST1_DIRECTORY: str = f"{TEST_DIRECTORY}1/"

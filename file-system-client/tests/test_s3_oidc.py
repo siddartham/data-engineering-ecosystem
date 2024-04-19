@@ -2,6 +2,7 @@
 OpenID Connect (OIDC) is an authentication protocol that verifies
 user identities when they sign in to access digital resources
 """
+
 import csv
 import os
 import unittest
@@ -11,10 +12,7 @@ from io import BytesIO, StringIO
 from typing import Any, Optional, Tuple
 
 from file_system_client import from_url
-from file_system_client.s3 import (
-    SimpleStorageService,
-    get_web_identity_token,
-)
+from file_system_client.s3 import SimpleStorageService, get_web_identity_token
 from file_system_client.utilities import (
     is_date_partition_directory,
     lru_cache,
