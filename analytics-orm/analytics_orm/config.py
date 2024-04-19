@@ -2,8 +2,8 @@ import warnings
 
 from sqlalchemy.exc import SAWarning  # type: ignore
 
-OKTA_URL: str = "https://org.okta.com"
-LDAP_HOST: str = "ldap://ad.org.com"
+OKTA_URL: str = "https://org.okta.com"  # Orgs SSO ORL
+LDAP_HOST: str = "ldap://ad.org.com"  # active directory URL
 
 # Turn off warnings for table arguments with unknown dialect prefixes
 warnings.filterwarnings(

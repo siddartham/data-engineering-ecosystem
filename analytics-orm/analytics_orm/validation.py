@@ -70,7 +70,12 @@ from .errors import (
     ViewCacheError,
 )
 from .types import Array, Object
-from .utilities import is_view, iter_recursive_subclasses, lru_cache
+from .utilities import (
+    get_bind_schema,
+    is_view,
+    iter_recursive_subclasses,
+    lru_cache,
+)
 
 SNOWFLAKE_CACHED_VIEW_RESPONSE_ERROR_THRESHOLD_SECONDS: float = 30.0
 
@@ -100,6 +105,7 @@ def _validate_column_compatibility(
             and (
                 (
                     (declared_column.type.precision is not None)
+                    and (reflected_column.type.precision is not None)
                     and (
                         declared_column.type.precision
                         > reflected_column.type.precision
@@ -107,6 +113,7 @@ def _validate_column_compatibility(
                 )
                 or (
                     (declared_column.type.scale is not None)
+                    and (reflected_column.type.scale is not None)
                     and (
                         declared_column.type.scale
                         > reflected_column.type.scale
@@ -303,6 +310,11 @@ class _Validator:
             )
         )
 
+    @property
+    @lru_cache()
+    def schema(self) -> Optional[str]:
+        return get_bind_schema(self.bind)
+
     def __reduce__(
         self,
     ) -> Tuple[
@@ -318,7 +330,7 @@ class _Validator:
     def reflect_schema_metadata(
         self, schema: Optional[str], only: Tuple[str, ...] = ()
     ) -> MetaData:
-        schema = schema or None
+        schema = schema or self.schema
         metadata: MetaData = MetaData(
             base=self.base, bind=self.bind, schema=schema
         )
@@ -338,6 +350,7 @@ class _Validator:
     def reflect_schema_table(
         self, schema: Optional[str], table_name: str
     ) -> Table:
+        schema = schema or self.schema
         metadata: MetaData = (
             # TODO: Optimize databricks metadata reflection
             self.reflect_schema_metadata(schema, only=(table_name,))
@@ -379,7 +392,7 @@ class _Validator:
         # column name
         if column.name.lower() != property_name:
             return ColumnNameError(
-                column.table.schema,
+                column.table.schema or self.schema,
                 column.table.name,
                 column.name,
                 property_name,
@@ -402,7 +415,7 @@ class _Validator:
         if table is None:
             try:
                 table = self.reflect_schema_table(
-                    column.table.schema, column.table.name
+                    column.table.schema or self.schema, column.table.name
                 )
             except TableNotReflectedError as error:
                 return error
@@ -413,7 +426,9 @@ class _Validator:
         )
         if reflected_column is None:
             return ColumnNotReflectedError(
-                column.table.schema, column.table.name, column.name
+                column.table.schema or self.schema,
+                column.table.name,
+                column.name,
             )
         return _validate_column_compatibility(column, reflected_column)
 
@@ -433,7 +448,7 @@ class _Validator:
         )
         if self.bind.execute(select_repeated_key_count).fetchone():
             yield PrimaryKeyNotUniqueError(
-                table.schema,
+                table.schema or self.schema,
                 table.name,
                 message=select_repeated_key_count.compile(
                     compile_kwargs={"literal_binds": True}
@@ -544,7 +559,8 @@ class _Validator:
                 > SNOWFLAKE_CACHED_VIEW_RESPONSE_ERROR_THRESHOLD_SECONDS
             ):
                 yield ViewCacheError(
-                    schema=get_class_schema_name(cls),
+                    schema=get_class_schema_name(cls, self.dialect_name)
+                    or self.schema,
                     view_name=view_name,
                     response_time_seconds=cached_response_time_seconds,
                     threshold_seconds=(
@@ -583,9 +599,10 @@ class _Validator:
                 f"metadata: {cls.__module__}.{cls.__name__}"
             )
             declared_column_names: Set[str] = set()
-
-            schema: str = get_class_schema_name(cls)
-            table_name: str = get_class_table_name(cls)
+            schema: str = (
+                get_class_schema_name(cls, self.dialect_name) or self.schema
+            )
+            table_name: str = get_class_table_name(cls, self.dialect_name)
             reflected_table: Table = self.reflect_schema_table(
                 schema, table_name
             )
@@ -616,7 +633,7 @@ class _Validator:
             )
             if undeclared_column_names:
                 yield ColumnsNotDeclaredError(
-                    schema,
+                    schema or self.schema,
                     table_name,
                     tuple(sorted(undeclared_column_names)),
                 )
@@ -630,14 +647,18 @@ class _Validator:
     def iter_declared_schemas_table_names(self) -> Iterable[Tuple[str, str]]:
         cls: Type[Base]
         for cls in iter_recursive_subclasses(self.base):
-            yield get_class_schema_name(cls), get_class_table_name(cls)
+            yield get_class_schema_name(
+                cls, self.dialect_name
+            ) or self.schema, get_class_table_name(cls, self.dialect_name)
 
     def iter_reflected_schemas_table_names(self) -> Iterable[Tuple[str, str]]:
         schema: str
         for schema in get_base_schema_names(self.base, self.dialect_name):
             table: Table
-            for table in self.reflect_schema_metadata(schema).tables.values():
-                yield table.schema or schema, table.name
+            for table in self.reflect_schema_metadata(
+                schema or self.schema
+            ).tables.values():
+                yield table.schema or schema or self.schema, table.name
 
     def validate(self, only: Sequence[str] = ()) -> Iterable[ValidationError]:
         """
@@ -646,10 +667,24 @@ class _Validator:
         # Verify that all reflected tables and views are declared
         schema: str
         table_name: str
-        for schema, table_name in set(
-            self.iter_reflected_schemas_table_names()
-        ) - set(self.iter_declared_schemas_table_names()):
-            yield TableNotDeclaredError(schema, table_name)
+        declared_schema_table_names: Set[Tuple[str, str]] = set(
+            self.iter_declared_schemas_table_names()
+        )
+        message: str = "Declared tables: {}".format(
+            ", ".join(
+                f"{schema}.{table_name}"
+                for schema, table_name in sorted(declared_schema_table_names)
+            )
+        )
+        for schema, table_name in (
+            set(self.iter_reflected_schemas_table_names())
+            - declared_schema_table_names
+        ):
+            yield TableNotDeclaredError(
+                schema,
+                table_name,
+                message,
+            )
         # Validate each declared mapping class
         subclasses: Iterable[Type[Base]] = iter_recursive_subclasses(self.base)
         if only:

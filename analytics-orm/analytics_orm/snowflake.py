@@ -1,6 +1,7 @@
 import logging
 from argparse import Namespace
-from functools import update_wrapper, wraps
+from dataclasses import dataclass
+from functools import wraps, update_wrapper
 from getpass import getuser
 from typing import (
     Callable,
@@ -14,14 +15,14 @@ from typing import (
     Union,
 )
 
-from org.cerberus_assistant.get import get_secret
+from cerberus_assistant.get import get_secret
 from snowflake.sqlalchemy import URL as snowflake_url  # type: ignore
 from snowflake.sqlalchemy.snowdialect import SnowflakeDialect  # type: ignore
 from snowflake.sqlalchemy.snowdialect import check_table  # type: ignore
 from sqlalchemy import Table  # type: ignore
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
-from sqlalchemy.engine.create import (
-    create_engine as _create_engine,  # type: ignore
+from sqlalchemy.engine.create import (  # type: ignore  # noqa
+    create_engine as _create_engine,
 )
 from sqlalchemy.engine.interfaces import Dialect  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
@@ -29,6 +30,7 @@ from sqlalchemy.engine.url import URL, make_url  # type: ignore
 from sqlalchemy.event.api import remove  # type: ignore
 from sqlalchemy.sql import quoted_name  # type: ignore
 from sqlalchemy.sql.compiler import IdentifierPreparer  # type: ignore
+from sqlalchemy.sql.expression import text  # type: ignore
 
 from .cli import parse_arguments as _parse_arguments
 from .config import OKTA_URL
@@ -319,8 +321,8 @@ def create_stage(
     - bind (sqlalchemy.Engine|sqlalchemy.Connection|None) = None
 
     ...the following parameters are a path + key to a cerberus secret stored
-    in a one of Org's [vaults](https://prod.cerberus.cloud.com). For
-    example: "app/org/snowlake-prod/password".
+    in a one of Org's [vaults](https://prod.cerberus.mycloud.com). For
+    example: "app/org/snowflake-prod/password".
 
     - user_cerberus_path (str) = ""
     - password_cerberus_path (str) = ""
@@ -439,7 +441,7 @@ def create_all(
 
         if database.lower() not in map(
             get_name,
-                connection.execute(text("SHOW DATABASES"), ()),
+            connection.execute(text("SHOW DATABASES"), ()),
         ):
             dialect: Dialect = connection.engine.dialect
             preparer_class: Type[IdentifierPreparer] = getattr(
@@ -510,6 +512,7 @@ def create_all(
             authenticator_cerberus_path=authenticator_cerberus_path,
             bind=bind,
             use_secondary_roles=use_secondary_roles,
+            create_stage_arguments=create_stage_arguments,
         )
     return bind
 

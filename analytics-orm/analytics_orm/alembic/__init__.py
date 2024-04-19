@@ -1,8 +1,14 @@
-from typing import Any, List
+from types import ModuleType
+from typing import List, Optional
 
 from . import autogenerate, ddl, migrations, operations
 
-snowflake: Any
+databricks: Optional[ModuleType]
+try:
+    from . import databricks
+except ImportError:
+    databricks = None
+snowflake: Optional[ModuleType]
 try:
     from . import snowflake
 except ImportError:
@@ -14,4 +20,5 @@ __all__: List[str] = [
     "ddl",
     "migrations",
     "snowflake",
+    "databricks",
 ]

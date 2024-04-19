@@ -1,5 +1,6 @@
 from argparse import Namespace
 from typing import (
+    Any,
     Callable,
     Iterable,
     List,
@@ -12,15 +13,15 @@ from typing import (
 
 from sqlalchemy import Table  # type: ignore
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
-from sqlalchemy.engine.create import (
-    create_engine as _create_engine,  # type: ignore
+from sqlalchemy.engine.create import (  # type: ignore  # noqa
+    create_engine as create_engine_,
 )
 from sqlalchemy.engine.url import URL  # type: ignore
 from sqlalchemy.sql.schema import ForeignKeyConstraint  # type: ignore
 
 from .cli import parse_arguments as _parse_arguments
 from .declarative import Base
-from .utilities import lru_cache, translate_all_engine_schemas_to
+from .utilities import translate_all_engine_schemas_to
 from .validation import validate as _validate
 
 __all__: List[str] = [

@@ -56,6 +56,8 @@ __all__: List[str] = [
     "register_hive_create_table_compiler",
     "DropPrimaryKey",
     "AddPrimaryKey",
+    "SetTags",
+    "UnsetTags",
     "DUMMY_STATEMENT",
 ]
 
@@ -97,6 +99,83 @@ def _sort_tables_and_constraints(*args: Any, **kwargs: Any) -> List[tuple]:
 
 
 ddl.sort_tables_and_constraints = _sort_tables_and_constraints  # type: ignore
+
+
+def _escape_tag_values(tags: Dict[str, str]) -> Dict[str, str]:
+    return {key: value.replace("'", "\\'") for key, value in tags.items()}
+
+
+# region Tags
+class SetTags(DDLElement):
+    __visit_name__: str = "set_tags"
+    __slots__: Tuple[str, ...] = (
+        "table_name",
+        "tags",
+        "schema",
+        "bind",
+    )
+
+    def __init__(
+        self,
+        table_name: str,
+        tags: Dict[str, str],
+        schema: Optional[str] = None,
+        bind: Union[Engine, Connection, None] = None,
+    ) -> None:
+        self.table_name = table_name
+        self.tags = tags
+        self.schema = schema
+        self.bind = bind
+
+
+class UnsetTags(DDLElement):
+    __visit_name__: str = "unset_tags"
+    __slots__: Tuple[str, ...] = ("table_name", "tags", "schema", "bind")
+
+    def __init__(
+        self,
+        table_name: str,
+        tags: Dict[str, str],
+        schema: Optional[str] = None,
+        bind: Union[Engine, Connection, None] = None,
+    ):
+        self.table_name = table_name
+        self.tags = tags
+        self.schema = schema
+        self.bind = bind
+
+
+@compiles(UnsetTags, "databricks")
+def _visit_unset_tags(
+    element: UnsetTags, compiler: DDLCompiler, **kwargs: Any
+) -> str:
+    table_name: str = _get_element_compiler_table_name(element, compiler)
+
+    tags: Dict[str, str] = _escape_tag_values(element.tags)
+
+    tag_names: Iterable[str] = (f"'{tag_name}'" for tag_name in tags.keys())
+
+    return "ALTER TABLE {} UNSET TAGS ({})".format(
+        table_name, ",".join(tag_names)
+    )
+
+
+@compiles(SetTags, "databricks")
+def _visit_set_tags(
+    element: SetTags, compiler: DDLCompiler, **kwargs: Any
+) -> str:
+    table_name: str = _get_element_compiler_table_name(element, compiler)
+
+    tags: Dict[str, str] = _escape_tag_values(element.tags)
+
+    def _iter_tag_pairs() -> Iterable[str]:
+        for tag_name, tag_value in tags.items():
+            yield f"'{tag_name}' = '{tag_value}'"
+
+    return "ALTER TABLE {} SET TAGS ({})".format(
+        table_name,
+        ",".join(_iter_tag_pairs()),
+    )
 
 
 # region Views
@@ -281,32 +360,16 @@ def _visit_create_table(
 def _visit_create_table_databricks(
     element: CreateTable, compiler: DDLCompiler, **kwargs: Any
 ) -> str:
-    element_table: Table = element.element
 
     def _databricks_post_create_table(table: Table) -> str:
-        column: Column
-        if any(
-            map(
-                lambda column: isinstance(column.default, ColumnDefault),
-                element_table.columns,
-            )
-        ):
-            return (
-                " USING DELTA"
-                "\nTBLPROPERTIES("
-                "'delta.feature.allowColumnDefaults' = 'supported',"
-                "'delta.minReaderVersion' = '2',"
-                "'delta.minWriterVersion' = '5',"
-                "'delta.columnMapping.mode' = 'name'"
-                ");"
-            )
         return (
             " USING DELTA"
-            "\nTBLPROPERTIES("
+            " TBLPROPERTIES("
+            "'delta.feature.allowColumnDefaults' = 'supported',"
             "'delta.minReaderVersion' = '2',"
             "'delta.minWriterVersion' = '5',"
             "'delta.columnMapping.mode' = 'name'"
-            ");"
+            ")"
         )
 
     compiler.post_create_table = _databricks_post_create_table
@@ -356,7 +419,6 @@ def _visit_drop_table(
 
 
 class AddPrimaryKey(DDLElement):
-
     __visit_name__: str = "add_primary_key"
 
     def __init__(
@@ -387,7 +449,7 @@ class DropPrimaryKey(DDLElement):
 
 
 def _get_element_compiler_table_name(
-    element: AddPrimaryKey, compiler: DDLCompiler
+    element: DDLElement, compiler: DDLCompiler
 ) -> str:
     table_name: str = compiler.preparer.quote(element.table_name)
     if element.schema:
@@ -396,12 +458,12 @@ def _get_element_compiler_table_name(
 
 
 def _get_constraint_compiler_parent_table_name(
-    constraint: DropConstraint, compiler: DDLCompiler
+    element: DropConstraint, compiler: DDLCompiler
 ) -> str:
-    table_name: str = compiler.preparer.quote(constraint.element.parent.name)
-    if constraint.element.parent.schema:
+    table_name: str = compiler.preparer.quote(element.element.parent.name)
+    if element.element.parent.schema:
         table_name = (
-            f"{compiler.preparer.quote(constraint.element.parent.schema)}"
+            f"{compiler.preparer.quote(element.element.parent.schema)}"
             f".{table_name}"
         )
     return table_name
@@ -424,19 +486,17 @@ def _visit_add_primary_key(
 
 @compiles(DropConstraint, "databricks")
 def _visit_drop_constraint_databricks(
-    constraint: DropConstraint, compiler: DDLCompiler, **kwargs: Any
+    element: DropConstraint, compiler: DDLCompiler, **kwargs: Any
 ) -> str:
     table_name: str = _get_constraint_compiler_parent_table_name(
-        constraint, compiler
+        element, compiler
     )
-    formatted_name: str = compiler.preparer.format_constraint(
-        constraint.element
-    )
-    # The constraint name needs to be lowercased in databricks
+    formatted_name: str = compiler.preparer.format_constraint(element.element)
+    # Constraint names are stored as all-lowercase in Databricks
     formatted_name = formatted_name.lower()
-    cascade: str = "CASCADE " if constraint.cascade else ""
-    if_exists: str = "IF EXISTS " if constraint.if_exists else ""
-
+    cascade: str = "CASCADE " if element.cascade else ""
+    # Always include `IF EXISTS` for Databricks
+    if_exists: str = "IF EXISTS "
     return (
         f"ALTER TABLE {table_name} DROP CONSTRAINT "
         f"{if_exists}"
@@ -445,19 +505,16 @@ def _visit_drop_constraint_databricks(
     )
 
 
-@compiles(DropConstraint)
+@compiles(DropConstraint, *(SUPPORTED_DIALECTS - {"databricks"}))
 def _visit_drop_constraint(
-    constraint: DropConstraint, compiler: DDLCompiler, **kwargs: Any
+    element: DropConstraint, compiler: DDLCompiler, **kwargs: Any
 ) -> str:
     table_name: str = _get_constraint_compiler_parent_table_name(
-        constraint, compiler
+        element, compiler
     )
-    formatted_name: str = compiler.preparer.format_constraint(
-        constraint.element
-    )
-    cascade: str = "CASCADE " if constraint.cascade else ""
-    if_exists: str = "IF EXISTS " if constraint.if_exists else ""
-
+    formatted_name: str = compiler.preparer.format_constraint(element.element)
+    cascade: str = "CASCADE " if element.cascade else ""
+    if_exists: str = "IF EXISTS " if element.if_exists else ""
     return (
         f"ALTER TABLE {table_name} DROP CONSTRAINT "
         f"{if_exists}"

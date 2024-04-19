@@ -2,6 +2,8 @@ import sys
 from importlib import import_module
 from types import ModuleType
 
+from analytics_orm.errors import get_exception_text
+
 from . import __name__ as _module_name
 
 
@@ -36,8 +38,8 @@ def main() -> None:
                 module = import_module(f"{_module_name}.{command}.__main__")
             except ImportError:
                 module = import_module(f"{_module_name}.{command}")
-        except ImportError as e:
-            print(e.msg)
+        except ImportError:
+            print(get_exception_text())
             _print_help()
             sys.exit(1)
         module.main()  # type: ignore

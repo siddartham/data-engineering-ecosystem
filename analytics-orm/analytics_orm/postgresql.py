@@ -20,15 +20,15 @@ from typing import (
 
 import psycopg2.errors  # type: ignore
 from more_itertools import unique_everseen
-from org.cerberus_assistant.get import get_secret
-from sqlalchemy import Table  # type: ignore
+from cerberus_assistant.get import get_secret
+from sqlalchemy import Table, text  # type: ignore
 from sqlalchemy.dialects.postgresql.base import PGDialect  # type: ignore
 from sqlalchemy.dialects.postgresql.base import (  # type: ignore
     PGExecutionContext,
 )
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
-from sqlalchemy.engine.create import (
-    create_engine as _create_engine,  # type: ignore
+from sqlalchemy.engine.create import (  # type: ignore  # noqa
+    create_engine as _create_engine,
 )
 from sqlalchemy.engine.interfaces import Dialect  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
@@ -85,7 +85,7 @@ def get_connection_url(
     - **database** (str) = "postgres"
 
     ...the following parameters are a path + key to a cerberus secret stored
-    in a one of Org's [vaults](https://prod.cerberus.orgcloud.com). For
+    in a one of Orgs [vaults](https://prod.cerberus.orgcloud.com). For
     example: "app/division/postgres-prod/password".
 
     - **user_cerberus_path** (str) = ""
@@ -208,7 +208,7 @@ def create_engine(
     - **echo** (bool)
 
     ...the following parameters are a path + key to a cerberus secret stored
-    in a one of Org's [vaults](https://prod.cerberus.orgcloud.com). For
+    in a one of Orgs [vaults](https://prod.cerberus.orgcloud.com). For
     example: "app/division/postgres-prod/password".
 
     - **user_cerberus_path** (str) = ""
@@ -222,7 +222,7 @@ def create_engine(
     """
     return translate_all_engine_schemas_to(
         _create_engine(
-            get_connection_string(
+            get_connection_url(
                 user=user,
                 password=password,
                 host=host,
@@ -284,6 +284,7 @@ def create_all(
     - **port_cerberus_path** (str) = ""
     - **database_cerberus_path** (str) = ""
     """
+    connection: Connection
     if checkfirst and not bind:
         # First check to see if the database exists, and if not--create it
         connection: Connection = create_engine(

@@ -803,6 +803,35 @@ class _OmniscientDefaultDict(defaultdict):
         return True
 
 
+def get_bind_schema(bind: Union[Connection, Engine]) -> Optional[str]:
+    """
+    Returns the schema name from an engine or connection
+    """
+    url: sqlalchemy.engine.url.URL = (
+        bind.engine.url if isinstance(bind, Connection) else bind.url
+    )
+    dialect_name: str = get_bind_dialect_name(bind)
+    if dialect_name == "snowflake":
+        # Snowflake appends the schema to the database name
+        return (url.database or "").partition("/")[2] or None
+    elif dialect_name == "sqlite":
+        return None
+    return url.query.get("schema", None)
+
+
+def get_bind_database(bind: Union[Connection, Engine]) -> Optional[str]:
+    """
+    Returns the database name for an engine or connection
+    """
+    url: sqlalchemy.engine.url.URL = (
+        bind.engine.url if isinstance(bind, Connection) else bind.url
+    )
+    if get_bind_dialect_name(bind) == "snowflake":
+        # Snowflake appends the schema to the database name
+        return (url.database or "").partition("/")[0] or None
+    return url.database
+
+
 def translate_all_bind_schemas_to(
     bind: Union[Engine, Connection], schema: Optional[str] = None
 ) -> Union[Engine, Connection]:
@@ -901,7 +930,7 @@ def get_dialect_identifier_preparer(
         dialect_class = dialect
         dialect = dialect_class()
     else:
-        dialect_class = type(dialect_class)
+        dialect_class = type(dialect)
     preparer_class: Type[IdentifierPreparer] = IdentifierPreparer
     if hasattr(dialect, "preparer"):
         preparer_class = dialect.preparer

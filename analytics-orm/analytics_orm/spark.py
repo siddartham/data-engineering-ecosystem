@@ -31,12 +31,15 @@ from urllib.error import HTTPError
 from urllib.request import urlopen
 from warnings import warn
 from xml.etree.ElementTree import Element
+
 print("before lxml tree")
 import lxml.etree
 print("after lxml tree")
+import pkg_resources
 import sqlalchemy  # type: ignore
 from ordered_set import OrderedSet
 from pyspark import sql as pyspark_sql  # type: ignore
+from pyspark.sql import SparkSession  # type: ignore
 from pyspark.sql import functions as pyspark_sql_functions  # type: ignore
 from pyspark.sql import types as pyspark_sql_types
 from pyspark.sql.types import TimestampType  # type: ignore
@@ -353,7 +356,9 @@ DELTA_PRE_RELEASE_MAVEN_ROOT: str = (
     "https://oss.sonatype.org/content/repositories/iodelta-1133/"
 )
 MAVEN_ROOT: str = "https://repo1.maven.org/maven2/"
+TRINO_JDBC: str = "io.trino:trino-jdbc"
 SNOWFLAKE_JDBC: str = "net.snowflake:snowflake-jdbc"
+DATABRICKS_JDBC: str = "com.databricks:databricks-jdbc"
 DELTA_CORE: str = "io.delta:delta-core_*"
 DELTA_SPARK: str = "io.delta:delta-spark_*"
 SCALA_LIBRARY: str = "org.scala-lang:scala-library"
@@ -682,6 +687,7 @@ def _add_jar_package_to_spark_defaults(
             == qualified_name
         )
 
+    file_name: str
     packages_str: str
     spark_jars_packages: Set[str] = set(
         chain(
@@ -700,6 +706,26 @@ def _add_jar_package_to_spark_defaults(
         )
     )
     spark_jars_packages.add(f"{qualified_name}:{version}")
+    spark_defaults["spark.jars.packages"].clear()
+    spark_defaults["spark.jars.packages"].update(spark_jars_packages)
+
+
+def _remove_jar_package_from_spark_defaults(
+    pattern: str, spark_defaults: SparkDefaults
+) -> None:
+    name: str
+    packages_str: str
+    spark_jars_packages: Set[str] = set(
+        filter(
+            lambda name: not fnmatch(name, pattern),
+            chain(
+                *(
+                    packages_str.split(",")
+                    for packages_str in spark_defaults["spark.jars.packages"]
+                )
+            ),
+        )
+    )
     spark_defaults["spark.jars.packages"].clear()
     spark_defaults["spark.jars.packages"].update(spark_jars_packages)
 
@@ -744,9 +770,28 @@ def _remove_driver_extra_class_path_from_spark_defaults(
 
 
 @lru_cache()
-def _get_jar_path(
-    package_identifier: str, maven_artifacts_root: str = MAVEN_ROOT
-) -> Path:
+def _iter_ivy_directories() -> Iterable[Path]:
+    path: Path
+    yield from map(
+        Path,
+        filter(
+            os.path.exists,
+            (
+                (
+                    SparkSession.builder.getOrCreate()
+                    .sparkContext.getConf()
+                    .get("spark.jars.ivy", "")
+                ),
+                os.path.expanduser("~/.ivy2"),
+                "/tmp/.ivy2",
+                os.path.join(get_spark_home(), ".ivy2"),
+            ),
+        ),
+    )
+
+
+@lru_cache()
+def _get_jar_path(package_identifier: str, maven_artifacts_root: str = MAVEN_ROOT) -> Path:
     """
     Download, or return the path of if already downloaded, the JAR for
     the identified package.
@@ -765,29 +810,136 @@ def _get_jar_path(
     return path
 
 
-def install_snowflake_jars() -> None:
+def install_trino_jars() -> None:
+    """
+    This function updates Spark Defaults to retrieve and use a driver for Trino
+    databases.
+    """
+    with SparkDefaults() as spark_defaults:
+        _add_jar_package_to_spark_defaults(TRINO_JDBC, spark_defaults)
+        _add_driver_extra_class_path_to_spark_defaults(
+            str(_get_jar_path(TRINO_JDBC)), spark_defaults
+        )
+    print("Success!")
+
+
+def _get_delta_core_scala_library_version(identifier: str) -> str:
+    maven_package_url: str = get_maven_package_url(identifier)
+    matched: Optional[re.Match] = re.search(
+        r"delta-core_([\d.]+)-", maven_package_url
+    )
+    if matched:
+        return matched.groups()[0]
+    return ""
+
+
+def install_delta_core(version: str = "") -> None:
+    """
+    This function updates Spark Defaults to retrieve and use the Delta Lake
+    Spark extension
+
+    Parameters:
+
+    - version (str) = ""
+    """
+    identifier: str = DELTA_CORE
+    if not version:
+        # Select the highest compatible version
+        # https://docs.delta.io/latest/releases.html
+        pyspark_version: str = pkg_resources.get_distribution(
+            "pyspark"
+        ).version
+        if pyspark_version.startswith("3.0."):
+            version = "0.8.*"
+        elif pyspark_version.startswith("3.1."):
+            version = "1.0.*"
+        elif pyspark_version.startswith("3.2."):
+            version = "2.0.*"
+        elif pyspark_version.startswith("3.3."):
+            version = "2.2.*"
+    if version:
+        identifier = f"{identifier}:{version}"
+    scala_library_identifier: str = SCALA_LIBRARY
+    scala_library_version: str = _get_delta_core_scala_library_version(
+        identifier
+    )
+    if scala_library_version:
+        scala_library_identifier = (
+            f"{scala_library_identifier}:{scala_library_version}.*"
+        )
+    with SparkDefaults() as spark_defaults:
+        _remove_driver_extra_class_path_from_spark_defaults(
+            "*delta*", spark_defaults
+        )
+        _remove_driver_extra_class_path_from_spark_defaults(
+            "*scala*", spark_defaults
+        )
+        _remove_jar_package_from_spark_defaults("*delta*", spark_defaults)
+        _remove_jar_package_from_spark_defaults("*scala*", spark_defaults)
+        _add_jar_package_to_spark_defaults(
+            scala_library_identifier, spark_defaults
+        )
+        _add_jar_package_to_spark_defaults(identifier, spark_defaults)
+        _add_driver_extra_class_path_to_spark_defaults(
+            str(_get_jar_path(scala_library_identifier)), spark_defaults
+        )
+        _add_driver_extra_class_path_to_spark_defaults(
+            str(_get_jar_path(identifier)), spark_defaults
+        )
+        spark_defaults["spark.sql.extensions"].add(
+            "io.delta.sql.DeltaSparkSessionExtension"
+        )
+        spark_defaults["spark.sql.catalog.spark_catalog"].add(
+            "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        )
+    print("Success!")
+
+
+def install_snowflake_jars(version: str = "") -> None:
     """
     This function updates Spark Defaults to retrieve and use a driver for
     Snowflake databases.
     """
+    identifier: str = SNOWFLAKE_JDBC
+    if version:
+        identifier = f"{identifier}:{version}"
     with SparkDefaults() as spark_defaults:
         _add_jar_package_to_spark_defaults(
-            SNOWFLAKE_JDBC, spark_defaults, maven_artifacts_root=MAVEN_ROOT
+            identifier, spark_defaults, maven_artifacts_root=MAVEN_ROOT
         )
         _add_driver_extra_class_path_to_spark_defaults(
-            str(
-                _get_jar_path(SNOWFLAKE_JDBC, maven_artifacts_root=MAVEN_ROOT)
-            ),
+            str(_get_jar_path(identifier, maven_artifacts_root=MAVEN_ROOT)),
             spark_defaults,
         )
     print("Success!")
 
+
+def install_databricks_jars(version: str = "") -> None:
+    """
+    This function updates Spark Defaults to retrieve and use a driver for
+    Databricks databases.
+    """
+    identifier: str = DATABRICKS_JDBC
+    if version:
+        identifier = f"{identifier}:{version}"
+    with SparkDefaults() as spark_defaults:
+        _add_jar_package_to_spark_defaults(
+            identifier, spark_defaults, maven_artifacts_root=MAVEN_ROOT
+        )
+        _add_driver_extra_class_path_to_spark_defaults(
+            str(_get_jar_path(identifier, maven_artifacts_root=MAVEN_ROOT)),
+            spark_defaults,
+        )
+    print("Success!")
 
 def _print_help() -> None:
     print(
         "Usage:\n"
         "  analytics-orm spark <command> [options]\n\n"
         "Commands:\n"
+        "  install-trino-jdbc-driver\n"
+        "                              Configure Spark to load and use a "
+        "Trino JDBC driver\n"
         "  install-snowflake-jdbc-driver\n"
         "                              Configure Spark to load and use a "
         "Snowflake JDBC driver"
@@ -805,19 +957,52 @@ def main() -> None:
     """
     This function is the CLI entry point for the following commands:
 
+    - `analytics-orm spark install-trino-jdbc-driver`
     - `analytics-orm spark install-snowflake-jdbc-driver`
+    - `analytics-orm spark install-delta-core`
     """
     command = _get_command()
     if command in ("-h", "--help"):
         _print_help()
-    elif command == "install-snowflake-jdbc-driver":
+    elif command in ("install-trino-jdbc-driver", "get-trino-jdbc-driver"):
         argparse.ArgumentParser(
-            prog="analytics-orm spark install-snowflake-jdbc-driver",
+            prog="analytics-orm spark install-trino-jdbc-driver",
+            description=(
+                "Configure Spark to load and use a Trino JDBC driver"
+            ),
+        ).parse_args()
+        install_trino_jars()
+    elif command in (
+        "install-snowflake-jdbc-driver",
+        "get-snowflake-jdbc-driver",
+    ):
+        argparse.ArgumentParser(
+            prog="nike-analytics-orm spark install-snowflake-jdbc-driver",
             description=(
                 "Configure Spark to load and use a Snowflake JDBC driver"
             ),
         ).parse_args()
         install_snowflake_jars()
+    elif command == "install-delta-core":
+        parser: argparse.ArgumentParser = argparse.ArgumentParser(
+            prog="analytics-orm spark install-delta-core",
+            description=(
+                "Configure Spark to load and use the Delta Lake extension"
+            ),
+        )
+        parser.add_argument(
+            "-v",
+            "--version",
+            default="",
+            help=(
+                "The version of Delta Lake to use. See the "
+                "[release compatibility matrix]"
+                "(https://docs.delta.io/latest/releases.html) for more "
+                "information."
+            ),
+        )
+        namespace: argparse.Namespace = parser.parse_args()
+        install_databricks_jars(namespace.version)
     else:
         _print_help()
         raise ValueError(command)

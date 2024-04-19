@@ -13,41 +13,47 @@ from typing import (
     Union,
 )
 
-import alembic  # type: ignore
+import alembic
 import alembic.autogenerate.compare
-from alembic.runtime.environment import EnvironmentContext  # type: ignore
-from alembic.runtime.migration import MigrationContext  # type: ignore
+from alembic.autogenerate.api import AutogenContext
+from alembic.runtime.environment import EnvironmentContext
+from alembic.runtime.migration import MigrationContext
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.engine.url import URL  # type: ignore
 from sqlalchemy.schema import Column  # type: ignore
+from sqlalchemy.sql.expression import BindParameter  # type: ignore
 from sqlalchemy.sql.schema import (  # type: ignore
+    DefaultClause,
     ForeignKey,
     ForeignKeyConstraint,
     SchemaItem,
     Table,
 )
-from sqlalchemy.sql.sqltypes import DateTime, Integer, Numeric  # type: ignore
 from sqlalchemy.sql.type_api import TypeEngine  # type: ignore
 
 from ..declarative import MetaData
-from ..types import get_column_type_class
 from ..utilities import get_bind_dialect_name
+from ..validation import are_column_types_compatible
 from . import ddl
 
+_databricks: Optional[ModuleType]
+__databricks: Optional[ModuleType]
 try:
-    from alembic.runtime.environment import AutogenContext  # type: ignore
+    from .. import databricks as __databricks  # noqa
+    from . import databricks as _databricks  # noqa
 except ImportError:
-    AutogenContext = EnvironmentContext  # type: ignore
+    databricks = None
 
-snowflake: Optional[ModuleType]
+_snowflake: Optional[ModuleType]
+__snowflake: Optional[ModuleType]
 try:
-    from . import snowflake
+    from .. import snowflake as __snowflake  # noqa
+    from . import snowflake as _snowflake  # noqa
 except ImportError:
     snowflake = None
 
 # Prevent linters from identifying these imports as unused
 assert ddl
-assert snowflake
 
 context: EnvironmentContext = alembic.context  # type: ignore
 if TYPE_CHECKING:
@@ -79,12 +85,17 @@ def _compare_type(
 
 
 def _get_foreign_key_constraint_comparator(
-    foreign_key_constraint: ForeignKeyConstraint,
+    foreign_key_constraint: ForeignKeyConstraint, dialect_name: str
 ) -> Tuple[Tuple[Any, ...], ...]:
     column: Column
     foreign_key: ForeignKey
     items: Tuple[Any, ...]
     number_of_columns: int = len(foreign_key_constraint.columns)
+    constraint_name: str = foreign_key_constraint.name
+    if dialect_name == "databricks":
+        # Constraints are saved as lower case in Databricks, but the
+        # metadata naming convention we apply results in an uppercase name
+        constraint_name = constraint_name.lower()
     return tuple(
         sorted(
             zip(
@@ -94,14 +105,10 @@ def _get_foreign_key_constraint_comparator(
                     for foreign_key in foreign_key_constraint.elements
                 ),
                 (
-                    (foreign_key_constraint.name,)
+                    (constraint_name,)
                     * number_of_columns
                     # foreign_key.name
                     # for foreign_key in foreign_key_constraint.elements
-                ),
-                (
-                    foreign_key.use_alter
-                    for foreign_key in foreign_key_constraint.elements
                 ),
                 (
                     foreign_key.onupdate
@@ -141,16 +148,21 @@ def _get_foreign_key_constraint_comparator(
 def _compare_foreign_key_constraints(
     foreign_key_constraint_a: ForeignKeyConstraint,
     foreign_key_constraint_b: ForeignKeyConstraint,
+    dialect_name: str,
 ) -> bool:
     """
     This function compares two foreign key constraints and returns `True`
     if they are the same or `False` if they are different.
     """
     foreign_key_constraint_a_comparator: Tuple[Tuple[Any, ...], ...] = (
-        _get_foreign_key_constraint_comparator(foreign_key_constraint_a)
+        _get_foreign_key_constraint_comparator(
+            foreign_key_constraint_a, dialect_name
+        )
     )
     foreign_key_constraint_b_comparator: Tuple[Tuple[Any, ...], ...] = (
-        _get_foreign_key_constraint_comparator(foreign_key_constraint_b)
+        _get_foreign_key_constraint_comparator(
+            foreign_key_constraint_b, dialect_name
+        )
     )
     if (
         foreign_key_constraint_a_comparator
@@ -218,7 +230,7 @@ def _get_include_object_function(
             and isinstance(compare_to, ForeignKeyConstraint)
         ):
             return not _compare_foreign_key_constraints(
-                schema_item, compare_to
+                schema_item, compare_to, dialect_name
             )
         return True
 
@@ -229,10 +241,23 @@ def _render_item(
     type_name: str, item: Any, autogen_context: AutogenContext
 ) -> Union[str, Literal[False]]:
     """
-    This function causes the default rendering to occur—we just use
-    it as a hook to add imports
+    This function adds required imports, and corrects rendering of server
+    defaults for databricks
     """
-    if type_name == "type":
+    if type_name == "server_default":
+        if (
+            getattr(getattr(autogen_context, "dialect", None), "name", "")
+            == "databricks"
+            and isinstance(item, DefaultClause)
+            and isinstance(item.arg, BindParameter)
+            and isinstance(item.arg.value, bool)
+        ):
+            return (
+                'sqlalchemy.text("true")'
+                if item.arg.value
+                else 'sqlalchemy.text("false")'
+            )
+    elif type_name == "type":
         item_type: type
         if isinstance(item, type):
             item_type = item
@@ -244,13 +269,16 @@ def _render_item(
     return False
 
 
-def _re_key_metadata_tables(
-    metadata: MetaData,
-) -> Dict[str, Table]:
-    # Assign schemas to tables
+def _re_key_metadata_tables(metadata: MetaData) -> Dict[str, Table]:
+    """
+    Return metadata where the `metadata.tables` index is keyed on the qualified
+    name of the table, where relevant
+    """
+    # Re-key metadata tables
     tables: Dict[str, Table] = {}
     table: Table
-    for table in metadata.tables.values():
+    key: str
+    for key, table in metadata.tables.items():
         tables[table.key] = table
     original_tables: Dict[str, Table] = metadata.tables
     metadata.tables = tables
@@ -291,10 +319,10 @@ def run(
     if bind:
         metadata.bind = bind
     bind = metadata.bind
+    dialect_name: str = get_bind_dialect_name(bind)
     original_metadata_tables: Dict[str, Table] = _re_key_metadata_tables(
         metadata
     )
-    dialect_name: str = get_bind_dialect_name(bind)
     include_object: Callable[
         [
             Any,

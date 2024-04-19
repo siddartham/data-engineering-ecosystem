@@ -10,5 +10,5 @@ __all__: List[str] = [
     "types",
     "utilities",
     "view",
-    "cli"
+    "cli",
 ]

@@ -59,7 +59,7 @@ class Object(types.TypeDecorator):
             dialect_name = str(dialect_name, encoding="utf-8")
         if dialect_name == "snowflake":
             return dialect.type_descriptor(OBJECT())
-        elif dialect_name in ("hive", "presto", "default"):
+        elif dialect_name in ("hive", "presto", "trino", "default"):
             return dialect.type_descriptor(types.String())
         elif dialect_name in ("sqlite", "postgresql"):
             return dialect.type_descriptor(types.JSON())
@@ -285,7 +285,7 @@ def get_dialect_specific_column_type(
 ) -> Union[Type[TypeEngine], TypeEngine]:
     """
     This function returns a column type which is specific to the indicated
-    `dialogue_name` (snowflake", "hive", "presto", or "sqlite").
+    `dialogue_name` (snowflake", "hive", "presto", "postgresql" or "sqlite").
     """
     if dialect_name == "snowflake":
         return _get_snowflake_column_type(column_type)

@@ -7,14 +7,15 @@ from typing import (
     Dict,
     Iterable,
     List,
-    Literal,
     Optional,
     Sequence,
     Tuple,
     Union,
+    cast,
 )
 
 import sqlalchemy  # type: ignore
+from databricks.sql.client import Cursor as DatabricksCursor  # type: ignore
 from databricks.sql.types import Row  # type: ignore
 from databricks.sqlalchemy.dialect import DatabricksDialect  # type: ignore
 from cerberus_assistant.get import get_secret
@@ -30,7 +31,16 @@ from sqlalchemy.sql.compiler import IdentifierPreparer  # type: ignore
 from typing_extensions import ParamSpec, TypedDict
 
 from .cli import parse_arguments as _parse_arguments
-from .utilities import get_dialect_identifier_preparer, lru_cache
+from .utilities import (
+    get_bind_schema,
+    get_dialect_identifier_preparer,
+    lru_cache,
+)
+
+from databricks.sql.client import (  # type: ignore  # isort: skip
+    Connection as DatabricksConnection,
+)
+
 
 __all__: List[str] = [
     "get_connection_url",
@@ -133,6 +143,9 @@ all_constraints as (
       = key_column_usage.position_in_unique_constraint
 )
 select * from all_constraints
+where constraint_schema = %(schema)s
+and constraint_type in ('PRIMARY KEY', 'FOREIGN KEY')
+order by ordinal_position asc
 """
 
 
@@ -141,14 +154,14 @@ class _ReflectedConstraint(TypedDict):
 
 
 class _ReflectedPrimaryKeyConstraint(_ReflectedConstraint):
-    constrained_columns: Optional[List[str]]
+    constrained_columns: List[str]
 
 
 class _ReflectedForeignKeyConstraint(_ReflectedConstraint):
     constrained_columns: List[str]
-    referred_schema: Optional[str]
-    referred_table: Optional[str]
-    referred_columns: Optional[List[str]]
+    referred_schema: str
+    referred_table: str
+    referred_columns: List[str]
 
 
 class _ReflectedColumn(TypedDict):
@@ -293,7 +306,6 @@ def drop_all(
             access_token_cerberus_path=access_token_cerberus_path,
             echo=echo,
         )
-
     if undeclared or undeclared_only:
         declarative_base.metadata.drop_undeclared(bind=bind)  # type: ignore
         if undeclared_only:
@@ -364,23 +376,7 @@ def parse_arguments(
 # region Patch Dialect
 
 
-def _iter_constraint_statement(
-    table_name: str,
-    schema: str,
-    constraint_type: Union[Literal["PRIMARY KEY"], Literal["FOREIGN KEY"]],
-    constraint_statement_parameters: Dict[str, str],
-) -> Iterable[str]:
-    yield _CONSTRAINT_STATEMENT
-    yield "where table_name = %(table_name)s"
-    constraint_statement_parameters["table_name"] = table_name
-    if schema:
-        constraint_statement_parameters["schema"] = schema
-        yield "and constraint_schema = %(schema)s"
-    yield f"and constraint_type = '{constraint_type}'"
-    yield "order by ordinal_position asc"
-
-
-# Save a reference the unpatched
+# Save a reference to unpatched methods
 _original_databricks_dialect_get_table_names: Callable[
     _DatabricksParamSpec, List[str]
 ] = DatabricksDialect.get_table_names
@@ -413,30 +409,107 @@ def _databricks_dialect_get_pk_constraint(
     table_name: str,
     schema: Optional[str] = None,
     **kwargs: Any,
-) -> _ReflectedPrimaryKeyConstraint:
-    preparer: IdentifierPreparer = get_dialect_identifier_preparer(self)
-    constraint_statement_parameters: Dict[str, str] = {}
-    constraint_statement: str = "\n".join(
-        _iter_constraint_statement(
-            preparer.quote(table_name),
-            preparer.quote(schema) if schema else "",
-            "PRIMARY KEY",
-            constraint_statement_parameters,
+) -> Optional[_ReflectedPrimaryKeyConstraint]:
+    if not schema:
+        schema = get_bind_schema(connection.engine)
+    assert schema, repr(locals())
+    primary_key_constraints: Tuple[_ReflectedPrimaryKeyConstraint, ...] = (
+        tuple(
+            _databricks_dialect_get_schema_constraints(connection, schema)
+            .get("PRIMARY KEY", {})
+            .get(table_name, {})
+            .values()
         )
     )
+    return primary_key_constraints[0] if primary_key_constraints else None
+
+
+@lru_cache()
+def _databricks_dialect_get_schema_constraints(
+    connection: Connection,
+    schema: str,
+) -> Dict[
+    str,
+    Dict[
+        str,
+        Dict[
+            str,
+            Union[
+                _ReflectedForeignKeyConstraint, _ReflectedPrimaryKeyConstraint
+            ],
+        ],
+    ],
+]:
+    preparer: IdentifierPreparer = get_dialect_identifier_preparer(
+        "databricks"
+    )
+    contraint_types_tables_constraints: Dict[
+        str,
+        Dict[
+            str,
+            Dict[
+                str,
+                Union[
+                    _ReflectedForeignKeyConstraint,
+                    _ReflectedPrimaryKeyConstraint,
+                ],
+            ],
+        ],
+    ] = {}
     result: CursorResult = connection.execute(
-        constraint_statement, constraint_statement_parameters
+        _CONSTRAINT_SELECT_STATEMENT, {"schema": preparer.quote(schema)}
     )
     row: Row
-    primary_key_columns: List[str] = []
-    primary_constraint_name: str = ""
     for row in result:
-        primary_key_columns.append(row["column_name"])
-        primary_constraint_name = row["constraint_name"]
-    return _ReflectedPrimaryKeyConstraint(
-        name=primary_constraint_name,
-        constrained_columns=primary_key_columns,
-    )
+        # Databricks stores constraints as uppercase, but the
+        # metadata naming convention produces uppercase names,
+        # so when reflecting we convert the names to uppercase to
+        # produce correct matches for comparison
+        constraint_name: str = row.constraint_name.upper()
+        if row.constraint_type not in contraint_types_tables_constraints:
+            contraint_types_tables_constraints[row.constraint_type] = {}
+        if (
+            row.table_name
+            not in contraint_types_tables_constraints[row.constraint_type]
+        ):
+            contraint_types_tables_constraints[row.constraint_type][
+                row.table_name
+            ] = {}
+        if (
+            constraint_name
+            not in contraint_types_tables_constraints[row.constraint_type][
+                row.table_name
+            ]
+        ):
+            if row.constraint_type == "FOREIGN KEY":
+                contraint_types_tables_constraints[row.constraint_type][
+                    row.table_name
+                ][constraint_name] = _ReflectedForeignKeyConstraint(
+                    name=constraint_name,
+                    constrained_columns=[row.column_name],
+                    referred_schema=row.referenced_schema,
+                    referred_table=row.referenced_table,
+                    referred_columns=[row.referenced_column],
+                )
+            if row.constraint_type == "PRIMARY KEY":
+                contraint_types_tables_constraints[row.constraint_type][
+                    row.table_name
+                ][constraint_name] = _ReflectedPrimaryKeyConstraint(
+                    name=constraint_name,
+                    constrained_columns=[row.column_name],
+                )
+        else:
+            contraint_types_tables_constraints[row.constraint_type][
+                row.table_name
+            ][constraint_name]["constrained_columns"].append(row.column_name)
+            if row.constraint_type == "FOREIGN KEY":
+                cast(
+                    _ReflectedForeignKeyConstraint,
+                    contraint_types_tables_constraints[row.constraint_type][
+                        row.table_name
+                    ][constraint_name],
+                )["referred_columns"].append(row.referenced_column)
+    return contraint_types_tables_constraints
 
 
 @wraps(DatabricksDialect.get_foreign_keys)
@@ -446,48 +519,16 @@ def _databricks_dialect_get_foreign_keys(
     table_name: str,
     schema: Optional[str] = None,
     **kwargs: Any,
-) -> Optional[Iterable[_ReflectedForeignKeyConstraint]]:
-    preparer: IdentifierPreparer = get_dialect_identifier_preparer(self)
-    constraint_statement_parameters: Dict[str, str] = {}
-    constraint_statement: str = "\n".join(
-        _iter_constraint_statement(
-            preparer.quote(table_name),
-            preparer.quote(schema) if schema else "",
-            "FOREIGN KEY",
-            constraint_statement_parameters,
-        )
-    )
-    result: CursorResult = connection.execute(
-        constraint_statement, constraint_statement_parameters
-    )
-    row: Row
-    foreign_key_constraints: Dict[str, Any] = {}
-    for row in result:
-        if row.constraint_name not in foreign_key_constraints:
-            foreign_key_constraints[row.constraint_name] = {
-                "name": row.constraint_name,
-                "constrained_columns": [],
-                "referred_schema": row.referenced_schema,
-                "referred_table": row.referenced_table,
-                "referred_columns": [],
-            }
-        foreign_key_constraints[row.constraint_name][
-            "constrained_columns"
-        ].append(row.column_name)
-        foreign_key_constraints[row.constraint_name][
-            "referred_columns"
-        ].append(row.referenced_column)
-    for (
-        constraint_name,
-        constraint_data,
-    ) in foreign_key_constraints.items():
-        yield _ReflectedForeignKeyConstraint(
-            name=constraint_name,
-            constrained_columns=constraint_data["constrained_columns"],
-            referred_schema=constraint_data["referred_schema"],
-            referred_table=constraint_data["referred_table"],
-            referred_columns=constraint_data["referred_columns"],
-        )
+) -> Iterable[_ReflectedForeignKeyConstraint]:
+    if not schema:
+        schema = get_bind_schema(connection.engine)
+    assert schema, repr(locals())
+    yield from _databricks_dialect_get_schema_constraints(
+        connection, schema
+    ).get("FOREIGN KEY", {}).get(table_name, {}).values()
+
+
+_PRECISION_SCALE_PATTERN: re.Pattern = re.compile(r"DECIMAL\((\d+,\d+)\)")
 
 
 @wraps(DatabricksDialect.get_columns)
@@ -505,11 +546,8 @@ def _databricks_dialect_get_columns(
     `get_columns` method to add support for columns with precision and
     scale.
     """
-
-    """
-    Pattern to extract the raw column type from the full type name
-    where the full name contains parens (e.g. DECIMAL(38,4) -> decimal)
-    """
+    # Pattern to extract the raw column type from the full type name
+    # where the full name contains parenthesis (e.g. DECIMAL(38,4) -> decimal)
     raw_column_name_pattern: re.Pattern = re.compile(r"\w+")
 
     def _get_numeric_with_precision_and_scale(
@@ -520,34 +558,26 @@ def _databricks_dialect_get_columns(
         return a sqlalchemy.types.Numeric instance
         with the extracted precision and scale
         """
-        precision_scale_pattern: re.Pattern = re.compile(
-            r"DECIMAL\((\d+,\d+)\)"
-        )
         precision_scale_match: Optional[re.Match] = re.search(
-            precision_scale_pattern, type_name
+            _PRECISION_SCALE_PATTERN, type_name
         )
-
         numeric: types.Numeric = types.Numeric()
         precision: int
         scale: int
-
         if precision_scale_match:
             precision, scale = map(
                 int, precision_scale_match.group(1).split(",")
             )
             numeric = types.Numeric(precision=precision, scale=scale)
-
         return numeric
 
-    columns_response: List[Row] = (
-        connection.connection.cursor()
-        .columns(
-            table_name=table_name,
-            schema_name=schema,
-            catalog_name=self.catalog,
-        )
-        .fetchall()
-    )
+    databricks_connection: DatabricksConnection = connection.connection
+    databricks_cursor: DatabricksCursor = databricks_connection.cursor()
+    columns_response: List[Row] = databricks_cursor.columns(
+        table_name=table_name,
+        schema_name=schema,
+        catalog_name=self.catalog,
+    ).fetchall()
     column: Row
     columns: List[_ReflectedColumn] = []
     for column in columns_response:

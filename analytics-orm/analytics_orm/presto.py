@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List, Union
 from urllib import parse
 
 import pyhive.presto  # type: ignore
-from org.cerberus_assistant.get import get_secrets
+from cerberus_assistant.get import get_secrets
 
 __all__: List[str] = ["get_connection_string"]
 

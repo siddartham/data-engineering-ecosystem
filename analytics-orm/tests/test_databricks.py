@@ -6,61 +6,88 @@ from databricks.sdk.service.compute import (  # type: ignore
     State,
     Wait,
 )
-from analytics_orm.databricks import create_engine
-from analytics_orm.utilities import lru_cache
-from analytics_orm.cerberus_assistant.get import get_secret
+from delta import configure_spark_with_delta_pip
+from cerberus_assistant.get import get_secret
+from pyspark.sql import SparkSession  # type: ignore
+from pyspark.sql.dataframe import DataFrame  # type: ignore
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
+from sqlalchemy.engine.url import URL  # type: ignore
+
+from analytics_orm.databricks import create_engine
+from analytics_orm.utilities import get_bind_schema
 
 SERVICE_PRINCIPAL_CERBERUS_SECRET_PATH: str = (
-    "app/org/ServicePrincipal."
-    "cloud.databricks.com.Developer"
+    "app/sustainability/sustainability/ServicePrincipal."
+    "cloud.databricks.com_App.community.Developer"
 )
+WAREHOUSE_HTTP_PATH: str = "/sql/1.0/warehouses/123143ffff4445"
+SCHEMA: str = "sustainability_dev"
+CLUSTER_ID: str = "1234-345678-y4u4czhv"
+ORG_ID: str = "1234556789"
 
-DEVELOPMENT_SCHEMA: str = "dev"
-TEST_CLUSTER_ID: str = "awararaw"
-DATABRICKS_WORKSPACE_ID: str = "12345567890"
+
+def test_cluster_connection() -> None:
+    access_token: str = get_secret(SERVICE_PRINCIPAL_CERBERUS_SECRET_PATH)
+    workspace_client: WorkspaceClient = WorkspaceClient(
+        host="community.cloud.databricks.com",
+        token=get_secret(SERVICE_PRINCIPAL_CERBERUS_SECRET_PATH),
+    )
+    test_cluster: ClusterDetails = workspace_client.clusters.get(CLUSTER_ID)
+    waited_cluster: Wait[ClusterDetails]
+    if test_cluster.state == State.TERMINATED:
+        print("Cluster was stopped, starting now..")
+        waited_cluster = workspace_client.clusters.start(CLUSTER_ID)
+        assert waited_cluster.result().state == State.RUNNING
+    engine: Engine = create_engine(
+        schema=SCHEMA,
+        http_path=f"/sql/protocolv1/o/{ORG_ID}/{CLUSTER_ID}",
+        access_token=access_token,
+    )
+    connection: Connection = engine.connect()
+    assert "information_schema" in map(
+        lambda row: row[0],
+        connection.exec_driver_sql("show schemas in development"),
+    )
 
 
-class TestDatabricks(unittest.TestCase):
-    @property
-    def access_token(self) -> str:
-        return get_secret(SERVICE_PRINCIPAL_CERBERUS_SECRET_PATH)
+def test_warehouse_connection(databricks_dev_connection: Connection) -> None:
+    assert "information_schema" in map(
+        lambda row: row[0],
+        databricks_dev_connection.exec_driver_sql(
+            "show schemas in development"
+        ),
+    )
 
-    @property
-    @lru_cache()
-    def workspace_client(self) -> WorkspaceClient:
-        workspace_client: WorkspaceClient = WorkspaceClient(
-            host="community.cloud.databricks.com",
-            token=self.access_token,
+
+def test_get_databricks_spark_dataframe(
+    databricks_dev_connection: Connection,
+) -> None:
+    url: URL = databricks_dev_connection.engine.url
+    schema: str = get_bind_schema(databricks_dev_connection) or "default"
+    data_frame: DataFrame = (
+        configure_spark_with_delta_pip(
+            SparkSession.builder.config(
+                "spark.sql.extensions",
+                "io.delta.sql.DeltaSparkSessionExtension",
+            ).config(
+                "spark.sql.catalog.spark_catalog",
+                "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+            )
         )
-
-        return workspace_client
-
-    @property
-    @lru_cache()
-    def bind(self) -> Connection:
-        engine: Engine
-        workspace_client: WorkspaceClient = self.workspace_client
-        test_cluster: ClusterDetails = workspace_client.clusters.get(
-            TEST_CLUSTER_ID
+        .getOrCreate()
+        .read.jdbc(
+            url=f"jdbc:databricks://{url.host}:{url.port or 443}/{schema}",
+            table="calculator",
+            properties=dict(
+                UID=url.username,
+                PWD=url.password,
+                SSL="1",
+                transportMode="http",
+                AuthMech="3",
+                ConnCatalog=url.query.get("catalog", ""),
+                ConnSchema=schema,
+                httpPath=url.query.get("http_path", ""),
+            ),
         )
-        waited_cluster: Wait[ClusterDetails]
-        if test_cluster.state == State.TERMINATED:
-            print("Cluster was stopped, starting now..")
-            waited_cluster = workspace_client.clusters.start(TEST_CLUSTER_ID)
-
-            assert waited_cluster.result().state == State.RUNNING
-
-        engine = create_engine(
-            schema=DEVELOPMENT_SCHEMA,
-            http_path=f"/sql/protocolv1/o/{SOLE_ORG_ID}/{TEST_CLUSTER_ID}",
-            access_token=self.access_token,
-        )
-
-        return engine.connect()
-
-    def test_create_engine(self) -> None:
-        assert "information_schema" in map(
-            lambda row: row[0],
-            self.bind.exec_driver_sql("show schemas in development"),
-        )
+    )
+    assert isinstance(data_frame, DataFrame)

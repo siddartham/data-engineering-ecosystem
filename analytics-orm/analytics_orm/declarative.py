@@ -2,6 +2,7 @@
 This module defines a declarative base and common types for all models in this
 library
 """
+
 import decimal
 import logging
 import math
@@ -24,9 +25,10 @@ from typing import (
     Union,
 )
 
-from sqlalchemy import Column
+from sqlalchemy import Column  # type: ignore
 from sqlalchemy import MetaData as _MetaData  # type: ignore
-from sqlalchemy import Table, create_engine, inspect
+from sqlalchemy import Table, create_engine, event, inspect
+from sqlalchemy.engine import CursorResult  # type: ignore
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.engine.mock import MockConnection  # type: ignore
 from sqlalchemy.engine.row import Row  # type: ignore
@@ -43,6 +45,7 @@ from .ddl import register_hive_create_table_compiler
 from .errors import NotNamedTupleError
 from .utilities import (
     get_bind_dialect_name,
+    get_bind_schema,
     get_bind_table_names,
     get_bind_view_names,
     get_class_qualified_name,
@@ -57,14 +60,6 @@ from .utilities import (
 )
 
 # region Dialect-specific imports
-_hive: Optional[ModuleType]
-try:
-    from . import _hive
-except ImportError:
-    _hive = None
-# endregion
-
-# region Patches
 update_all_dialects_construct_arguments(Table, **{"*": None})
 patch_urllib_parse_uses("s3")
 try:
@@ -79,6 +74,13 @@ try:
     from . import databricks  # noqa: F401
 except ImportError:
     pass
+
+_hive: Optional[ModuleType]
+try:
+    from . import _hive
+except ImportError:
+    _hive = None
+
 # endregion
 
 __all__: List[str] = [
@@ -113,6 +115,7 @@ class MetaData(_MetaData):
     """
 
     tables: Dict[str, Table]
+    tables_tags: Dict[str, Dict[str, str]] = {}
 
     def __init__(
         self, base: Optional[Type["Base"]] = None, *args: Any, **kwargs: Any
@@ -200,18 +203,46 @@ class MetaData(_MetaData):
                 translate_all_bind_schemas_to(self.bind.engine, None)
                 if self.bind is not self.bind.engine:
                     translate_all_bind_schemas_to(self.bind, None)
+
+            _convert_column_names(self.base, dialect_name=dialect_name)
             _base_apply_table_args(self.base, dialect_name=dialect_name)
 
-    @property
-    def bind(self) -> Union[Engine, Connection]:
-        return self._bind
+            if dialect_name == "databricks":
+                self.reflect_table_tags()
+                event.listen(
+                    Table, "after_parent_attach", self._add_table_tags
+                )
 
-    @bind.setter
-    def bind(self, bind: Union[str, Union[Engine, Connection]]) -> None:
-        do_rebind: bool = self._before_bind(bind)
-        if do_rebind:
-            super()._bind_to(bind)
-            self._after_bind()
+    def _add_table_tags(self, table: Table, parent: _MetaData) -> None:
+        """
+        Updates a reflected table's info with its tags
+        """
+        table_tags: Dict[str, str] = self.tables_tags.get(table.name, {})
+        table.info.update({"tags": table_tags})
+
+    def reflect_table_tags(self) -> None:
+        """
+        Loads all table tags for the active connection into a cache to be used
+        during table reflection
+        """
+
+        schema: Optional[str] = get_bind_schema(self.bind)
+        assert schema
+
+        table_tags_statement: str = """
+            SELECT table_name, tag_name, tag_value
+            FROM INFORMATION_SCHEMA.TABLE_TAGS
+            WHERE schema_name = %(table_schema)s
+        """
+
+        result: CursorResult = self.bind.execute(
+            table_tags_statement, {"table_schema": schema}
+        )
+        row: Row
+        for row in result:
+            if row.table_name not in self.tables_tags:
+                self.tables_tags[row.table_name] = {}
+            self.tables_tags[row.table_name][row.tag_name] = row.tag_value
 
     def create_views(
         self,
@@ -316,20 +347,33 @@ class MetaData(_MetaData):
         schema_name: str
         undeclared: Tuple[Table, ...] = ()
         cls: Type[Base]
+        table_name: str
         for cls in iter_recursive_subclasses(self.base):
-            key = (
-                get_class_schema_name(cls, dialect_name=dialect_name).lower(),
-                get_class_table_name(cls, dialect_name=dialect_name).lower(),
-            )
-            assert key not in declared_table_schemas_names
-            declared_table_schemas_names.add(key)
+            table_name = get_class_table_name(
+                cls, dialect_name=dialect_name
+            ).lower()
+            if table_name:
+                schema_name = get_class_schema_name(
+                    cls, dialect_name=dialect_name
+                ).lower()
+                key = (schema_name, table_name)
+                if key in declared_table_schemas_names:
+                    raise ValueError(
+                        "The same schema + table name was found for multiple "
+                        "classes.\n"
+                        f"- Schema Name: {repr(key[0])}\n"
+                        f"- Table Name: {repr(key[1])}"
+                    )
+                declared_table_schemas_names.add(key)
         for schema_name in get_base_schema_names(
             self.base,
             dialect_name=dialect_name,
         ):
             undeclared_table_schemas_names: Set[Tuple[str, str]] = set()
             undeclared_table_names: Set[str] = set()
-            reflected_metadata = _MetaData(bind=bind, schema=schema_name)
+            reflected_metadata = MetaData(
+                base=self.base, schema=schema_name, bind=bind
+            )
             name: str
             for name in chain(
                 get_bind_table_names(bind, schema=schema_name),
@@ -343,6 +387,7 @@ class MetaData(_MetaData):
                     undeclared_table_schemas_names.add(key)
                     undeclared_table_names.add(name)
             reflected_metadata.reflect(
+                bind=bind,
                 only=undeclared_table_names,
                 views=True,
             )
@@ -391,7 +436,7 @@ class MetaData(_MetaData):
         checkfirst: bool = True,
     ) -> None:
         self.bind = bind
-        super().drop_all(bind=bind, tables=tables, checkfirst=checkfirst)
+        super().drop_all(bind=self.bind, tables=tables, checkfirst=checkfirst)
 
     def reflect(
         self,
@@ -427,8 +472,13 @@ class MetaData(_MetaData):
             for table in self.tables.values():
                 if table.schema and (table.schema not in schema_names):
                     schema_names.add(table.schema)
+                    connection: Connection
+                    if isinstance(bind, Connection):
+                        connection = bind
+                    else:
+                        connection = bind.connect()
                     try:
-                        bind.engine.execute(CreateSchema(table.schema))
+                        connection.execute(CreateSchema(table.schema))
                     except ProgrammingError as error:
                         if "exists" not in str(error).lower():
                             raise error
@@ -452,6 +502,16 @@ class Base:
         `analytics_orm.declarative.declarative_base`.
         """
         pass
+
+    @property
+    def bind(self) -> Union[Engine, Connection]:
+        return self.metadata.bind
+
+    @bind.setter
+    def bind(
+        self, bind: Union[str, Union[Engine, Connection, str, URL]]
+    ) -> None:
+        self.metadata.bind = bind
 
     @declarative.declared_attr
     def __tablename__(cls) -> str:
@@ -481,10 +541,10 @@ class Base:
             yield property_name_, getattr(self, property_name_)
 
     def __repr__(self) -> str:
-        return "%s(\n%s\n)" % (
+        return "{}(\n{}\n)".format(
             get_class_qualified_name(type(self)),
             ",\n".join(
-                "    %s=%s" % (property_name_, repr(value))
+                f"    {property_name_}={repr(value)}"
                 for property_name_, value in self._items
             ),
         )
@@ -676,7 +736,6 @@ def get_base_table_name_subclass(
         raise error
 
 
-
 def get_base_table_names_subclasses(
     base: Type[Base],
 ) -> Dict[str, Type["Base"]]:
@@ -694,11 +753,12 @@ def _get_class_default_table_args(cls: Type[Base]) -> Dict[str, Any]:
     return OrderedDict(
         [
             ("schema", None),
-            ("presto_schema", None),
             ("postgresql_schema", None),
             ("sqlite_schema", None),
-            ("hive_schema", None),
             ("snowflake_schema", snowflake_schema),
+            ("databricks_schema", None),
+            ("presto_schema", None),
+            ("hive_schema", None),
             ("hive_table_name", cls.__tablename__),
             ("hive_stored_as", "PARQUET"),
             ("hive_location", f"./{cls.__tablename__}/"),

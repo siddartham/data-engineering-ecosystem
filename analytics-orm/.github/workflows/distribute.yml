@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - of
+      - main
     paths:
       - setup.py
       - setup.cfg

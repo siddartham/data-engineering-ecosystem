@@ -2,14 +2,14 @@
 
 
 ### Fundamental Questions in building a Data Engineering environment?
-* Why and How to build a common file-system interface to interact with databricks file system, local file system, s3 etc. ? 
-* Why and How to build an ORM framework - internal mechanics of ORM ? 
-* Why and How to build an ORM model for your database, to set urls, permissions? 
-* Why and How to build an ETL framework? 
-* Why and How to build an ETL wrapper for your team, to set permissions? 
-* How to build an ETL based on framework? 
-* Why and How to write a Client SDK, what is the need for oapi, instead of openapi-codegen? 
-* How to use metaprogramming, abstract base classes, decorators, hooks to build tools and packages ?
+* Why and How to build a common file-system interface to interact with databricks file system, local file system, s3 etc. ? - `file-system-client`
+* Why and How to build an ORM framework - internal mechanics of ORM ? - `analytics-orm`
+* Why and How to build an ORM model for your database, to set urls, permissions? - `my-datastore-orm`
+* Why and How to build an ETL framework? - `analytics-etl`
+* Why and How to build an ETL wrapper for your team, to set permissions? - `my-datastore-etl`
+* How to build an ETL based on framework? - `sample-etl`
+* Why and How to write a Client SDK, what is the need for `oapi`, instead of `openapi-codegen`, `openapi-core`?
+* How to use metaprogramming, abstract base classes, decorators, hooks to build tools and packages ?  ex: client generation, foundational libraries, class generation
 
 
 ### Data Engineering Foundational Libraries
@@ -40,7 +40,7 @@ Thus, we need to have the following packages:
 
 1. `file-system-client` - provides an uniform interface to access files from different file systems, dbfs, s3, local file system
    * This is wrapper over `boto3`(for S3) and `localstack-client`(for local testing)
-2. `orm-framework` - provides a declarative way to define the schema of the databases across different data stores and environments.
+2. `analytics-orm` - provides a declarative way to define the schema of the databases across different data stores and environments.
    * This is a wrapper over sqlalchemy, to build a declarative base class for ORM classes.
    * Provides wrappers to connectors to different data stores & computes
      * `psycopg2` for postgres
@@ -50,8 +50,8 @@ Thus, we need to have the following packages:
      * `pyspark` for Spark
      * `pyarrow`, `pandas` for multi-threaded processing, API extraction
      * `cerberus-python-client` for pulling secrets from cerberus, for testing connections with data stores.
-3. `etl-framework` - package provides a common framework for "Extract, Transform and Load" (ETL) jobs - using multi processing and pyspark patterns to process data
-   * This depends on `file-system-client[s3]` and `orm-framework[pyarrow]`
+3. `analytics-etl` - package provides a common framework for "Extract, Transform and Load" (ETL) jobs - using multi processing and pyspark patterns to process data
+   * This depends on `file-system-client[s3]` and `analytics-orm[pyarrow]`
 4. `data-quality-framework` - provides a common framework for data quality checks.
 
 
@@ -63,10 +63,9 @@ Using foundational libraries, we can build team/org specific data engineering ec
 
 Above 3 functionalities can be achieved by 3 packages.
 
-1. `my-datastore-orm` - Hosting schema of your data store(using orm-framework base class), across different environments, different data stores(Hive, Delta Lake, Snowflake etc).
-2. `my-datastore-etl-wrapper` - a wrapper over `etl-framework` to provide a common interface for all ETLs over your data stores and file systems.
+1. `my-datastore-orm` - Hosting schema of your data store(using analytics-orm base class), across different environments, different data stores(Hive, Delta Lake, Snowflake etc).
+2. `my-datastore-etl` - a wrapper over `analytics-etl` to provide a common interface for all ETLs over your data stores and file systems.
 3. `my-datastore-data-quality` - This package provides an example of how to use the data-quality-framework to perform data quality checks
-
 
 
 ### Example ETL to load objects to Data Store
@@ -75,6 +74,12 @@ Above 3 functionalities can be achieved by 3 packages.
 ### Attribute Naming Standards
 `attribute-name-validator` - This package provides a tool for attribute name validation against the naming standards.
 
+### Miscellaneous Libraries/Folders
+
+1. `cerberus-assistant` - to retrieve secrets from cerberus vault
+2. `docker-utilties` - to publish docker images
+3. `mail-client` - a CLI & library to send updates as mails
+4. `dev-env-setup` - instructions to setup development environment
 
 
 ### Current Status
@@ -86,13 +91,13 @@ Above 3 functionalities can be achieved by 3 packages.
 
 #### Foundational Libraries
 - [x] `file-system-client`
-- [x] `orm-framework`
-- [x] `etl-framework`
+- [x] `analytics-orm`
+- [x] `analytics-etl`
 - [x] `my-datastore-validation` - can factor out common code to `data-quality-framework`
 
 #### Data Store Wide Libraries
 - [x] `my-datastore-orm`
-- [x] `my-datastore-etl-wrapper`
+- [x] `my-datastore-etl`
 
 #### Example ETL to load objects to Data Store
 - [x] `my-sample-etl`

@@ -1,16 +1,17 @@
 import unittest
 
 from delta import configure_spark_with_delta_pip
-from analytics_orm.snowflake import create_engine
-from analytics_orm.utilities import is_ci, lru_cache
 from pyspark.sql import SparkSession  # type: ignore
 from pyspark.sql.dataframe import DataFrame  # type: ignore
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.engine.url import URL  # type: ignore
 
-GID_USER: str = "a.SF.D.ORG.RW"
-PASSWORD_CERBERUS_PATH: str = f"app/org/snowflake/{GID_USER}"
-WAREHOUSE: str = "DEV_WAREHOUSE"
+from analytics_orm.snowflake import create_engine
+from analytics_orm.utilities import is_ci, lru_cache
+
+USER: str = "a.SF.D.GSA.RW"
+PASSWORD_CERBERUS_PATH: str = "app/sustainability/snowflake/a.SF.D.GSA.RW"
+WAREHOUSE: str = "GSA_FOUNDATION_PREPROD"
 
 
 class TestSnowflake(unittest.TestCase):
@@ -21,7 +22,7 @@ class TestSnowflake(unittest.TestCase):
         if is_ci():
             engine = create_engine(
                 database="SNOWFLAKE_DEV_DB",
-                user=GID_USER,
+                user=USER,
                 password_cerberus_path=PASSWORD_CERBERUS_PATH,
                 role="READWRITE_DEV",
                 warehouse=WAREHOUSE,
