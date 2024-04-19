@@ -205,11 +205,15 @@ def camel_split(string: str) -> Tuple[str, ...]:
         character_type: _CharacterType = (
             _CharacterType.LOWERCASE
             if character in _LOWERCASE_ALPHABET
-            else _CharacterType.DIGIT
-            if character in _DIGITS
-            else _CharacterType.UPPERCASE
-            if character in _UPPERCASE_ALPHABET
-            else _CharacterType.OTHER
+            else (
+                _CharacterType.DIGIT
+                if character in _DIGITS
+                else (
+                    _CharacterType.UPPERCASE
+                    if character in _UPPERCASE_ALPHABET
+                    else _CharacterType.OTHER
+                )
+            )
         )
         if character_type == _CharacterType.LOWERCASE:
             if preceding_character_type == _CharacterType.LOWERCASE:

@@ -7,6 +7,7 @@ from tempfile import mkdtemp
 from typing import Any, Optional, Tuple
 
 import file_system_client.local as local
+from file_system_client import from_url
 from file_system_client.utilities import (
     is_date_partition_directory,
     lru_cache,
@@ -184,6 +185,10 @@ class TestLocal(unittest.TestCase):
             # file found
             assert path == test2_csv, f"\n{test2_csv} !=\n{path}"
             assert self.file_system.get(path).read() == self.csv2.read()
+
+    def test_from_url(self) -> None:
+        url: str = self.file_system.get_url()
+        assert from_url(url).get_url() == url
 
 
 if __name__ == "__main__":

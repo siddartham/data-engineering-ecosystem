@@ -42,7 +42,7 @@ class DatabricksFileSystem(Local):
     system on Databricks.
     """
 
-    def get_url(self, path: str) -> str:
+    def get_url(self, path: str = "") -> str:
         """
         Get an absolute URL from an object key (`path`)
         """

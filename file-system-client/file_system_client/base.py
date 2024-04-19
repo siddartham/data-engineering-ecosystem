@@ -82,7 +82,7 @@ class FileSystem(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_url(self, path: str) -> str:
+    def get_url(self, path: str = "") -> str:
         """
         Get an absolute URL from a relative path.
 

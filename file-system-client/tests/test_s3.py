@@ -8,7 +8,7 @@ from pathlib import Path
 from time import sleep
 from typing import Any, Optional, Tuple
 
-from file_system_client import s3
+from file_system_client import from_url, s3
 from file_system_client.utilities import (
     is_date_partition_directory,
     lru_cache,
@@ -232,6 +232,9 @@ class TestS3(unittest.TestCase):
             self.file_system.bucket.meta.client.meta.endpoint_url
         )
 
+    def test_from_url(self) -> None:
+        url: str = self.file_system.get_url()
+        assert from_url(url).get_url() == url
 
 if __name__ == "__main__":
     unittest.main()

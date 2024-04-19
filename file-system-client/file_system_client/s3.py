@@ -1030,7 +1030,7 @@ class SimpleStorageService(FileSystem):
                 disable_local_endpoints()
         return bucket
 
-    def get_url(self, path: str, protocol: str = "s3") -> str:
+    def get_url(self, path: str = "", protocol: str = "s3") -> str:
         """
         Get an absolute URL from an object key (`prefix`)
         """
@@ -1508,6 +1508,15 @@ def from_url(
 ) -> SimpleStorageService:
     """
     Create an instance of `SimpleStorageService` from a URL
+
+    Parameters:
+
+    - url (str)
+    - arn (str) = "": Only applicable for S3
+    - profile_name (str) = "": Only applicable for S3
+    - endpoint_url (str) = "": Only applicable for S3
+    - config (botocore.config.Config|None) = None: Only applicable for S3
+    - region_name (str) = "": Only applicable for S3
     """
     parse_result: ParseResult = urlparse(url)
     assert parse_result.scheme.lower() in ("s3", "s3a")
