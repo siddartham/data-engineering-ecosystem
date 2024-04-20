@@ -10,17 +10,17 @@ from typing import Any, Dict, Optional, Tuple
 
 import pyarrow  # type: ignore
 import pytest
-from etl_framework.concurrency import Concurrency
-from orm_framework.declarative import (
+from analytics_etl.concurrency import Concurrency
+from analytics_orm.declarative import (
     get_class_column_names,
     get_class_table_name,
 )
-from orm_framework.pyarrow import get_schema_from_mapping
+from analytics_orm.pyarrow import get_schema_from_mapping
 from file_system_client import local
 from file_system_client.base import FileSystem
-from my_datastore_orm.common_dimension import Calculator
+from my_datastore_model.common_dimension import Calculator
 
-from my_datastore_etl_wrapper.broker import Broker, Work
+from my_datastore_etl.broker import Broker, Work
 
 lru_cache: Any = functools.lru_cache
 TEST_CSV: str = "test_csv/"

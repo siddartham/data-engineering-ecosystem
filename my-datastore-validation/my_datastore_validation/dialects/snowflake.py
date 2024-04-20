@@ -1,13 +1,13 @@
 from argparse import Namespace
 from typing import TYPE_CHECKING, Callable, Optional, Sequence, Union
 
-from orm_framework.snowflake import parse_arguments
-from orm_framework.utilities import (
+from analytics_orm.snowflake import parse_arguments
+from analytics_orm.utilities import (
     apply_environment_defaults,
     apply_role_defaults,
 )
-from my_datastore_orm.base import Base
-from my_datastore_orm.dialects.snowflake import (
+from my_datastore_model.base import Base
+from my_datastore_model.dialects.snowflake import (
     DEFAULT_ROLE,
     DEFAULT_SCHEMA,
     ENVIRONMENTS,

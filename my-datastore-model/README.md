@@ -106,7 +106,7 @@ from sqlalchemy import (
     ForeignKey,
 )
 from my_datastore_orm.base import Base
-from orm_framework import view
+from analytics_orm import view
 
 class Dimension(Base):
     """

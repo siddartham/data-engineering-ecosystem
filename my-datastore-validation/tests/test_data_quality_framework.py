@@ -5,10 +5,10 @@ import unittest
 from io import BytesIO
 from typing import IO, Any, Callable, Tuple
 
-from orm_framework.errors import ValidationError
-from my_datastore_orm.base import Base
-from my_datastore_orm.common_dimension import Calculator
-from my_datastore_orm.dialects.sqlite import create_all
+from analytics_orm.errors import ValidationError
+from my_datastore_model.base import Base
+from my_datastore_model.common_dimension import Calculator
+from my_datastore_model.dialects.sqlite import create_all
 from sqlalchemy.engine.base import Engine  # type: ignore
 from sqlalchemy.orm.session import Session, sessionmaker  # type: ignore
 from sqlalchemy.schema import Column  # type: ignore

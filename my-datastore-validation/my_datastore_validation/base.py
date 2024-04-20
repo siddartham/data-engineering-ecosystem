@@ -12,11 +12,11 @@ from typing import (
     Union,
 )
 
-from orm_framework import validation
-from orm_framework.errors import ValidationError
-from orm_framework.utilities import iter_recursive_subclasses
-from my_datastore_etl_wrapper.utilities import alert
-from my_datastore_orm.base import Base
+from analytics_orm import validation
+from analytics_orm.errors import ValidationError
+from analytics_orm.utilities import iter_recursive_subclasses
+from my_datastore_etl.utilities import alert
+from my_datastore_model.base import Base
 from sqlalchemy.engine.base import Connection  # type: ignore
 from sqlalchemy.engine.base import Engine  # type: ignore
 from sqlalchemy.engine.create import create_engine  # type: ignore
@@ -118,7 +118,7 @@ class BaseValidation:
     def validate(self) -> Iterable[ValidationError]:
         """
         implemented for explicit use to invoke
-        orm_framework.validations.validate
+        analytics_orm.validations.validate
         """
         yield from validation.validate(
             self.base,

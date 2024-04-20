@@ -126,7 +126,7 @@ except ImportError:
 
 has_postgresql_extra: bool = False
 try:
-    import orm_framework.postgresql  # noqa
+    import analytics_orm.postgresql  # noqa
 
     has_postgresql_extra = True
 except ImportError:
@@ -469,9 +469,9 @@ class Work:
     Parameters:
 
     - file_system (file_system_client.base.FileSystem)
-    - databricks_base (typing.Type[orm_framework.declarative.Base]|None)
-    - snowflake_base (typing.Type[orm_framework.declarative.Base]|None)
-    - postgresql_base (typing.Type[orm_framework.declarative.Base]|None)
+    - databricks_base (typing.Type[analytics_orm.declarative.Base]|None)
+    - snowflake_base (typing.Type[analytics_orm.declarative.Base]|None)
+    - postgresql_base (typing.Type[analytics_orm.declarative.Base]|None)
     - postgresql_connection_string (str)
     - snowflake_connection_string (str)
     - databricks_connection_string (str)
@@ -1281,9 +1281,9 @@ class Broker:
     - concurrency (analytics_etl.concurrency.Concurrency)
       = analytics_etl.concurrency.Concurrency.MULTIPROCESSING
     - file_system (file_system_client.base.FileSystem)
-    - databricks_base (typing.Type[orm_framework.declarative.Base]|None)
-    - snowflake_base (typing.Type[orm_framework.declarative.Base]|None)
-    - postgresql_base (typing.Type[orm_framework.declarative.Base]|None)
+    - databricks_base (typing.Type[analytics_orm.declarative.Base]|None)
+    - snowflake_base (typing.Type[analytics_orm.declarative.Base]|None)
+    - postgresql_base (typing.Type[analytics_orm.declarative.Base]|None)
     - postgresql_connection_string (str)
     - snowflake_connection_string (str)
     - databricks_connection_string (str)

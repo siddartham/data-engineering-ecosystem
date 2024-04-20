@@ -1,6 +1,6 @@
 from typing import Callable, Iterable, Optional, Union
 
-from orm_framework import sqlite
+from analytics_orm import sqlite
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.sql.schema import ForeignKeyConstraint, Table  # type: ignore
 

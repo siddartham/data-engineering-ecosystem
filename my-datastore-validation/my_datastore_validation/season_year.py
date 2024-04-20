@@ -2,13 +2,13 @@ from datetime import datetime
 from typing import Iterable, Tuple, Type
 
 from more_itertools import first
-from orm_framework.declarative import (
+from analytics_orm.declarative import (
     get_class_schema_name,
     get_class_table_name,
 )
-from orm_framework.utilities import iter_recursive_subclasses
-from my_datastore_orm.base import Base
-from my_datastore_orm.bcl_product import SeasonYearV
+from analytics_orm.utilities import iter_recursive_subclasses
+from my_datastore_model.base import Base
+from my_datastore_model.bcl_product import SeasonYearV
 from sqlalchemy.sql.expression import select  # type: ignore
 
 from data_quality_framework.base import BaseValidation

@@ -1,4 +1,4 @@
-from orm_framework.errors import TableValidationError
+from analytics_orm.errors import TableValidationError
 
 
 class NonContiguousSeasonYearCodeError(TableValidationError):

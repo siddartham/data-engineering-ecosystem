@@ -1,8 +1,8 @@
 from argparse import Namespace
 from typing import TYPE_CHECKING, Callable, Sequence, Union
 
-from orm_framework.sqlite import create_engine, parse_arguments
-from my_datastore_orm.base import Base
+from analytics_orm.sqlite import create_engine, parse_arguments
+from my_datastore_model.base import Base
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.sql.schema import ForeignKeyConstraint  # type: ignore
 

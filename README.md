@@ -69,7 +69,7 @@ Above 3 functionalities can be achieved by 3 packages.
 
 
 ### Example ETL to load objects to Data Store
-1. `sample-etl` - A sample ETL provides an example of how to use the `my-etl-wrapper` to process data
+1. `sample-etl` - A sample ETL provides an example of how to use the `my-datastore-etl` and `my-datastore-model` to process data and load data
 
 ### Attribute Naming Standards
 `attribute-name-validator` - This package provides a tool for attribute name validation against the naming standards.

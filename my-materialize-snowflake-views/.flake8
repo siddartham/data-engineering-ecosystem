@@ -1,0 +1,8 @@
+[flake8]
+exclude =
+    .git,
+    venv,
+    .tox
+ignore = F842, W503
+max-complexity = 10
+max-line-length = 79

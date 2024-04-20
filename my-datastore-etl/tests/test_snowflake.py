@@ -2,11 +2,11 @@ import functools
 import unittest
 from typing import Callable
 
-from orm_framework.utilities import is_ci
+from analytics_orm.utilities import is_ci
 from pyspark.sql.dataframe import DataFrame  # type: ignore
 from sqlalchemy import text  # type: ignore
 
-from my_datastore_etl_wrapper.broker import Broker
+from my_datastore_etl.broker import Broker
 
 broker_lru_cache: Callable[[], Broker] = functools.lru_cache  # type: ignore
 
