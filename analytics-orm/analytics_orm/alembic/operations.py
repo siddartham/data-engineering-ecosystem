@@ -16,18 +16,18 @@ class UnsetTagsOp(AlterTableOp):
     def __init__(
         self,
         table_name: str,
-        tags: Dict[str, str],
+        tags: "Dict[str, str]",
         schema: Optional[str] = None,
     ) -> None:
         super().__init__(table_name, schema=schema)
-        self.tags: Dict[str, str] = tags
+        self.tags: "Dict[str, str]" = tags
 
     @classmethod
     def unset_tags(
         cls,
         operations: Operations,
         table_name: str,
-        tags: Dict[str, str],
+        tags: "Dict[str, str]",
         schema: Optional[str] = None,
     ) -> None:
         operations.invoke(cls(table_name, tags, schema))
@@ -62,18 +62,18 @@ class SetTagsOp(AlterTableOp):
     def __init__(
         self,
         table_name: str,
-        tags: Dict[str, str],
+        tags: "Dict[str, str]",
         schema: Optional[str] = None,
     ) -> None:
         super().__init__(table_name, schema=schema)
-        self.tags: Dict[str, str] = tags
+        self.tags: "Dict[str, str]" = tags
 
     @classmethod
     def set_tags(
         cls,
         operations: Operations,
         table_name: str,
-        tags: Dict[str, str],
+        tags: "Dict[str, str]",
         schema: Optional[str] = None,
     ) -> None:
         operations.invoke(cls(table_name, tags, schema))
