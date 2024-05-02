@@ -1357,10 +1357,21 @@ class Work:
             # Copy from the delta table directly into Snowflake
             options: _SnowflakeOptions = self._get_snowflake_options()
             options["sfSchema"] = schema
-            options["dbtable"] = qualified_table_name
-            self.get_table_spark_dataframe(table_name).write.format(
-                "snowflake"
-            ).options(**options).mode("overwrite").save()
+            options["dbtable"] = table_name
+            table_data_frame: SparkDataFrame = self.get_table_spark_dataframe(
+                table_name
+            )
+            log.info(f"Writing {table_name} to Snowflake")
+            try:
+                table_data_frame.write.format("snowflake").options(
+                    **options
+                ).mode("overwrite").save()
+            except Exception as error:
+                append_exception_text(
+                    error,
+                    "Error encountered while attempting to load table. "
+                    f"Options:\n {repr(options)}",
+                )
         else:
             self._snowflake_copy_into_table(qualified_table_name)
 
