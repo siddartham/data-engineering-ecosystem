@@ -29,7 +29,7 @@ def _get_sustainability_model_deviation_version_specifier(
     deviation: int,
 ) -> str:
     installed_version: Version = parse(
-        pkg_resources.get_distribution("nike-sustainability-model").version
+        pkg_resources.get_distribution("my-datastore-model").version
     )
     specificity: int = deviation + 1
     greater_or_equal_specificity: bool = specificity >= len(
@@ -58,7 +58,7 @@ def update_sustainability_model(
     dry_run: bool = False,
 ) -> Optional[Exception]:
     """
-    Upgrade the installed version of `nike-sustainability-model`, and
+    Upgrade the installed version of `my-datastore-model`, and
     return `None` if successful (otherwise return the error).
 
     Parameters:
@@ -73,7 +73,7 @@ def update_sustainability_model(
      - dry_run (bool) = False: If `True`, commands will be printed, but not
       executed (for debugging)
     """
-    print("Attempting to upgrade nike-sustainability-model")
+    print("Attempting to upgrade my-datastore-model")
     version_specifier: str = ""
     operator: str = ""
     if deviation:
@@ -95,12 +95,12 @@ def update_sustainability_model(
         "install",
         "--upgrade",
         (
-            f"nike-sustainability-model{extras_str}"
+            f"my-datastore-model{extras_str}"
             f"{operator}{version_specifier}"
         ),
         "--extra-index-url",
         (
-            "https://artifactory.nike.com/artifactory/api/pypi/python-local/"
+            "https://artifactory.org.com/artifactory/api/pypi/python-local/"
             "simple"
         ),
     )
@@ -114,14 +114,14 @@ def update_sustainability_model(
             ).strip()
         except Exception as error:
             warn(
-                "Unable to upgrade nike-sustainability-model:\n"
+                "Unable to upgrade my-datastore-model:\n"
                 f'{"".join(format_exception(*sys.exc_info()))}'
             )
             return error
         pkg_resources.working_set.entries = []
         pkg_resources.working_set.__init__()  # type: ignore
         model_version: str = pkg_resources.get_distribution(
-            "nike-sustainability-model"
+            "my-datastore-model"
         ).version
-        print(f"nike-sustainability-model version: {model_version}")
+        print(f"my-datastore-model version: {model_version}")
     return None

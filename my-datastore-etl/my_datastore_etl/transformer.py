@@ -1,8 +1,8 @@
 from typing import Any, Type
 
-from etl_framwork.transformer import Transformer as _Transformer
-from orm_framework.declarative import Base as ORMBase
-from my_datastore_orm.base import Base
+from analytics_etl.transformer import Transformer as _Transformer
+from analytics_orm.declarative import Base as ORMBase
+from my_datastore_model.base import Base
 
 
 class Transformer(_Transformer):

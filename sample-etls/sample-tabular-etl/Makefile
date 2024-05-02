@@ -61,6 +61,7 @@ requirements:
 	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \
 	dependency requirements update\
 	 -i more-itertools -aen all\
+	 -do \
 	 setup.cfg pyproject.toml tox.ini && \
 	daves-dev-tools requirements freeze\
 	 -nv setuptools -nv filelock -nv platformdirs\
@@ -73,11 +74,22 @@ test:
 
 # Make sure to bump the version before running the following
 test-dev-dag:
-	{ venv/Scripts/activate.bat || . venv/bin/activate ; } && \
-	daves-dev-tools pypi distribute --skip-existing && \
+	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \
+	dev-tools pypi distribute --skip-existing && \
 	make requirements && \
-	daves-dev-tools airflow deploy dev && \
-	daves-dev-tools airflow run dev --include sample_etl --detach
+	python3 scripts/copy_incremental_dag.py && \
+	databricks-jobs update-libraries sample-tabular-etl-dev && \
+	echo 'pip install -r /Workspace/Shared/sustainability/sample-tabular-etl-dev-requirements.txt' > init.sh && \
+	databricks-jobs upload\
+	 -f airflow/code/sustainability_footprint_etl_requirements.txt /Workspace/Shared/sustainability/sample-tabular-etl-dev-requirements.txt\
+	 -f init.sh /Workspace/Shared/sustainability/sample-tabular-etl-dev-init.sh && \
+    rm init.sh && \
+	databricks-jobs update-init-scripts\
+	 -is /Workspace/Shared/sustainability/sample-tabular-etl-dev-init.sh\
+	 sample-tabular-etl-dev\
+	 sample-tabular-etl-incremental-dev && \
+	dev-tools airflow deploy dev && \
+	dev-tools airflow run dev --include sample_tabular_etl --detach
 
 format:
 	{ . venv/bin/activate || venv/Scripts/activate.bat ; } && \

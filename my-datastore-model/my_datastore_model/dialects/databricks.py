@@ -19,6 +19,7 @@ from analytics_orm.validation import validate
 from sqlalchemy import ForeignKeyConstraint, Table  # type: ignore
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.engine.url import URL  # type: ignore
+from sqlalchemy.sql.expression import text  # type: ignore
 
 from ..base import Base
 
@@ -150,6 +151,15 @@ def create_environment_engine(
     )
 
 
+def _create_bind_managed_volume(
+    bind: Union[Engine, Connection],
+) -> Connection:
+    if isinstance(bind, Engine):
+        bind = bind.connect()
+    bind.execute(text("create volume if not exists temp"))
+    return bind
+
+
 @apply_environment_defaults("test", **TEST_DEFAULTS)
 @apply_environment_defaults("dev", **DEV_DEFAULTS)
 @apply_environment_defaults("qa", **QA_DEFAULTS)
@@ -185,6 +195,7 @@ def create_environment(
             access_token_cerberus_path=access_token_cerberus_path,
             echo=echo,
         )
+    _create_bind_managed_volume(bind)
     bind = create_all(
         Base,
         http_path=http_path,

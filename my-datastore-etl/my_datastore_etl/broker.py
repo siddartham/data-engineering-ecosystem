@@ -20,9 +20,9 @@ from analytics_orm.utilities import apply_environment_defaults
 from file_system_client.base import FileSystem
 from file_system_client.dbfs import DatabricksFileSystem
 from file_system_client.local import Local
-from my_datastore_orm.base import Base as APIBase
-from my_datastore_orm.base import Base
-from my_datastore_orm.dialects.s3 import ENVIRONMENTS_URLS
+from my_api_model.base import Base as APIBase
+from my_datastore_model.base import Base
+from my_datastore_model.dialects.s3 import ENVIRONMENTS_URLS
 
 SNOWFLAKE_S3_STAGE_NAME: str = "STAGE.S3_SUSTAINABILITY"
 
@@ -38,7 +38,7 @@ __all__: List[str] = [
     "ENVIRONMENTS",
     "Broker",
     "Work",
-    "SOLE_FILE_SYSTEM_ROOT",
+    "EXTERNAL_FILE_SYSTEM_ROOT",
 ]
 
 ENVIRONMENTS: FrozenSet[str] = frozenset(
@@ -47,12 +47,14 @@ ENVIRONMENTS: FrozenSet[str] = frozenset(
         "sole-dev",
         "sole-qa",
         "sole-prod",
+        "sole-test",
         "map-dev",
         "map-qa",
         "map-prod",
+        "map-test",
     )
 )
-SOLE_FILE_SYSTEM_ROOT: str = (
+EXTERNAL_FILE_SYSTEM_ROOT: str = (
     "/Volumes/development/team_sustainability/waffle_window/"
 )
 
@@ -77,18 +79,43 @@ def get_environment_file_system(environment: str) -> FileSystem:
         working_path: str = tempfile.mkdtemp()
         return Local(root=f"{working_path}/")
     elif environment.startswith("sole-"):
+        # Managed Unity Catalog Volume
         environment = environment.rpartition("-")[-1]
+        catalog: str = (
+            "non_published_domain" if environment == "prod" else "development"
+        )
         return DatabricksFileSystem(
-            root=f"{SOLE_FILE_SYSTEM_ROOT}{environment}/"
+            root=f"/Volumes/{catalog}/sustainability_{environment}/temp/"
         )
     elif environment.startswith("map-"):
+        # Waffle Iron S3 Bucket
         environment = environment.rpartition("-")[-1]
         return s3.from_url(
             ENVIRONMENTS_URLS[environment],
             arn=_get_map_environment_sustainability_s3_arn(environment),
         )
     else:
+        # Waffle Iron S3 Bucket
         return s3.from_url(ENVIRONMENTS_URLS[environment])
+
+
+def get_environment_external_file_system(
+    environment: str,
+) -> Optional[FileSystem]:
+    """
+    Get an instance of a sub-class of
+    `nike.file_system_client.base.FileSystem` representing the given
+    `environment`, if/when the external file system should be different from
+    the internal (temp) file system
+    """
+    if environment == "local":
+        # Local testing
+        return None
+    else:
+        environment = environment.rpartition("-")[-1]
+        return DatabricksFileSystem(
+            root=f"{EXTERNAL_FILE_SYSTEM_ROOT}{environment}/"
+        )
 
 
 def get_environment_snowflake_connection_string(environment: str) -> str:
@@ -97,7 +124,7 @@ def get_environment_snowflake_connection_string(environment: str) -> str:
     """
     if not has_snowflake_extra:
         return ""
-    from my_datastore_orm.dialects import snowflake
+    from my_datastore_model.dialects import snowflake
 
     if environment == "local":
         # For local unit-testing, allow read-only interactions with QA
@@ -118,7 +145,7 @@ def get_environment_databricks_connection_string(environment: str) -> str:
     """
     if not has_databricks_extra:
         return ""
-    from my_datastore_orm.dialects import databricks
+    from my_datastore_model.dialects import databricks
 
     if environment == "local":
         # TODO: local delta lake unit testing
@@ -135,7 +162,7 @@ def get_environment_postgresql_connection_string(environment: str) -> str:
     if not has_postgresql_extra:
         return ""
     from analytics_orm import postgresql as orm_postgresql
-    from my_datastore_orm.dialects import postgresql
+    from my_datastore_model.dialects import postgresql
 
     if environment == "local":
         # For unit-testing
@@ -173,6 +200,9 @@ def get_environment_postgresql_connection_string(environment: str) -> str:
 
 LOCAL_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("local"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "local"
+    ),
     "databricks_connection_string": lambda: (
         get_environment_databricks_connection_string("local")
     ),
@@ -188,6 +218,9 @@ LOCAL_DEFAULTS: Dict[str, Any] = {
 }
 SOLE_DEV_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("sole-dev"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "sole-dev"
+    ),
     "databricks_connection_string": lambda: (
         get_environment_databricks_connection_string("sole-dev")
     ),
@@ -201,6 +234,9 @@ SOLE_DEV_DEFAULTS: Dict[str, Any] = {
 }
 SOLE_QA_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("sole-qa"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "sole-qa"
+    ),
     "databricks_connection_string": lambda: (
         get_environment_databricks_connection_string("sole-qa")
     ),
@@ -214,9 +250,12 @@ SOLE_QA_DEFAULTS: Dict[str, Any] = {
 }
 SOLE_PROD_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("sole-prod"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "sole-prod"
+    ),
     "databricks_connection_string": lambda: (
         # TODO: Remove this after prod database is set up
-        get_environment_databricks_connection_string("sole-test")
+        get_environment_databricks_connection_string("sole-prod")
     ),
     "snowflake_connection_string": lambda: (
         get_environment_snowflake_connection_string("sole-prod")
@@ -226,8 +265,22 @@ SOLE_PROD_DEFAULTS: Dict[str, Any] = {
     ),
     "concurrency": Concurrency.SPARK,
 }
+SOLE_TEST_DEFAULTS: Dict[str, Any] = {
+    "file_system": lambda: get_environment_file_system("sole-test"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "sole-test"
+    ),
+    "databricks_connection_string": lambda: (
+        # TODO: Remove this after prod database is set up
+        get_environment_databricks_connection_string("sole-test")
+    ),
+    "concurrency": Concurrency.SPARK,
+}
 MAP_DEV_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("map-dev"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "map-dev"
+    ),
     "databricks_connection_string": lambda: (
         get_environment_databricks_connection_string("map-dev")
     ),
@@ -240,6 +293,9 @@ MAP_DEV_DEFAULTS: Dict[str, Any] = {
 }
 MAP_QA_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("map-qa"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "map-qa"
+    ),
     "databricks_connection_string": lambda: (
         get_environment_databricks_connection_string("map-qa")
     ),
@@ -252,6 +308,9 @@ MAP_QA_DEFAULTS: Dict[str, Any] = {
 }
 MAP_PROD_DEFAULTS: Dict[str, Any] = {
     "file_system": lambda: get_environment_file_system("map-prod"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "map-prod"
+    ),
     "databricks_connection_string": lambda: (
         get_environment_databricks_connection_string("map-prod")
     ),
@@ -260,6 +319,15 @@ MAP_PROD_DEFAULTS: Dict[str, Any] = {
     ),
     "postgresql_connection_string": lambda: (
         get_environment_postgresql_connection_string("map-prod")
+    ),
+}
+MAP_TEST_DEFAULTS: Dict[str, Any] = {
+    "file_system": lambda: get_environment_file_system("map-test"),
+    "external_file_system": lambda: get_environment_external_file_system(
+        "map-test"
+    ),
+    "databricks_connection_string": lambda: (
+        get_environment_databricks_connection_string("map-test")
     ),
 }
 
@@ -277,6 +345,7 @@ class Work(_Work):
         self,
         environment: str = "",
         file_system: Optional[FileSystem] = None,
+        external_file_system: Optional[FileSystem] = None,
         databricks_base: Optional[Type[ORMBase]] = Base,
         snowflake_base: Optional[Type[ORMBase]] = Base,
         postgresql_base: Optional[Type[ORMBase]] = APIBase,
@@ -292,6 +361,7 @@ class Work(_Work):
         self.environment: str = environment
         super().__init__(
             file_system=file_system,
+            external_file_system=external_file_system,
             databricks_base=databricks_base,
             snowflake_base=snowflake_base,
             postgresql_base=postgresql_base,
@@ -314,14 +384,17 @@ class Broker(_Broker):
     @apply_environment_defaults("sole-dev", **SOLE_DEV_DEFAULTS)
     @apply_environment_defaults("sole-qa", **SOLE_QA_DEFAULTS)
     @apply_environment_defaults("sole-prod", **SOLE_PROD_DEFAULTS)
+    @apply_environment_defaults("sole-test", **SOLE_TEST_DEFAULTS)
     @apply_environment_defaults("map-dev", **MAP_DEV_DEFAULTS)
     @apply_environment_defaults("map-qa", **MAP_QA_DEFAULTS)
     @apply_environment_defaults("map-prod", **MAP_PROD_DEFAULTS)
+    @apply_environment_defaults("map-test", **MAP_TEST_DEFAULTS)
     @call_arguments
     def __init__(
         self,
         environment: str,
         file_system: FileSystem,
+        external_file_system: Optional[FileSystem] = None,
         parallelism: Optional[int] = None,
         concurrency: Concurrency = Concurrency.MULTIPROCESSING,
         databricks_base: Optional[Type[ORMBase]] = Base,
@@ -341,6 +414,7 @@ class Broker(_Broker):
         assert environment in ENVIRONMENTS
         super().__init__(
             file_system=file_system,
+            external_file_system=external_file_system,
             parallelism=parallelism,
             concurrency=concurrency,
             databricks_base=databricks_base,
