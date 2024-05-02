@@ -147,3 +147,5 @@ Deployment to Artifactory will occur when your changes are merged into the
 You can increment the version number by changing the **version** parameter in
 the `setup()` function call in **setup.py**.
 
+
+![databricks-volumes](./images/external-volume-to-managed-volume-change.png)

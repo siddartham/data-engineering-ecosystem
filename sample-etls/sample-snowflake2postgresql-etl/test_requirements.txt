@@ -1,0 +1,7 @@
+alembic
+black
+flake8
+mypy
+pip
+pytest
+tox

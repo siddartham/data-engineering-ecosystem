@@ -34,32 +34,37 @@ from typing import (
     Set,
     Tuple,
     Type,
+    TypedDict,
     Union,
     cast,
 )
 from warnings import warn
 
+import file_system_client.s3 as s3
+import pandas  # type: ignore
 import pyarrow  # type: ignore
 from analytics_orm.declarative import (
     Base,
     get_base_table_name_subclass,
+    get_class_column_names,
     get_class_mapper,
     get_class_primary_key_column_names,
     get_class_qualified_table_name,
-    get_class_table_name,
+    get_class_schema_name,
     iter_base_sorted_subclasses,
 )
 from analytics_orm.errors import append_exception_text
+from analytics_orm.pyarrow import get_schema_from_mapping
 from analytics_orm.utilities import lru_cache
-from file_system_client import from_url, s3
+from file_system_client import from_url
 from file_system_client.base import FileSystem
+from file_system_client.dbfs import DatabricksFileSystem
 from file_system_client.errors import get_exception_text
 from file_system_client.local import Local
 from file_system_client.utilities import (
     get_date_directory_name,
     is_date_partition_directory,
 )
-from pandas import DataFrame  # type: ignore
 from sqlalchemy import Column, DateTime, text  # type: ignore
 from sqlalchemy.engine.base import Connection, Engine  # type: ignore
 from sqlalchemy.engine.create import create_engine  # type: ignore
@@ -68,7 +73,12 @@ from sqlalchemy.engine.result import Row  # type: ignore
 from sqlalchemy.engine.url import URL  # type: ignore
 from sqlalchemy.orm import Session, sessionmaker  # type: ignore
 from sqlalchemy.sql.compiler import IdentifierPreparer  # type: ignore
-from sqlalchemy.sql.expression import Select, TextClause  # type: ignore
+from sqlalchemy.sql.expression import (  # type: ignore
+    Select,
+    TextClause,
+    select,
+)
+from sqlalchemy.sql.functions import count  # type: ignore
 from sqlalchemy.sql.type_api import TypeEngine  # type: ignore
 from urllib3 import PoolManager  # type: ignore
 
@@ -93,9 +103,13 @@ has_spark_extra: bool = False
 try:
     # isort: off
     from analytics_orm.spark import (
-        get_data_frame_with_unique_primary_keys,
-        get_struct_type_from_mapping,
-        merge_data_frames,
+        get_data_frame_with_unique_primary_keys as spark_get_data_frame_with_unique_primary_keys,  # noqa: E501
+        get_struct_type_from_mapping as spark_get_struct_type_from_mapping,
+        merge_data_frames as spark_merge_data_frames,
+    )
+    from analytics_orm.pandas import (
+        get_data_frame_with_unique_primary_keys as pandas_get_data_frame_with_unique_primary_keys,  # noqa: E501
+        merge_data_frames as pandas_merge_data_frames,
     )
     from pyspark import RDD  # type: ignore
     from pyspark.sql import SparkSession  # type: ignore
@@ -115,15 +129,14 @@ except ImportError:
     RDD = None  # type: ignore
     SparkSession = None  # type: ignore
     SparkDataFrame = None  # type: ignore
-    merge_data_frames = None  # type: ignore
-    get_struct_type_from_mapping = None  # type: ignore
-    get_data_frame_with_unique_primary_keys = None  # type: ignore
+    spark_merge_data_frames = None  # type: ignore
+    spark_get_struct_type_from_mapping = None  # type: ignore
+    spark_get_data_frame_with_unique_primary_keys = None  # type: ignore
     AnalysisException = None  # type: ignore
     StructType = None  # type: ignore
     DeltaMergeBuilder = None  # type: ignore
     DeltaTableBuilder = None  # type: ignore
     DeltaTable = None  # type: ignore
-
 has_postgresql_extra: bool = False
 try:
     import analytics_orm.postgresql  # noqa
@@ -441,8 +454,35 @@ def _iter_snowflake_qualified_table_names(base: Type[Base]) -> Iterable[str]:
             yield get_class_qualified_table_name(cls, dialect_name="snowflake")
 
 
+class _SnowflakeJDBCProperties(TypedDict, total=False):
+    database: str
+    user: str
+    role: str
+    warehouse: str
+    authenticator: str
+    password: str
+
+
+class _SnowflakeJDBCArguments(TypedDict):
+    url: str
+    properties: _SnowflakeJDBCProperties
+
+
+class _SnowflakeOptions(TypedDict, total=False):
+    sfUrl: str
+    sfUser: str
+    sfPassword: str
+    sfDatabase: str
+    sfSchema: str
+    sfWarehouse: str
+    sfRole: str
+    sfAuthenticator: str
+    dbtable: str
+
+
 WORK_SLOTS: Tuple[str, ...] = (
     "file_system",
+    "external_file_system",
     "databricks_base",
     "snowflake_base",
     "postgresql_base",
@@ -468,7 +508,14 @@ class Work:
 
     Parameters:
 
-    - file_system (file_system_client.base.FileSystem)
+    - file_system (file_system_client.base.FileSystem):
+      A file system to use for session (temp) storage
+    - external_file_system (file_system_client.base.FileSystem)
+      A file system from which to consume data. For non-spark jobs, this
+      should be a `DatabricksFileSystem` representing a location in a
+      Unity Catalog Volume representing the same files as `file_system`,
+      as this will be used to formulate URLs for copying data into the
+      delta lake
     - databricks_base (typing.Type[analytics_orm.declarative.Base]|None)
     - snowflake_base (typing.Type[analytics_orm.declarative.Base]|None)
     - postgresql_base (typing.Type[analytics_orm.declarative.Base]|None)
@@ -486,6 +533,7 @@ class Work:
     def __init__(
         self,
         file_system: Optional[FileSystem] = None,
+        external_file_system: Optional[FileSystem] = None,
         databricks_base: Optional[Type[Base]] = None,
         snowflake_base: Optional[Type[Base]] = None,
         postgresql_base: Optional[Type[Base]] = None,
@@ -499,6 +547,11 @@ class Work:
         echo: bool = False,
     ) -> None:
         self.file_system: Optional[FileSystem] = file_system
+        # When only one file system is provided, use it for both
+        # internal (temp) and external file systems
+        self.external_file_system: Optional[FileSystem] = (
+            external_file_system or file_system
+        )
         self.databricks_base: Optional[Type[Base]] = databricks_base
         self.snowflake_base: Optional[Type[Base]] = snowflake_base
         self.postgresql_base: Optional[Type[Base]] = postgresql_base
@@ -506,7 +559,9 @@ class Work:
         self.postgresql_connection_string: str = postgresql_connection_string
         self.databricks_connection_string: str = databricks_connection_string
         self.snowflake_s3_stage_name: str = snowflake_s3_stage_name
-        assert tables_directory.endswith("/")
+        assert tables_directory.endswith(
+            "/"
+        ) and not tables_directory.startswith("/")
         self.tables_directory: str = tables_directory
         self.temp_directory: str = temp_directory
         self.echo: bool = echo
@@ -616,7 +671,6 @@ class Work:
         Databricks job with those installed in the current environment, and
         raises an error if they do not match.
         """
-
         from databricks.sdk import WorkspaceClient
         from databricks.sdk.service.compute import Library
         from databricks.sdk.service.jobs import RunTask
@@ -807,6 +861,104 @@ class Work:
             )
             raise error
 
+    def get_databricks_pandas_dataframe(
+        self,
+        table: str,
+    ) -> pandas.DataFrame:
+        """
+        Get a Spark DataFrame from a Databricks table name or
+        `SELECT` statement.
+
+        Parameters:
+
+        - table (str): A table name, such as
+          `CATALOG.SCHEMA.TABLE`,  or a sub-query suitable for use in a FROM
+          clause, including the surrounding parenthesis, such as
+          `(SELECT * FROM CATALOG.SCHEMA.TABLE)`.
+        """
+        sql: str
+        table = table.strip()
+        if table.startswith("("):
+            assert table.endswith(")")
+            sql = table[1:-1]
+        else:
+            sql = table
+        connection: Connection = (
+            self.databricks_session.bind.connect()
+            if isinstance(self.databricks_session.bind, Engine)
+            else self.databricks_session.bind
+        )
+        return pandas.read_sql(sql, con=connection)
+
+    def _pandas_read_parquet(
+        self, path: str, external: bool = False
+    ) -> pandas.DataFrame:
+        file_system: FileSystem = cast(
+            FileSystem,
+            (self.external_file_system if external else self.file_system),
+        )
+        if file_system.is_file(path):
+            return pandas.read_parquet(file_system.get(path))
+        elif file_system.is_directory(path):
+            # Return a data frame concatenating all files in the directory
+            file_path: str
+            paths: Tuple[str, ...] = tuple(
+                filter(
+                    lambda file_path: file_path.lower().endswith(".parquet"),
+                    file_system.iter_file_paths(path),
+                )
+            )
+            if not paths:
+                raise FileNotFoundError(path)
+            return pandas.concat(
+                map(pandas.read_parquet, map(file_system.get, paths)),
+                ignore_index=True,
+            )
+        else:
+            raise FileNotFoundError(path)
+
+    def _get_snowflake_jdbc_arguments(self) -> _SnowflakeJDBCArguments:
+        url: URL = self.snowflake_session.bind.engine.url
+        return dict(
+            url=f"jdbc:snowflake://{url.host}.snowflakecomputing.com",
+            properties=dict(
+                database=(
+                    url.database.partition("/")[0] if url.database else None
+                ),
+                user=url.username,
+                role="ALL",
+                warehouse=url.query["warehouse"],
+                authenticator=url.query["authenticator"],
+                **(
+                    {}
+                    if url.query["authenticator"] == "externalbrowser"
+                    else {
+                        "password": url.password,
+                    }
+                ),
+            ),
+        )
+
+    def _get_snowflake_options(self) -> _SnowflakeOptions:
+        url: URL = self.snowflake_session.bind.engine.url
+        database: str
+        schema: str
+        database, schema = url.database.partition("/")[::2]
+        options: _SnowflakeOptions = {
+            "sfUrl": f"{url.host}.snowflakecomputing.com",
+            "sfUser": url.username,
+            "sfPassword": url.password,
+            "sfDatabase": database,
+            "sfWarehouse": url.query["warehouse"],
+        }
+        if schema:
+            options["sfSchema"] = schema
+        if "role" in url.query:
+            options["sfRole"] = url.query["role"]
+        if "authenticator" in url.query:
+            options["sfAuthenticator"] = url.query["authenticator"]
+        return options
+
     def get_snowflake_spark_dataframe(
         self,
         table: str,
@@ -833,42 +985,28 @@ class Work:
         - predicates ([str]|None)
         """
         # Get our credentials from the Snowflake SQLAlchemy ORM session
-        url: URL = self.snowflake_session.bind.engine.url
         item: Tuple[str, Any]
+        kwargs: Dict[str, Any] = cast(
+            Dict[str, Any], self._get_snowflake_jdbc_arguments()
+        )
+        kwargs.update(
+            **dict(
+                filter(
+                    lambda item: item[1] is not None,
+                    (
+                        ("column", column),
+                        ("lowerBound", lower_bound),
+                        ("upperBound", upper_bound),
+                        ("numPartitions", num_partitions),
+                        ("predicates", predicates),
+                    ),
+                )
+            )
+        )
         try:
             return self.spark_session.read.jdbc(
-                url=f"jdbc:snowflake://{url.host}.snowflakecomputing.com",
                 table=table,
-                properties=dict(
-                    database=(
-                        url.database.partition("/")[0]
-                        if url.database
-                        else None
-                    ),
-                    user=url.username,
-                    role="ALL",
-                    warehouse=url.query["warehouse"],
-                    authenticator=url.query["authenticator"],
-                    **(
-                        {}
-                        if url.query["authenticator"] == "externalbrowser"
-                        else {
-                            "password": url.password,
-                        }
-                    ),
-                ),
-                **dict(
-                    filter(
-                        lambda item: item[1] is not None,
-                        (
-                            ("column", column),
-                            ("lowerBound", lower_bound),
-                            ("upperBound", upper_bound),
-                            ("numPartitions", num_partitions),
-                            ("predicates", predicates),
-                        ),
-                    )
-                ),
+                **kwargs,
             )
         except Exception as error:
             append_exception_text(
@@ -896,10 +1034,12 @@ class Work:
         return self.spark_session.createDataFrame((), schema=schema)
 
     def get_delta_table(
-        self, table_name: str, schema: Optional[StructType] = None
+        self,
+        table_name: str,
+        schema: Optional[StructType] = None,
     ) -> DeltaTable:
         """
-        Get a Spark DataFrame for a delta lake table
+        Get a delta table (requires spark)
 
         Parameters:
 
@@ -915,7 +1055,11 @@ class Work:
                 f"{bind_url_query['schema']}."
                 f"{table_name.lower()}",
             )
-        file_system: FileSystem = cast(FileSystem, self.file_system)
+        file_system: FileSystem = cast(FileSystem, self.external_file_system)
+        assert type(file_system) is Local, (
+            "This method is only supported on databricks, and for testing "
+            "locally"
+        )
         path: str = f"{self.tables_directory}{table_name}/"
         url: str = file_system.get_url(path)
         log.info(f"Retrieving Delta Table {table_name} from {url}")
@@ -929,7 +1073,7 @@ class Work:
                 base: Type[Base] = cast(
                     Type[Base], self.databricks_base or self.snowflake_base
                 )
-                schema = get_struct_type_from_mapping(
+                schema = spark_get_struct_type_from_mapping(
                     get_base_table_name_subclass(base, table_name)
                 )
             builder.addColumns(schema)
@@ -949,7 +1093,9 @@ class Work:
         """
         if self._is_databricks():
             return self.get_delta_table(table_name, schema).toDF()
-        elif has_databricks_extra and not isinstance(self.file_system, Local):
+        elif has_databricks_extra and not (
+            type(self.external_file_system) is Local
+        ):
             # This job can connect to a Databricks warehouse, but is not
             # running on a Databricks cluster, and is not running local unit
             # tests
@@ -959,6 +1105,45 @@ class Work:
             # a databricks warehouse
             return self.get_delta_table(table_name, schema).toDF()
 
+    def get_table_pandas_dataframe(
+        self,
+        table_name: str,
+    ) -> pandas.DataFrame:
+        """
+        Get a Spark DataFrame for a delta lake or parquet table
+
+        Parameters:
+
+        - table_name (str)
+        """
+        if has_spark_extra:
+            return self.get_table_spark_dataframe(table_name).toPandas()
+        elif has_databricks_extra and not (
+            type(self.external_file_system) is Local
+        ):
+            # This job can connect to a Databricks warehouse, but is not
+            # running on a Databricks cluster, and is not running local unit
+            # tests
+            return self.get_databricks_pandas_dataframe(table_name.lower())
+        else:
+            # This job is running local unit tests or cannot connect to
+            # a databricks warehouse
+            try:
+                return self._pandas_read_parquet(
+                    f"{self.tables_directory}{table_name}/", external=True
+                )
+            except FileNotFoundError:
+                # If no files exist, return an empty data frame
+                table_class: Type[Base] = get_base_table_name_subclass(
+                    cast(
+                        Type[Base], self.databricks_base or self.snowflake_base
+                    ),
+                    table_name,
+                )
+                return pandas.DataFrame(
+                    columns=get_class_column_names(table_class)
+                )
+
     @retry(
         errors=(RuntimeError,),
         retry_hook=_write_parquet_retry_hook,
@@ -966,7 +1151,7 @@ class Work:
     )
     def write_parquet(
         self,
-        rows: Union[DataFrame, Iterable[Tuple[Any, ...]]],
+        rows: Union[pandas.DataFrame, Iterable[Tuple[Any, ...]]],
         path: str,
         column_names: Tuple[str, ...] = (),
         schema: Optional[pyarrow.Schema] = None,
@@ -984,8 +1169,8 @@ class Work:
         """
         assert self.file_system
         message: str
-        data_frame: DataFrame
-        if isinstance(rows, DataFrame):
+        data_frame: pandas.DataFrame
+        if isinstance(rows, pandas.DataFrame):
             data_frame = rows
         else:
             rows = list(rows)
@@ -994,7 +1179,7 @@ class Work:
                 return
             assert column_names, "Column names are required"
             try:
-                data_frame = DataFrame(rows, columns=column_names)
+                data_frame = pandas.DataFrame(rows, columns=column_names)
             except Exception:
                 message = (
                     "Error encountered while attempting to create data frame "
@@ -1045,7 +1230,9 @@ class Work:
             for row in self.snowflake_session.execute(text(query))
         )
 
-    def get_table_stage_select_statement(self, table_name: str) -> str:
+    def get_table_snowflake_stage_select_statement(
+        self, table_name: str
+    ) -> str:
         """
         This method returns a select statement which will retrieve the
         specified table from S3 in a format which can be ingested by
@@ -1055,14 +1242,19 @@ class Work:
             Type[Base], self.databricks_base or self.snowflake_base
         )
         cls: Type[Base] = get_base_table_name_subclass(base, table_name)
-        qualified_table_name: str = get_class_qualified_table_name(cls)
-        return self._get_table_stage_select_statement(
-            cls, table_name, qualified_table_name
-        )
+        return self._get_class_snowflake_stage_select_statement(cls)
 
-    def _get_table_stage_select_statement(
-        self, cls: Type[Base], table_name: str, qualified_table_name: str
+    # For backwards compatibility
+    get_table_stage_select_statement = (
+        get_table_snowflake_stage_select_statement
+    )
+
+    def _get_class_snowflake_stage_select_statement(
+        self, cls: Type[Base]
     ) -> str:
+        qualified_table_name: str = get_class_qualified_table_name(
+            cls, "snowflake"
+        )
         column_names: Tuple[str, ...] = self._get_column_names(
             qualified_table_name
         )
@@ -1081,6 +1273,7 @@ class Work:
                     )
                 )
 
+        table_name: str = qualified_table_name.rpartition(".")[2]
         property_name: str
         column: Column
         # The columns must be sorted to account for scenarios where the order
@@ -1104,30 +1297,25 @@ class Work:
             table_name,
         )
 
-    def snowflake_load_table(self, table_name: str) -> None:
+    def _snowflake_copy_into_table(self, qualified_table_name: str) -> None:
         """
-        This method populates a Snowflake table from parquet files in NGAP.
-
-        Parameter:
-
-            - table_name (str): The schema-qualified name of the table
-              ("SCHEMA_NAME.TABLE_NAME").
+        Copy parquet table data into Snowflake
         """
         # Important: `self.snowflake_session` must be accessed before
         # accessing `Base`
+        cls: Type[Base] = get_base_table_name_subclass(
+            cast(Type[Base], self.snowflake_base), qualified_table_name
+        )
+        if "." not in qualified_table_name:
+            qualified_table_name = get_class_qualified_table_name(
+                cls, "snowflake"
+            )
         assert self.snowflake_base is not None
         snowflake_session: Session = self.snowflake_session
         self.snowflake_base.metadata.bind = snowflake_session.bind
-        log.info(f"Loading {table_name} into Snowflake")
-        cls: Type[Base] = get_base_table_name_subclass(
-            self.snowflake_base, table_name
-        )
-        qualified_table_name: str = get_class_qualified_table_name(
-            cls, "snowflake"
-        )
-        table_name = get_class_table_name(cls, "snowflake")
-        select_from_stage: str = self._get_table_stage_select_statement(
-            cls, table_name, qualified_table_name
+        log.info(f"Loading {qualified_table_name} into Snowflake")
+        select_from_stage: str = (
+            self._get_class_snowflake_stage_select_statement(cls)
         )
         snowflake_session.execute(
             text(f"TRUNCATE TABLE {qualified_table_name}")
@@ -1143,6 +1331,77 @@ class Work:
         for row in snowflake_session.execute(text(command)):
             log.info(repr(row))
         log.info(f"Finished populating table: {qualified_table_name}")
+
+    def snowflake_load_table(self, qualified_table_name: str) -> None:
+        """
+        This method copies a table into Snowflake
+
+        Parameter:
+
+            - table_name (str): A table name (may be qualified with a schema)
+        """
+        if self._is_databricks():
+            cls: Type[Base] = get_base_table_name_subclass(
+                cast(Type[Base], self.snowflake_base), qualified_table_name
+            )
+            table_name: str
+            schema: str
+            if "." in qualified_table_name:
+                schema, table_name = qualified_table_name.split(".")
+            else:
+                table_name = qualified_table_name
+                schema = get_class_schema_name(cls, "snowflake")
+                qualified_table_name = get_class_qualified_table_name(
+                    cls, "snowflake"
+                )
+            # Copy from the delta table directly into Snowflake
+            options: _SnowflakeOptions = self._get_snowflake_options()
+            options["sfSchema"] = schema
+            options["dbtable"] = qualified_table_name
+            self.get_table_spark_dataframe(table_name).write.format(
+                "snowflake"
+            ).options(**options).mode("overwrite").save()
+        else:
+            self._snowflake_copy_into_table(qualified_table_name)
+
+    def _databricks_copy_into_table(
+        self,
+        table_name: str = "",
+        directory: str = "",
+    ) -> None:
+        """
+        Copy parquet files from the external file system into a delta lake
+        table.
+
+        Parameters:
+
+        - table_name (str) = "": If not provided, this will be inferred from
+          the directory name.
+        - directory (str) = "": The directory containing the parquet files.
+          If not provided, this will be inferred from the table name.
+        """
+        assert table_name or directory
+        # Infer a table name if needed
+        if not table_name:
+            table_name = directory.rstrip("/ ").rpartition("/")[-1]
+        if not directory:
+            directory = f"{self.tables_directory}{table_name}/"
+        # The external file system represents the location we'll
+        # be loading from. The external file system should point to the
+        # same location as our internal file system, just using
+        # a different protocol (dbfs)
+        from_url: str = cast(FileSystem, self.external_file_system).get_url(
+            directory
+        )
+        log.info(f"{from_url} -> {table_name}")
+        # Load the parquet files into the delta lake table
+        self.databricks_session.execute(
+            text(
+                f"COPY INTO {table_name} "
+                f"FROM '{from_url}' "
+                "FILEFORMAT = PARQUET"
+            )
+        )
 
     def snowflake_copy_into_location(
         self,
@@ -1302,6 +1561,7 @@ class Broker:
     def __init__(
         self,
         file_system: Union[FileSystem, str],
+        external_file_system: Union[FileSystem, str, None] = None,
         parallelism: Optional[int] = None,
         concurrency: Concurrency = Concurrency.MULTIPROCESSING,
         databricks_base: Optional[Type[Base]] = None,
@@ -1330,6 +1590,11 @@ class Broker:
         assert (file_system is None) or isinstance(
             file_system, FileSystem
         ), repr(file_system)
+        if isinstance(external_file_system, str):
+            external_file_system = from_url(external_file_system)
+        assert (external_file_system is None) or isinstance(
+            external_file_system, FileSystem
+        ), repr(external_file_system)
         assert isinstance(echo, bool)
         assert (parallelism is None) or isinstance(parallelism, int)
         self.parallelism: Optional[int] = parallelism or None
@@ -1341,6 +1606,7 @@ class Broker:
             assert issubclass(work, Work)
             work = work(
                 file_system=file_system,
+                external_file_system=external_file_system,
                 databricks_base=databricks_base,
                 snowflake_base=snowflake_base,
                 postgresql_base=postgresql_base,
@@ -1484,12 +1750,14 @@ class Broker:
         pre_existing_data_frame_hook: Union[
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
-            Callable[[DataFrame, type], DataFrame],
+            Callable[[pandas.DataFrame, type], pandas.DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
             # A function which receives both a source data frame *and*
             # a pre-existing, "target" data frame (spark or pandas), and an
             # ORM table class
-            Callable[[DataFrame, DataFrame, type], DataFrame],
+            Callable[
+                [pandas.DataFrame, pandas.DataFrame, type], pandas.DataFrame
+            ],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
         ] = None,
@@ -1619,12 +1887,14 @@ class Broker:
         pre_existing_data_frame_hook: Union[
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
-            Callable[[DataFrame, type], DataFrame],
+            Callable[[pandas.DataFrame, type], pandas.DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
             # A function which receives both a source data frame *and*
             # a pre-existing, "target" data frame (spark or pandas), and an
             # ORM table class
-            Callable[[DataFrame, DataFrame, type], DataFrame],
+            Callable[
+                [pandas.DataFrame, pandas.DataFrame, type], pandas.DataFrame
+            ],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
         ] = None,
@@ -1700,8 +1970,11 @@ class Broker:
                 table_name,
                 cast(
                     Union[
-                        Callable[[DataFrame, type], DataFrame],
-                        Callable[[DataFrame, DataFrame, type], DataFrame],
+                        Callable[[pandas.DataFrame, type], pandas.DataFrame],
+                        Callable[
+                            [pandas.DataFrame, pandas.DataFrame, type],
+                            pandas.DataFrame,
+                        ],
                         None,
                     ],
                     pre_existing_data_frame_hook,
@@ -1720,11 +1993,13 @@ class Broker:
         pre_existing_data_frame_hook: Union[
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
-            Callable[[DataFrame, type], DataFrame],
+            Callable[[pandas.DataFrame, type], pandas.DataFrame],
             # A function which receives both a source data frame *and*
             # a pre-existing, "target" data frame (spark or pandas), and an
             # ORM table class
-            Callable[[DataFrame, DataFrame, type], DataFrame],
+            Callable[
+                [pandas.DataFrame, pandas.DataFrame, type], pandas.DataFrame
+            ],
             None,
         ] = None,
         overwrite: Optional[bool] = False,
@@ -1794,11 +2069,11 @@ class Broker:
             base, table_name
         )
         source_data_frame: SparkDataFrame = (
-            get_data_frame_with_unique_primary_keys(
+            spark_get_data_frame_with_unique_primary_keys(
                 self.work.spark_session.read.parquet(
                     source_url_pattern,
-                    schema=get_struct_type_from_mapping(  # type: ignore
-                        get_base_table_name_subclass(base, table_name)
+                    schema=spark_get_struct_type_from_mapping(  # type: ignore
+                        table_class
                     ),
                 ),
                 table_class,
@@ -1868,12 +2143,10 @@ class Broker:
         base: Type[Base] = cast(
             Type[Base], self.work.databricks_base or self.work.snowflake_base
         )
-        schema: StructType = get_struct_type_from_mapping(
-            get_base_table_name_subclass(base, table_name)
-        )
         table_class: Type[Base] = get_base_table_name_subclass(
             base, table_name
         )
+        schema: StructType = spark_get_struct_type_from_mapping(table_class)
         #######################################################################
         # TODO: Delete the following (and related logic) after all jobs have
         # been upgraded and run at least once (all delta tables are populated)
@@ -1927,7 +2200,7 @@ class Broker:
                     )
             if not overwrite:
                 # Merge and de-duplicate records
-                data_frame = merge_data_frames(
+                data_frame = spark_merge_data_frames(
                     (data_frame, target_data_frame),
                     table_class,
                     defaults=defaults,
@@ -1976,19 +2249,21 @@ class Broker:
             self.work.file_system.clear(temp_url)
         return target_url
 
-    def _pandas_merge(
+    def _pandas_merge(  # noqa: C901
         self,
-        data_frame: DataFrame,
+        data_frame: pandas.DataFrame,
         table_name: str = "",
         directory: str = "",
         pre_existing_data_frame_hook: Union[
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
-            Callable[[DataFrame, type], DataFrame],
+            Callable[[pandas.DataFrame, type], pandas.DataFrame],
             # A function which receives both a source data frame *and*
             # a pre-existing, "target" data frame (spark or pandas), and an
             # ORM table class
-            Callable[[DataFrame, DataFrame, type], DataFrame],
+            Callable[
+                [pandas.DataFrame, pandas.DataFrame, type], pandas.DataFrame
+            ],
             None,
         ] = None,
         defaults: Optional[Dict[str, Any]] = None,
@@ -2010,24 +2285,141 @@ class Broker:
           data is merged into it.
         - defaults ({str: typing.Any}|None) = None: A mapping of column
           names to default values to fill in when/if adding columns.
-
-        TODO: Implement `Broker._pandas_merge`
         """
-        raise NotImplementedError()
+        # If a directory is explicitly specified, we don't merge into a delta
+        # table, we just write parquet files
+        parquet_files_only: bool = True if directory else False
+        # Infer a table name if needed
+        if not table_name:
+            table_name = directory.rstrip("/ ").split("/")[-1]
+        if not directory:
+            directory = f"{self.work.tables_directory}{table_name}/"
+        assert self.work.external_file_system
+        target_url: str = self.work.external_file_system.get_url(directory)
+        base: Type[Base] = cast(
+            Type[Base], self.work.databricks_base or self.work.snowflake_base
+        )
+        table_class: Type[Base] = get_base_table_name_subclass(
+            base, table_name
+        )
+        #######################################################################
+        # TODO: Delete the following (and related logic) after all jobs have
+        # been upgraded and run at least once (all delta tables are populated)
+        #######################################################################
+        # Check if the target table is empty, and use the corresponding
+        # parquet files if it is.
+        target_is_empty: bool = False
+        if (not parquet_files_only) and has_databricks_extra:
+            target_is_empty = (
+                False
+                if self.work.databricks_session.execute(
+                    select(count()).select_from(table_class.__table__)
+                ).fetchone()[0]
+                else True
+            )
+        #######################################################################
+        if (
+            ((pre_existing_data_frame_hook is not None) and not overwrite)
+            or parquet_files_only
+            or target_is_empty
+        ):
+            target_data_frame: Optional[pandas.DataFrame] = None
+            if parquet_files_only or target_is_empty:
+                try:
+                    target_data_frame = self.work._pandas_read_parquet(
+                        directory
+                    )
+                except FileNotFoundError:
+                    target_data_frame = pandas.DataFrame(
+                        columns=get_class_column_names(table_class)
+                    )
+            else:
+                target_data_frame = self.work.get_table_pandas_dataframe(
+                    table_name
+                )
+            if (pre_existing_data_frame_hook is not None) and not overwrite:
+                # Make sure we were provided with a function
+                assert callable(pre_existing_data_frame_hook)
+                # Determine how many parameters the function requires,
+                # so that we can pass the correct number of arguments
+                parameter_count: int = len(
+                    inspect.signature(
+                        pre_existing_data_frame_hook
+                    ).parameters.keys()
+                )
+                if parameter_count == 2:
+                    target_data_frame = pre_existing_data_frame_hook(
+                        target_data_frame, table_class  # type: ignore
+                    )
+                elif parameter_count == 3:
+                    target_data_frame = pre_existing_data_frame_hook(
+                        data_frame,
+                        target_data_frame,  # type: ignore
+                        table_class,
+                    )
+                else:
+                    raise ValueError(
+                        "Your `pre_existing_data_frame_hook` requires an "
+                        f"unsupported number of arguments: {parameter_count}"
+                    )
+            if overwrite:
+                # De-duplicate records
+                data_frame = pandas_get_data_frame_with_unique_primary_keys(
+                    data_frame,
+                    table_class,
+                )
+            else:
+                # Merge and de-duplicate records
+                data_frame = pandas_merge_data_frames(
+                    (data_frame, target_data_frame),
+                    table_class,
+                    defaults=defaults,
+                )
+        file_path: str = f"{directory}data.parquet"
+        assert self.work.file_system
+        self.work.file_system.delete_success(directory)
+        log.info(f"Writing to {target_url}data.parquet")
+        self.work.write_parquet(
+            data_frame,
+            file_path,
+            column_names=get_class_column_names(table_class),
+            schema=get_schema_from_mapping(table_class),
+        )
+        # Delete any other parquet files we find
+        for path in filter(
+            file_path.__ne__, self.work.file_system.iter_file_paths(directory)
+        ):
+            self.work.file_system.delete(path)
+        self.work.file_system.put_success(directory)
+        if (
+            (not parquet_files_only)
+            and has_databricks_extra
+            and isinstance(
+                self.work.external_file_system, DatabricksFileSystem
+            )
+        ):
+            self.work._databricks_copy_into_table(
+                table_name,
+                directory,
+            )
 
     def merge(
         self,
-        data: Union[SparkDataFrame, DataFrame, Iterable[Tuple[Any, ...]]],
+        data: Union[
+            SparkDataFrame, pandas.DataFrame, Iterable[Tuple[Any, ...]]
+        ],
         table_name: str = "",
         pre_existing_data_frame_hook: Union[
             # A function which receives only the pre-existing, "target" data
             # frame (spark or pandas), and an ORM table class
-            Callable[[DataFrame, type], DataFrame],
+            Callable[[pandas.DataFrame, type], pandas.DataFrame],
             Callable[[SparkDataFrame, type], SparkDataFrame],
             # A function which receives both a source data frame *and*
             # a pre-existing, "target" data frame (spark or pandas), and an
             # ORM table class
-            Callable[[DataFrame, DataFrame, type], DataFrame],
+            Callable[
+                [pandas.DataFrame, pandas.DataFrame, type], pandas.DataFrame
+            ],
             Callable[[SparkDataFrame, SparkDataFrame, type], SparkDataFrame],
             None,
         ] = None,
@@ -2058,7 +2450,7 @@ class Broker:
         """
         if not concurrency:
             concurrency = self.concurrency
-        if not isinstance(data, ((SparkDataFrame, DataFrame))):
+        if not isinstance(data, ((SparkDataFrame, pandas.DataFrame))):
             if concurrency == Concurrency.SPARK:
                 data = list(data)
                 # If an empty iterable was provided, there is nothing to write
@@ -2074,12 +2466,12 @@ class Broker:
                 )
                 data = self.work.spark_session.createDataFrame(
                     data,
-                    schema=get_struct_type_from_mapping(
+                    schema=spark_get_struct_type_from_mapping(
                         get_base_table_name_subclass(base, table_name)
                     ),
                 )
             else:
-                data = DataFrame(data)
+                data = pandas.DataFrame(data)
         if isinstance(data, SparkDataFrame):
             self._spark_merge(
                 data,
@@ -2100,17 +2492,17 @@ class Broker:
                 overwrite=overwrite,
             )
         else:
-            assert isinstance(data, DataFrame)
+            assert isinstance(data, pandas.DataFrame)
             self._pandas_merge(
                 data,
                 table_name,
                 directory,
                 cast(
                     Union[
-                        Callable[[DataFrame, type], DataFrame],
+                        Callable[[pandas.DataFrame, type], pandas.DataFrame],
                         Callable[
-                            [DataFrame, DataFrame, type],
-                            DataFrame,
+                            [pandas.DataFrame, pandas.DataFrame, type],
+                            pandas.DataFrame,
                         ],
                         None,
                     ],

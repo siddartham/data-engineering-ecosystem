@@ -1,0 +1,2 @@
+apache-airflow[kubernetes]~=2.7
+ae-compute-ops~=5.1

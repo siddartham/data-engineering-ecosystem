@@ -1,0 +1,29 @@
+import sys
+from importlib import import_module
+from types import ModuleType
+
+from . import __name__ as _module_name
+
+
+def _get_dialect() -> str:
+    dialect: str = "postgresql"
+    if len(sys.argv) > 1 and (sys.argv[1] in ("postgresql", "sqlite")):
+        dialect = sys.argv.pop(1).lower().replace("-", "_")
+    return dialect
+
+
+def main() -> None:
+    """
+    Run a .dialects sub-module `main` function.
+    """
+    dialect = _get_dialect()
+    module: ModuleType
+    try:
+        module = import_module(f"{_module_name}.dialects.{dialect}.__main__")
+    except ImportError:
+        module = import_module(f"{_module_name}.dialects.{dialect}")
+    module.main()  # type: ignore
+
+
+if __name__ == "__main__":
+    main()

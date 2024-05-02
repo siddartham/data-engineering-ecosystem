@@ -1,0 +1,3 @@
+dev-tools
+analytics-orm[alembic,postgresql]
+mail-client

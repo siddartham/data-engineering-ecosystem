@@ -1,6 +1,7 @@
 # python-package-template
 [![cicd](https://github.com/siddartham/data-engineering-ecosystem/python-package-template/actions/workflows/test.yml/badge.svg)](https://github.com/siddartham/data-engineering-ecosystem/python-package-template/actions/workflows/cicd.yml)
 
+A cookiecutter template for python libraries.
 
 To create a repository based on this template:
 

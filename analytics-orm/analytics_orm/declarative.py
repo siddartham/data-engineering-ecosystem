@@ -115,7 +115,7 @@ class MetaData(_MetaData):
     """
 
     tables: Dict[str, Table]
-    tables_tags: Dict[str, Dict[str, str]] = {}
+    _tables_tags: Dict[str, Dict[str, str]] = {}
 
     def __init__(
         self, base: Optional[Type["Base"]] = None, *args: Any, **kwargs: Any
@@ -208,7 +208,7 @@ class MetaData(_MetaData):
             _base_apply_table_args(self.base, dialect_name=dialect_name)
 
             if dialect_name == "databricks":
-                self.reflect_table_tags()
+                self._reflect_table_tags()
                 event.listen(
                     Table, "after_parent_attach", self._add_table_tags
                 )
@@ -217,32 +217,33 @@ class MetaData(_MetaData):
         """
         Updates a reflected table's info with its tags
         """
-        table_tags: Dict[str, str] = self.tables_tags.get(table.name, {})
+        table_tags: Dict[str, str] = self._tables_tags.get(table.name, {})
         table.info.update({"tags": table_tags})
 
-    def reflect_table_tags(self) -> None:
+    def _reflect_table_tags(self) -> None:
         """
         Loads all table tags for the active connection into a cache to be used
         during table reflection
         """
-
-        schema: Optional[str] = get_bind_schema(self.bind)
-        assert schema
-
-        table_tags_statement: str = """
-            SELECT table_name, tag_name, tag_value
-            FROM INFORMATION_SCHEMA.TABLE_TAGS
-            WHERE schema_name = %(table_schema)s
-        """
-
-        result: CursorResult = self.bind.execute(
-            table_tags_statement, {"table_schema": schema}
-        )
-        row: Row
-        for row in result:
-            if row.table_name not in self.tables_tags:
-                self.tables_tags[row.table_name] = {}
-            self.tables_tags[row.table_name][row.tag_name] = row.tag_value
+        dialect_name: str = get_bind_dialect_name(self.bind)
+        if dialect_name == "databricks":
+            schema: Optional[str] = get_bind_schema(self.bind)
+            assert schema
+            bind: Union[Engine, Connection] = self.bind
+            if isinstance(bind, Engine):
+                bind = bind.connect()
+            row: Row
+            for row in bind.exec_driver_sql(
+                (
+                    "select table_name, tag_name, tag_value "
+                    "from information_schema.table_tags "
+                    "where schema_name = %(table_schema)s"
+                ),
+                {"table_schema": schema},
+            ):
+                if row.table_name not in self._tables_tags:
+                    self._tables_tags[row.table_name] = {}
+                self._tables_tags[row.table_name][row.tag_name] = row.tag_value
 
     def create_views(
         self,

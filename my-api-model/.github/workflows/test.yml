@@ -1,0 +1,42 @@
+name: test
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches:
+    - '*'
+    paths:
+    - my_api_model/**
+    - pyproject.toml
+    - setup.py
+    - setup.cfg
+    - tests/**
+    - requirements.txt
+    - tox.ini
+    - .github/**
+jobs:
+  test:
+    runs-on: [self-hosted, bmx-runner, bmx-sustainability-runner]
+    strategy:
+      matrix:
+        python:
+          - 3.8
+          - 3.9
+          - "3.10"
+          - 3.11
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: zulu
+        java-version: 8
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+        cache: "pip"
+        cache-dependency-path: "requirements.txt"
+    - run: |
+        sudo apt-get update
+        sudo apt-get install libpq-dev libsasl2-dev postgresql-client -y
+    - run: make ci-install
+    - run: make test
