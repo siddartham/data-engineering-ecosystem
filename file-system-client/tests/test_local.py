@@ -1,5 +1,6 @@
 import csv
 import os
+import pickle
 import unittest
 from datetime import datetime
 from io import BytesIO, StringIO
@@ -36,6 +37,11 @@ class TestLocal(unittest.TestCase):
     @property  # type: ignore
     def file_system(self) -> local.Local:
         return get_file_system()
+
+    def test_pickle(self) -> None:
+        unpickled: local.Local = pickle.loads(pickle.dumps(self.file_system))
+        assert unpickled.root == self.file_system.root
+        pickle.dumps(unpickled)
 
     @property  # type: ignore
     def csv1(self) -> BytesIO:
@@ -125,7 +131,7 @@ class TestLocal(unittest.TestCase):
     def test_get_url(self) -> None:
         """
         This method verifies that
-        `analytics_etl.file_system.s3.S3.get_url` returns
+        `my_datastore_etl.file_system.s3.S3.get_url` returns
         an S3 URL formatted in the expected fashion.
         """
         url: str = self.file_system.get_url(TEST1_CSV)

@@ -1,8 +1,11 @@
 import logging
 import os
 import shutil
-from typing import IO, Iterable, List, Union
+from tempfile import mkdtemp
+from typing import IO, Iterable, List, Tuple, Union
 from urllib.parse import ParseResult, quote_plus, urlparse
+
+from file_system_client.errors import append_exception_text
 
 from .base import FileSystem
 from .utilities import FileSortKey
@@ -16,8 +19,22 @@ class Local(FileSystem):
     system using this common interface.
     """
 
-    def __init__(self, root: str) -> None:
+    __slots__: Tuple[str, ...] = FileSystem.__slots__
+
+    def __init__(self, root: str = "") -> None:
         super().__init__(root=root)
+
+    @property
+    def root(self) -> str:
+        return self._root
+
+    @root.setter
+    def root(self, root: str) -> None:
+        assert isinstance(root, str)
+        root = root.strip()
+        if not root.endswith("/"):
+            root = f"{root}/"
+        self._root = root
 
     def get_url(self, path: str = "") -> str:
         """
@@ -42,21 +59,14 @@ class Local(FileSystem):
             path = f"/{path}"
         return super().get_absolute_path(path)
 
-    def iter_file_paths(
+    def _iter_file_paths(
         self,
         directory: str = "",
         recursive: bool = True,
-        sort_key: FileSortKey = FileSortKey.DEFAULT,
-        sort_reverse: bool = False,
     ) -> Iterable[str]:
         """
         Yield all files in a directory
         """
-        if sort_key != FileSortKey.DEFAULT or sort_reverse:
-            raise NotImplementedError(
-                "File path sorting has not yet been implemented "
-                "for local file systems"
-            )
         directory = self.get_absolute_path(directory)
         root: str
         directories: Iterable[str]
@@ -70,6 +80,39 @@ class Local(FileSystem):
                     )
             if not recursive:
                 break
+
+    def iter_file_paths(
+        self,
+        directory: str = "",
+        recursive: bool = True,
+        sort_key: FileSortKey = FileSortKey.DEFAULT,
+        sort_reverse: bool = False,
+    ) -> Iterable[str]:
+        """
+        Yield all files in a directory
+
+        Parameters:
+
+        - directory (str)
+        - recursive (bool)
+        - sort_key (file_system_client.base.FileSortKey)
+        - sort_reverse (bool)
+        """
+        paths: Iterable[str] = self._iter_file_paths(
+            directory=directory, recursive=recursive
+        )
+        if sort_key == FileSortKey.NAME:
+            paths = sorted(paths, reverse=sort_reverse)
+        elif sort_key == FileSortKey.MODIFIED:
+            path: str
+            paths = sorted(
+                paths,
+                key=lambda path: os.path.getmtime(
+                    self.get_absolute_path(path)
+                ),
+                reverse=sort_reverse,
+            )
+        yield from paths
 
     # For backwards compatibility
     get_file_paths = iter_file_paths
@@ -108,33 +151,43 @@ class Local(FileSystem):
         - key (str)
         """
         assert path and isinstance(path, str)
-        path = self.get_absolute_path(path)
-        return open(path, "rb")
+        absolute_path: str = self.get_absolute_path(path)
+        try:
+            return open(absolute_path, "rb")
+        except Exception as error:
+            append_exception_text(
+                error,
+                (
+                    f"Root: {self.root}\n"
+                    f"Path: {path}\n"
+                    f"Absolute Path: {absolute_path}"
+                ),
+            )
+            raise error
 
     def iter_sub_directories(
         self, directory: str = "", recursive: bool = False
     ) -> Iterable[str]:
-        path: str = self.get_absolute_path(directory)
+        directory = directory.replace("\\", "/")
+        if directory.startswith("/"):
+            directory = directory[1:]
+        if directory and not directory.endswith("/"):
+            directory = f"{directory}/"
+        absolute_directory: str = self.get_absolute_path(directory)
         listed: List[str]
         try:
-            listed = os.listdir(path)
+            listed = os.listdir(absolute_directory)
         except FileNotFoundError:
             return
-        directories: Iterable[str] = filter(
-            lambda dir: os.path.isdir(os.path.join(path, dir)),
-            listed,
-        )
-        sub_directory_name: str
-        yield from map(
-            lambda sub_directory_name: self.get_relative_path(
-                "{}/".format(
-                    os.path.join(os.path.normpath(path), sub_directory_name)
-                    .replace("\\", "/")
-                    .rstrip("/ ")
-                )
-            ),
-            directories,
-        )
+        name: str
+        for name in listed:
+            if os.path.isdir(os.path.join(absolute_directory, name)):
+                sub_directory: str = f"{directory}{name}/"
+                yield sub_directory
+                if recursive:
+                    yield from self.iter_sub_directories(
+                        sub_directory, recursive=recursive
+                    )
 
     get_sub_directories = iter_sub_directories
 
@@ -179,8 +232,12 @@ class Local(FileSystem):
         return os.path.isdir(os.path.normpath(self.get_absolute_path(path)))
 
 
-def from_url(url: str) -> Local:
-    parse_result: ParseResult = urlparse(url)
-    assert parse_result.scheme.lower() == "file"
-    path: str = f"{parse_result.netloc}{parse_result.path}"
-    return Local(path)
+def from_url(url: str = "") -> Local:
+    if url:
+        parse_result: ParseResult = urlparse(url)
+        assert parse_result.scheme.lower() == "file"
+        path: str = f"{parse_result.netloc}{parse_result.path}"
+        return Local(path)
+    else:
+        # If the URL is empty, create and use a temporary directory
+        return Local(mkdtemp())

@@ -11,12 +11,18 @@ try:
 except ImportError:
     s3 = None
     Config = None
+box: Any
+try:
+    from . import box
+except ImportError:
+    box = None
 
 __all__: List[str] = [
     "base",
     "local",
     "dbfs",
     "s3",
+    "box",
     "from_url",
 ]
 
@@ -54,5 +60,13 @@ def from_url(
         return s3.from_url(url)
     elif url.startswith("dbfs://"):
         return dbfs.from_url(url)
+    elif url.startswith("http://"):
+        if box is None:
+            raise ValueError(
+                "Use of the Box file system requires installing "
+                'file-system-client with the "box" extra: '
+                "`pip install file-system-client[box]`"
+            )
+        return box.from_url(url)
     else:
         return local.from_url(url)

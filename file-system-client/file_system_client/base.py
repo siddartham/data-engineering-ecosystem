@@ -1,10 +1,24 @@
+import inspect
 import logging
 from abc import ABC, abstractmethod
-from collections import namedtuple
+from collections import deque
+from dataclasses import dataclass
 from datetime import date, datetime
-from io import BytesIO
-from typing import IO, Iterable, List, Optional, Tuple, Type, Union
+from operator import itemgetter
+from typing import (
+    IO,
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
 
+from ._utilities import FileBytesIO
 from .utilities import (
     SUCCESS,
     SUCCESS_FILE_NAME,
@@ -19,18 +33,32 @@ assert get_date_directory_name  # type: ignore
 log: logging.Logger = logging.getLogger(__name__)
 
 
-LatestDirectoryFiles: Type[tuple] = namedtuple(
-    "LatestDirectoryFiles", ("directory", "files")
-)
-LatestDirectorySubDirectories: Type[tuple] = namedtuple(
-    "LatestDirectorySubDirectories", ("directory", "sub_directories")
-)
+@dataclass(frozen=True)
+class LatestDirectorySubDirectories:
+    directory: str
+    sub_directories: Iterable[str]
+
+    def __iter__(self) -> Iterator:
+        yield self.directory
+        yield self.sub_directories
+
+
+@dataclass(frozen=True)
+class LatestDirectoryFiles:
+    directory: str
+    files: Iterable[str]
+
+    def __iter__(self) -> Iterator:
+        yield self.directory
+        yield self.files
 
 
 class FileSystem(ABC):
     """
     This class defines a common interface for file system clients
     """
+
+    __slots__: Tuple[str, ...] = ("_root",)
 
     def __init__(self, root: str = "") -> None:
         self._root: str = ""
@@ -45,6 +73,57 @@ class FileSystem(ABC):
         assert isinstance(root, str)
         self._root = root.strip()
 
+    def __getstate__(self) -> Dict[str, Any]:
+        """
+        Get a dictionary of attributes for pickling
+        """
+        slot: str
+        return dict(
+            map(
+                lambda slot: (slot, getattr(self, slot)),
+                self.__slots__,
+            )
+        )
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        """
+        Unpickle an instance of `DatabricksFileSystem` from a state
+        dictionary created using `__getstate__`
+        """
+        # Determine which state keys are parameters for the `__init__` method
+        # Introspection is utilized here in order to support (theoretical)
+        # sub-classes which could have different parameters or slots
+        parameters: Iterable[
+            Tuple[str, inspect.Parameter]
+        ] = inspect.signature(
+            self.__init__  # type: ignore
+        ).parameters.items()
+        item: Tuple[str, inspect.Parameter]
+        parameter_names: Set[str] = set(
+            map(
+                itemgetter(0),
+                filter(
+                    lambda item: item[1].kind
+                    not in (
+                        inspect.Parameter.VAR_POSITIONAL,
+                        inspect.Parameter.POSITIONAL_ONLY,
+                    ),
+                    parameters,
+                ),
+            )
+        )
+        state_keys: Set[str] = set(state.keys())
+        kwargs: Dict[str, Any] = {}
+        key: str
+        value: Any
+        # For properties matching init parameters, pass them to the `__init__`
+        # method
+        for key in state_keys & parameter_names:
+            kwargs[key] = state.pop(key)
+        self.__init__(**kwargs)  # type: ignore
+        # Set the remaining state slots
+        deque(map(lambda item: setattr(self, *item), state.items()), maxlen=0)
+
     @abstractmethod
     def put(self, file: Union[IO[bytes], bytes], path: str) -> str:
         """
@@ -57,7 +136,7 @@ class FileSystem(ABC):
         - path (str): A path, relative to `self.root`, to which the file object
           will be saved.
         """
-        raise NotImplementedError()
+        raise NotImplementedError(f"{type(self).__name__}.put")
 
     @abstractmethod
     def delete(self, path: str) -> None:
@@ -68,7 +147,7 @@ class FileSystem(ABC):
 
         - path (str)
         """
-        raise NotImplementedError()
+        raise NotImplementedError(f"{type(self).__name__}.delete")
 
     @abstractmethod
     def get(self, path: str) -> IO[bytes]:
@@ -79,7 +158,7 @@ class FileSystem(ABC):
 
         - path (str): The path of a file relative to the root directory.
         """
-        raise NotImplementedError()
+        raise NotImplementedError(f"{type(self).__name__}.get")
 
     @abstractmethod
     def get_url(self, path: str = "") -> str:
@@ -90,7 +169,7 @@ class FileSystem(ABC):
 
         - path (str): A file path relative to `self.root`.
         """
-        raise NotImplementedError()
+        raise NotImplementedError(f"{type(self).__name__}.get_url")
 
     @abstractmethod
     def iter_file_paths(
@@ -120,7 +199,7 @@ class FileSystem(ABC):
 
         Returns: An iterable of all files in `directory`.
         """
-        raise NotImplementedError()
+        raise NotImplementedError(f"{type(self).__name__}.iter_file_paths")
 
     # For backwards compatibility
     get_file_paths = iter_file_paths
@@ -142,7 +221,9 @@ class FileSystem(ABC):
           sub-directories, including sub-directories of each sub-directory,
           etc., will be included.
         """
-        raise NotImplementedError()
+        raise NotImplementedError(
+            f"{type(self).__name__}.iter_sub_directories"
+        )
 
     get_sub_directories = iter_sub_directories
 
@@ -254,7 +335,7 @@ class FileSystem(ABC):
         - path (str): A path, relative to the file system root, at which to
           look for a file.
         """
-        raise NotImplementedError()
+        raise NotImplementedError(f"{type(self).__name__}.is_file")
 
     @abstractmethod
     def is_directory(self, path: str) -> bool:
@@ -266,7 +347,7 @@ class FileSystem(ABC):
         - path (str): A path, relative to the file system root, at which to
           look for a directory.
         """
-        raise NotImplementedError()
+        raise NotImplementedError(f"{type(self).__name__}.is_directory")
 
     def had_success(self, directory: str) -> bool:
         """
@@ -319,7 +400,7 @@ class FileSystem(ABC):
         """
         log.info(f"Putting a success indicator: {directory}")
         self.put(
-            BytesIO(SUCCESS),
+            FileBytesIO(SUCCESS),
             f'{directory.rstrip("/ ")}/{SUCCESS_FILE_NAME}',
         )
 
@@ -533,9 +614,11 @@ class FileSystem(ABC):
 
         - directory (str): A directory path, relative to the file system root.
         """
-        file_path: str
-        for file_path in self.iter_file_paths(directory):
-            self.delete(file_path)
+        path: str
+        for path in self.iter_file_paths(directory):
+            self.delete(path)
+        for path in self.iter_sub_directories(directory):
+            self.delete_directory(path)
 
     def delete_directory(self, directory: str) -> None:
         """
@@ -560,21 +643,17 @@ class FileSystem(ABC):
         """
         directory_: str
         try:
-            return self.get_relative_path(
-                max(
+            return max(
+                filter(
+                    self.had_success,
                     filter(
-                        self.had_success,
-                        filter(
-                            is_date_partition_directory,
-                            self.iter_sub_directories(
-                                directory, recursive=False
-                            ),
-                        ),
+                        is_date_partition_directory,
+                        self.iter_sub_directories(directory, recursive=False),
                     ),
-                    key=lambda directory_: get_path_datetime_and_index(
-                        directory_
-                    ).datetime,
-                )
+                ),
+                key=lambda directory_: get_path_datetime_and_index(
+                    directory_
+                ).datetime,
             )
         except ValueError:
             return ""
@@ -666,3 +745,16 @@ class FileSystem(ABC):
             )
             return f"{unique_path}{suffix}"
         raise ValueError(path)
+
+    def copy(self, source: str, target: str) -> None:
+        """
+        Copy a file from a `source` path (relative to the root directory) to a
+        `target` path (relative to the root directory).
+
+        Parameters:
+
+        - source (str): The path of the file to copy.
+        - target (str): The path to which the file should be copied.
+        """
+        with self.get(source) as source_io:
+            self.put(source_io, target)

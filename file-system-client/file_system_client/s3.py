@@ -7,7 +7,6 @@ from abc import ABC, ABCMeta, abstractmethod
 from copy import copy
 from datetime import datetime
 from inspect import Parameter, signature
-from io import BytesIO
 from itertools import chain
 from typing import (
     IO,
@@ -41,6 +40,7 @@ from botocore.credentials import ReadOnlyCredentials  # type: ignore
 from botocore.exceptions import ClientError  # type: ignore
 from botocore.response import StreamingBody  # type: ignore
 
+from ._utilities import FileBytesIO
 from .base import FileSystem
 from .errors import append_exception_text, get_exception_text
 from .utilities import (
@@ -586,7 +586,7 @@ def _cannot_put_in_bucket_prefix(bucket: Bucket, prefix: str) -> str:
     )
     error_message: str = ""
     try:
-        bucket.upload_fileobj(BytesIO(), success_file_path)
+        bucket.upload_fileobj(FileBytesIO(), success_file_path)
     except Exception:
         error_message = get_exception_text()
     finally:
@@ -830,6 +830,17 @@ class SimpleStorageService(FileSystem):
       [configuration object](https://bit.ly/3cUHEwy).
     """
 
+    __slots__: Tuple[str, ...] = FileSystem.__slots__ + (
+        "_endpoint_url",
+        "_bucket",
+        "assumed_role_arn",
+        "_assumed_role_expires",
+        "_profile_name",
+        "bucket_name",
+        "config",
+        "region_name",
+    )
+
     def __init__(
         self,
         bucket_name: str = "",
@@ -840,7 +851,6 @@ class SimpleStorageService(FileSystem):
         config: Optional[botocore.config.Config] = None,
         region_name: str = "",
     ) -> None:
-        super().__init__(root=root)
         self._endpoint_url: str = endpoint_url
         self._bucket: Optional[Bucket] = None
         self.assumed_role_arn: str = arn
@@ -849,6 +859,41 @@ class SimpleStorageService(FileSystem):
         self.bucket_name = bucket_name
         self.config = config
         self.region_name = region_name
+        super().__init__(root=root)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        """
+        Get a dictionary of attributes for pickling
+        """
+        # Attempt to obtain and cache these properties, prior to
+        # parallelization, so they only need to be created once, but
+        # don't raise an error if we can't obtain them quite yet
+        cached_properties: Tuple[str, ...] = (
+            "endpoint_url",
+            "profile_name",
+        )
+        property_name: str
+        for property_name in cached_properties:
+            try:
+                getattr(self, property_name)
+            except Exception:
+                pass
+        slot: str
+        return dict(
+            map(
+                lambda slot: (slot, getattr(self, slot)),
+                chain(
+                    filter(
+                        lambda slot: (
+                            (slot in FileSystem.__slots__)
+                            or (not slot.startswith("_"))
+                        ),
+                        self.__slots__,
+                    ),
+                    cached_properties,
+                ),
+            )
+        )
 
     @property
     def endpoint_url(self) -> str:
@@ -871,52 +916,12 @@ class SimpleStorageService(FileSystem):
             del os.environ["AWS_PROFILE"]
         self._profile_name = profile_name
 
-    def __reduce__(
-        self,
-    ) -> Tuple[
-        Type["SimpleStorageService"],
-        Tuple[
-            str,
-            str,
-            str,
-            str,
-            str,
-            Optional[botocore.config.Config],
-            str,
-        ],
-    ]:
-        # Attempt to obtain and cache the profile name, but don't
-        # raise an error if we can't obtain credentials quite yet
-        try:
-            getattr(self, "profile_name")
-        except Exception:
-            pass
-        return (
-            SimpleStorageService,
-            (
-                self.bucket_name,
-                self.root,
-                self._profile_name,
-                self.assumed_role_arn,
-                self.endpoint_url,
-                self.config,
-                self.region_name,
-            ),
-        )
-
     def __copy__(self) -> "SimpleStorageService":
-        cls: Type["SimpleStorageService"]
-        arguments: Tuple[
-            str,
-            str,
-            str,
-            str,
-            str,
-            Optional[botocore.config.Config],
-            str,
-        ]
-        cls, arguments = self.__reduce__()
-        return cls(*arguments)
+        cls: Type["SimpleStorageService"] = type(self)
+        state: Dict[str, Any] = self.__getstate__()
+        instance: SimpleStorageService = cls()
+        instance.__setstate__(state)
+        return instance
 
     def __deepcopy__(
         self, memo: Optional[dict] = None
@@ -1066,10 +1071,10 @@ class SimpleStorageService(FileSystem):
             kwargs.update(Prefix=self.get_absolute_path(directory))
         if delimiter:
             kwargs.update(Delimiter=delimiter)
+        resource_collection: ResourceCollection
         if kwargs:
             return self.bucket.objects.filter(**kwargs)
-        else:
-            return self.bucket.objects.all()
+        return self.bucket.objects.all()
 
     def iter_file_paths(
         self,
@@ -1126,10 +1131,32 @@ class SimpleStorageService(FileSystem):
             object_keys = sorted(object_keys, reverse=sort_reverse)
         elif sort_reverse and sort_key is FileSortKey.DEFAULT:
             object_keys = reversed(tuple(object_keys))
-        return object_keys
+        yield from filter(
+            lambda object_key: not object_key.endswith("/"), object_keys
+        )
 
     # For compatibility
     get_file_paths = iter_file_paths
+
+    def _list_objects_v2_prefixes(
+        self, prefix: str, start_after: str = ""
+    ) -> Iterable[str]:
+        response: Dict[str, Any] = self.bucket.meta.client.list_objects_v2(
+            Bucket=self.bucket.name,
+            Prefix=prefix,
+            Delimiter="/",
+            **(dict(StartAfter=start_after) if start_after else {}),
+        )
+        yield from map(
+            _get_common_prefix,
+            response.get("CommonPrefixes", ()),
+        )
+        # Chain paginated responses if necessary
+        if response.get("IsTruncated", False):
+            yield from self._list_objects_v2_prefixes(
+                prefix=prefix,
+                start_after=response["CommonPrefixes"][-1]["Prefix"],
+            )
 
     def iter_sub_directories(
         self, directory: str = "/", recursive: bool = False
@@ -1143,33 +1170,9 @@ class SimpleStorageService(FileSystem):
         - recursive (bool) = False
         """
 
-        def list_objects_v2_prefixes(
-            prefix: str, start_after: str = ""
-        ) -> Iterable[str]:
-            response: Dict[str, Any] = self.bucket.meta.client.list_objects_v2(
-                Bucket=self.bucket.name,
-                Prefix=prefix,
-                Delimiter="/",
-                **(dict(StartAfter=start_after) if start_after else {}),
-            )
-            prefixes: Iterable[str] = map(
-                _get_common_prefix,
-                response.get("CommonPrefixes", ()),
-            )
-            # Chain paginated responses if necessary
-            if response.get("IsTruncated", False):
-                prefixes = chain(
-                    prefixes,
-                    list_objects_v2_prefixes(
-                        prefix=prefix,
-                        start_after=response["CommonPrefixes"][-1]["Prefix"],
-                    ),
-                )
-            return prefixes
-
         sub_directory: str
         sub_sub_directory: str
-        for sub_directory in list_objects_v2_prefixes(
+        for sub_directory in self._list_objects_v2_prefixes(
             prefix=self.get_absolute_path(directory)
         ):
             sub_directory = self.get_relative_path(sub_directory)
@@ -1320,6 +1323,35 @@ class SimpleStorageService(FileSystem):
         log.info(f'Deleting objects with prefix: "{directory}"')
         self.iter_object_summaries(directory).delete()
 
+    def copy(self, source: str, target: str) -> None:
+        """
+        Copy a file from a `source` path (relative to the root directory) to a
+        `target` path (relative to the root directory).
+
+        Parameters:
+        - source (str): The path of the file to copy.
+        - target (str): The path to which the file should be copied.
+        """
+
+        copy_source: Dict[str, str] = {
+            "Bucket": self.bucket.name,
+            "Key": source,
+        }
+
+        target_key: str = self.get_absolute_path(target)
+
+        target_object: Object = self.bucket.Object(
+            target_key,
+        )
+
+        try:
+            log.info(f"Attempting to copy file: {source}...")
+            target_object.copy_from(CopySource=copy_source)
+            log.info(f"...copy complete: {target_key}")
+        except Exception as error:
+            append_exception_text(error, f"\nFailed to copy: {source}")
+            raise error
+
     def delete_directory(self, directory: str) -> None:
         """
         Delete all files in a directory.
@@ -1378,7 +1410,7 @@ class SimpleStorageService(FileSystem):
         if not isinstance(file, bytes):
             try:
                 file.seek(0)
-            except AttributeError:
+            except (AttributeError, NotImplementedError):
                 pass
         # Where a metadata key matches system-defined metadata, they need
         # to be passed as keyword arguments
