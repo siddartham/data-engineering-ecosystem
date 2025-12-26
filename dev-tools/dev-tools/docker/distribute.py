@@ -114,7 +114,7 @@ def distribute_container(
         else:
             for value in sorted(build_arguments):
                 build_command.append(f"--build-arg {value}")
-    build_command.append(".")
+    build_command.append("")
     version: str = get_package_version(setup_script)
     # The *commands* variable is a tuple of lists, with each list representing
     # contingencies where only one of the commands needs to succeed in order

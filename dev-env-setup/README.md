@@ -259,3 +259,52 @@ Make is a build automation tool that is used to build software on Unix-like oper
 DBeaver is a free and open-source universal database tool for developers and database administrators. It provides a
 graphical user interface for managing databases and executing SQL commands. DBeaver is useful because it provides a
 simple and intuitive way to interact with databases.
+
+
+
+
+## Java Project Management
+
+### Maven 
+
+#### To Resolve Vulnerability
+
+To address a vulnerability, see the dependency tree on the parent dependency of the vulnerability 
+
+```shell
+mvn clean dependency:tree
+mvn versions:use-latest-releases -Dincludes={parent-dependency-groupid}:{artifactID} -DgenerateBackupPoms=false
+```
+
+#### To update all packages
+```shell
+mvn versions:display-dependency-updates
+mvn versions:use-next-releases
+```
+
+This command will modify `pom.xml` to use next available release version, effectively keeping you within the current major version while still applying minor or patch updates. The plugin will also create a `pom.xml.versionsBackup` file for easy rollback.
+
+#### 
+
+
+## Docker
+
+Q. To handle "Is the docker daemon running?" on Mac
+
+A.`Colima` - `Co`ntainers in `Lima` i.e `Li`nux on `Ma`c
+
+`Colima` creates a minimal VM with Docker or containerd inside the VM
+
+`Colima` is not hypervisor itself. It relies on `Lima`, which uses macOS's built-in hypervisor framework(or QEMU as fallback) to run a lightweight Linux VM. 
+It is a container runtime manager.
+
+Colima is an open-source alternative to Docker Desktop, which is resource intensive and requires paid licensing for commercial use.
+```shell
+brew install docker
+brew install colima
+export DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
+docker context use colima
+colima start
+docker ps
+bogie init # pulls image if it doesn't exist
+```
